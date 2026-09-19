@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Management Committee Console — Northgate College</title>
+<style>
+:root{
+  --bg:#ffffff;
+  --ink:#111111;
+  --ink-soft:#5b5b5b;
+  --ink-faint:#9a9a9a;
+  --line:#dcdcdc;
+  --line-strong:#b7b7b7;
+  --fill:#f4f4f4;
+  --sidebar:#070707;
+  --sidebar-line:#242424;
+  --sidebar-ink:#cfcfcf;
+  --sidebar-ink-dim:#7a7a7a;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{font-family:var(--sans);color:var(--ink);background:var(--bg);font-size:14.5px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+button,input,select,textarea{font-family:inherit;}
+.app{display:flex;min-height:100vh;}
+
+.sidebar{width:264px;flex-shrink:0;background:var(--sidebar);color:var(--sidebar-ink);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.brand{padding:26px 24px 18px;border-bottom:1px solid var(--sidebar-line);}
+.brand-mark{font-family:var(--serif);font-size:19px;color:#fff;letter-spacing:.01em;}
+.brand-sub{font-size:11px;color:var(--sidebar-ink-dim);margin-top:5px;}
+.nav{flex:1;padding:12px 10px;overflow-y:auto;}
+.nav-item{display:flex;align-items:center;gap:11px;width:100%;padding:9px 12px;background:none;border:none;color:var(--sidebar-ink);font-size:13px;text-align:left;cursor:pointer;border-left:2px solid transparent;font-family:var(--sans);}
+.nav-item:hover{color:#fff;}
+.nav-item.active{color:#fff;border-left-color:#fff;background:rgba(255,255,255,.06);}
+.nav-mono{width:30px;height:20px;border:1px solid var(--sidebar-line);display:flex;align-items:center;justify-content:center;font-size:9.5px;letter-spacing:.02em;color:var(--sidebar-ink-dim);flex-shrink:0;}
+.nav-item.active .nav-mono{border-color:#fff;color:#fff;}
+.sidebar-foot{padding:16px 24px;border-top:1px solid var(--sidebar-line);font-size:11.5px;color:var(--sidebar-ink-dim);}
+.sidebar-foot .who{color:#e6e6e6;font-size:12.5px;margin-bottom:2px;}
+
+.main{flex:1;min-width:0;}
+.topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;padding:28px 40px 20px;border-bottom:1px solid var(--line);flex-wrap:wrap;}
+.topbar h1{font-family:var(--serif);font-weight:400;font-size:26px;margin:0;}
+.topbar .desc{font-size:13px;color:var(--ink-soft);margin-top:6px;max-width:660px;}
+.topbar .actions{display:flex;gap:10px;flex-shrink:0;padding-top:2px;}
+.content{padding:32px 40px 90px;max-width:1180px;}
+
+.btn{font-family:var(--sans);font-size:13px;padding:9px 16px;border:1px solid var(--ink);background:var(--ink);color:#fff;cursor:pointer;white-space:nowrap;}
+.btn:hover{background:#000;}
+.btn-outline{background:transparent;color:var(--ink);border:1px solid var(--line-strong);}
+.btn-outline:hover{border-color:var(--ink);}
+.btn-small{padding:5px 11px;font-size:12px;}
+
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-bottom:38px;}
+.kpi{padding:20px 22px;border-left:1px solid var(--line);}
+.kpi:first-child{border-left:none;}
+.kpi .num{font-family:var(--serif);font-size:29px;font-variant-numeric:tabular-nums;}
+.kpi .label{font-size:11.8px;color:var(--ink-soft);margin-top:5px;}
+.kpi .delta{font-size:11.3px;margin-top:7px;color:var(--ink-faint);}
+
+.section-head{display:flex;justify-content:space-between;align-items:baseline;margin:44px 0 14px;flex-wrap:wrap;gap:6px;}
+.section-head h2{font-family:var(--serif);font-weight:400;font-size:18px;margin:0;}
+.section-head .hint{font-size:11.8px;color:var(--ink-faint);}
+.lede{font-size:13px;color:var(--ink-soft);margin:-8px 0 30px;max-width:680px;}
+
+.chart-wrap{border:1px solid var(--line);padding:22px 24px 16px;}
+.legend{display:flex;gap:20px;font-size:12px;color:var(--ink-soft);margin-top:12px;flex-wrap:wrap;}
+.legend span{display:inline-flex;align-items:center;gap:6px;}
+.swatch{width:10px;height:10px;display:inline-block;border:1px solid var(--ink);}
+
+.table-wrap{overflow-x:auto;border-bottom:1px solid var(--line);}
+table.ledger{width:100%;border-collapse:collapse;font-size:13px;min-width:560px;}
+table.ledger th{text-align:left;font-weight:500;color:var(--ink-soft);font-size:11.3px;padding:0 14px 10px;border-bottom:1px solid var(--ink);white-space:nowrap;}
+table.ledger td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top;}
+table.ledger tbody tr{cursor:pointer;}
+table.ledger tbody tr:hover{background:var(--fill);}
+table.ledger td.num, table.ledger th.num{text-align:right;font-variant-numeric:tabular-nums;}
+.tag{display:inline-block;font-size:10.8px;padding:2.5px 8px;border:1px solid var(--ink);white-space:nowrap;}
+.tag.dim{border-color:var(--line-strong);color:var(--ink-soft);}
+.row-actions{display:flex;gap:6px;}
+
+.dash-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));border-top:1px solid var(--ink);border-bottom:1px solid var(--line);margin:8px 0 40px;}
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);}
+.dash-card{background:#fff;padding:24px;cursor:pointer;}
+.dash-card:hover{background:var(--fill);}
+.dash-card .mono{width:34px;height:24px;border:1px solid var(--ink);display:flex;align-items:center;justify-content:center;font-size:10px;margin-bottom:16px;}
+.dash-card h4{font-family:var(--serif);font-weight:400;font-size:16px;margin:0 0 8px;}
+.dash-card p{font-size:12.3px;color:var(--ink-soft);margin:0 0 14px;min-height:50px;}
+.dash-card .metric{font-family:var(--serif);font-size:21px;}
+.dash-card .metric-label{font-size:11px;color:var(--ink-faint);}
+
+.branch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin-bottom:8px;}
+.branch-tile{background:#fff;padding:16px;}
+.branch-tile .name{font-size:11.5px;color:var(--ink-soft);margin-bottom:8px;}
+.branch-tile .score{font-family:var(--serif);font-size:24px;}
+.branch-tile .score.flag{color:var(--ink);}
+.branch-tile .tag{margin-top:8px;}
+
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.32);display:flex;align-items:center;justify-content:center;z-index:80;padding:20px;}
+.modal{background:#fff;width:480px;max-width:100%;max-height:92vh;overflow-y:auto;padding:30px 32px;border:1px solid var(--ink);}
+.modal h3{font-family:var(--serif);font-weight:400;font-size:21px;margin:0 0 4px;}
+.modal .sub{font-size:12.5px;color:var(--ink-soft);margin-bottom:22px;}
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:11.8px;color:var(--ink-soft);margin-bottom:6px;}
+.field input, .field select, .field textarea{width:100%;padding:9px 10px;border:1px solid var(--line-strong);font-family:var(--sans);font-size:13.5px;background:#fff;color:var(--ink);}
+.field input:focus, .field select:focus, .field textarea:focus{outline:2px solid var(--ink);outline-offset:1px;}
+.field textarea{min-height:78px;resize:vertical;}
+.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:24px;}
+
+.drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.25);z-index:70;display:flex;justify-content:flex-end;}
+.drawer{width:440px;max-width:94vw;background:#fff;height:100%;overflow-y:auto;padding:32px 34px;border-left:1px solid var(--ink);}
+.drawer .eyebrow{font-size:11.5px;color:var(--ink-faint);margin-bottom:6px;}
+.drawer h3{font-family:var(--serif);font-size:21px;font-weight:400;margin:0 0 18px;}
+.kv{display:flex;justify-content:space-between;gap:16px;padding:11px 0;border-bottom:1px solid var(--line);font-size:13px;}
+.kv .k{color:var(--ink-soft);flex-shrink:0;}
+.kv .v{text-align:right;}
+.drawer-actions{display:flex;gap:10px;margin-top:26px;flex-wrap:wrap;}
+.drawer-note{margin-top:20px;}
+.close-x{background:none;border:none;font-size:20px;color:var(--ink-soft);cursor:pointer;line-height:1;padding:0;}
+.drawer-top{display:flex;justify-content:space-between;align-items:flex-start;}
+.notice{border:1px solid var(--line-strong);padding:14px 16px;font-size:12.5px;color:var(--ink-soft);margin-top:18px;}
+
+.toast{position:fixed;bottom:26px;right:26px;background:#111;color:#fff;padding:13px 20px;font-size:13px;z-index:100;border:1px solid #000;}
+.empty{padding:40px 0;text-align:center;color:var(--ink-faint);font-size:13px;border:1px dashed var(--line-strong);}
+.pill-count{display:inline-block;font-size:11px;border:1px solid var(--ink);padding:2px 9px;margin-left:10px;}
+.checklist{list-style:none;padding:0;margin:18px 0 0;}
+.checklist li{padding:9px 0;border-bottom:1px solid var(--line);font-size:12.8px;color:var(--ink-soft);}
+.menu-btn{display:none;border:1px solid var(--line-strong);background:#fff;padding:8px 10px;cursor:pointer;margin-right:12px;}
+.title-row{display:flex;align-items:center;}
+
+@media (max-width:820px){
+  .sidebar{position:fixed;z-index:60;transform:translateX(-100%);transition:transform .2s;}
+  .sidebar.open{transform:translateX(0);}
+  .topbar,.content{padding-left:20px;padding-right:20px;}
+  .menu-btn{display:inline-flex !important;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <main class="main">
+    <div class="topbar" id="topbar"></div>
+    <div class="content" id="content"></div>
+  </main>
+</div>
+<div id="modal-root"></div>
+<div id="drawer-root"></div>
+<div id="toast-root"></div>
+
+<script>
+/* ============================= UTILITIES ============================= */
+const $ = sel => document.querySelector(sel);
+const num = n => Math.round(n).toLocaleString('en-US');
+function toast(msg){
+  const root = $('#toast-root');
+  root.innerHTML = `<div class="toast">${msg}</div>`;
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(()=>{ root.innerHTML=''; }, 2600);
+}
+function closeModal(){ $('#modal-root').innerHTML=''; }
+function closeDrawer(){ $('#drawer-root').innerHTML=''; }
+
+/* ============================= CHART (SVG bar) ============================= */
+function barChart(id, labels, series){
+  const w = Math.max(600, labels.length*Math.max(78, series.length*44));
+  const h = 210, padL=8, padB=30, padT=16, padR=8;
+  const max = Math.max(1, ...series.flatMap(s=>s.values)) * 1.18;
+  const groupW = (w-padL-padR)/labels.length;
+  const barW = Math.min(28, (groupW-16)/series.length);
+  let bars='';
+  labels.forEach((lab,li)=>{
+    const gx = padL + li*groupW + (groupW - (barW*series.length+(series.length-1)*6))/2;
+    series.forEach((s,si)=>{
+      const val = s.values[li];
+      const bh = (val/max)*(h-padT-padB);
+      const bx = gx + si*(barW+6);
+      const by = h-padB-bh;
+      const fillId = si===0? `url(#${id}-f0)` : si===1? `url(#${id}-f1)` : `url(#${id}-f2)`;
+      bars += `<rect x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(bh,0).toFixed(1)}" fill="${fillId}" stroke="#111" stroke-width="0.6"/>`;
+      bars += `<text x="${(bx+barW/2).toFixed(1)}" y="${(by-5).toFixed(1)}" font-size="9.2" text-anchor="middle" fill="#5b5b5b" font-family="sans-serif">${s.fmt?s.fmt(val):val}</text>`;
+    });
+    bars += `<text x="${(gx + (barW*series.length+(series.length-1)*6)/2).toFixed(1)}" y="${h-10}" font-size="9.8" text-anchor="middle" fill="#5b5b5b" font-family="sans-serif">${lab}</text>`;
+  });
+  bars += `<line x1="${padL}" y1="${h-padB}" x2="${w-padR}" y2="${h-padB}" stroke="#111" stroke-width="1"/>`;
+  return `<svg viewBox="0 0 ${w} ${h}" style="width:100%;height:${h}px;display:block;">
+    <defs>
+      <pattern id="${id}-f1" width="6" height="6" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"><rect width="6" height="6" fill="#fff"/><line x1="0" y1="0" x2="0" y2="6" stroke="#111" stroke-width="2.6"/></pattern>
+      <pattern id="${id}-f0" width="2" height="2" patternUnits="userSpaceOnUse"><rect width="2" height="2" fill="#111"/></pattern>
+      <pattern id="${id}-f2" width="2" height="2" patternUnits="userSpaceOnUse"><rect width="2" height="2" fill="#c7c7c7"/></pattern>
+    </defs>
+    ${bars}
+  </svg>`;
+}
+function chartLegend(series){
+  return `<div class="legend">${series.map((s,i)=>`<span><span class="swatch" style="background:${i===0?'#111':i===1?'repeating-linear-gradient(45deg,#111,#111 2px,#fff 2px,#fff 4px)':'#c7c7c7'}"></span>${s.name}</span>`).join('')}</div>`;
+}
+
+/* ============================= CONSTANTS ============================= */
+const BRANCHES = ['Operations','Academics','Business Development','Finance','HR','RTE','SSD','IT Support','Resource Management'];
+const BRANCH_FULL = {
+  'Operations':'Operations','Academics':'Academics','Business Development':'Business Development (BD)',
+  'Finance':'Finance','HR':'Human Resources','RTE':'Research, Training & Extension (RTE)',
+  'SSD':'Student Support Department (SSD)','IT Support':'IT Support','Resource Management':'Resource Management'
+};
+const REPORT_TYPES = ['Research Output','Placement Stats','Quality Indicator','Escalation'];
+
+/* ============================= STATE / MOCK DATA ============================= */
+const state = {
+  active:'dashboard',
+  roster:[
+    {name:'Dr. Elena Vasquez', role:'College CEO', type:'Fixed', branch:'Executive Office', termStart:'Permanent', termEnd:'—', status:'Active'},
+    {name:'Marcus Whitfield', role:'Chief Operating Officer', type:'Fixed', branch:'Executive Office', termStart:'Permanent', termEnd:'—', status:'Active'},
+    {name:'Dr. Priya Nandakumar', role:'Management Committee — Academics Rep.', type:'Dynamic', branch:'Academics', termStart:'Jan 2026', termEnd:'Dec 2026', status:'Active'},
+    {name:'Samuel Okafor', role:'Management Committee — Finance Rep.', type:'Dynamic', branch:'Finance', termStart:'Jan 2026', termEnd:'Dec 2026', status:'Active'},
+    {name:'Grace Lin', role:'Management Committee — HR Rep.', type:'Dynamic', branch:'HR', termStart:'Mar 2026', termEnd:'Feb 2027', status:'Active'},
+    {name:'Tomás Reyes', role:'Management Committee — BD Rep.', type:'Dynamic', branch:'Business Development', termStart:'Jan 2026', termEnd:'Dec 2026', status:'Active'},
+    {name:'Adaeze Chukwu', role:'Management Committee — Operations Rep.', type:'Dynamic', branch:'Operations', termStart:'Feb 2026', termEnd:'Jan 2027', status:'Active'},
+    {name:'—', role:'Management Committee — IT Support Rep.', type:'Dynamic', branch:'IT Support', termStart:'—', termEnd:'—', status:'Vacant'},
+    {name:'—', role:'Management Committee — RTE Rep.', type:'Dynamic', branch:'RTE', termStart:'—', termEnd:'—', status:'Vacant'},
+  ],
+  audits:[
+    {branch:'Academics', score:92, date:'Aug 2026', findings:1, auditor:'Dr. Priya Nandakumar', notes:'Strong module review cycle; documentation current.', trend:'Stable'},
+    {branch:'IT Support', score:93, date:'Aug 2026', findings:0, auditor:'IT Manager', notes:'Ticket SLA holding at 98%.', trend:'Stable'},
+    {branch:'HR', score:90, date:'Aug 2026', findings:1, auditor:'Grace Lin', notes:'Onboarding SLAs met across all departments.', trend:'Stable'},
+    {branch:'Finance', score:88, date:'Aug 2026', findings:2, auditor:'Samuel Okafor', notes:'Minor reconciliation delays in July close.', trend:'Improving'},
+    {branch:'RTE', score:87, date:'Jun 2026', findings:2, auditor:'RTE Coordinator', notes:'Research ethics documentation updated this cycle.', trend:'Improving'},
+    {branch:'Resource Management', score:86, date:'Jul 2026', findings:1, auditor:'Resource Mgmt Lead', notes:'Inventory audit clean; one asset tag mismatch.', trend:'Stable'},
+    {branch:'Business Development', score:84, date:'Jul 2026', findings:2, auditor:'Tomás Reyes', notes:'Partner pipeline reporting gaps identified.', trend:'Stable'},
+    {branch:'Operations', score:81, date:'Jul 2026', findings:3, auditor:'Adaeze Chukwu', notes:'Facilities maintenance ticket backlog above target.', trend:'Declining'},
+    {branch:'SSD', score:79, date:'Jul 2026', findings:4, auditor:'SSD Lead', notes:'Counselling wait-times above the 5-day target.', trend:'Declining'},
+  ],
+  reports:[
+    {branch:'RTE', type:'Research Output', headline:'Q2 research publications up 18% year-over-year', detail:'12 peer-reviewed papers published across Applied Sciences and Health faculties this quarter, ahead of the annual target pace.', date:'Aug 2026', status:'Reviewed', metric:'12 papers'},
+    {branch:'Business Development', type:'Placement Stats', headline:'Employer placement rate holds at 82% at six months', detail:'Placement tracking across all diploma programs shows steady performance against the 80% institutional target.', date:'Aug 2026', status:'Reviewed', metric:'82%'},
+    {branch:'Academics', type:'Quality Indicator', headline:'Module pass ratio composite at 88.3%', detail:'Aggregated pass ratio across departments, consistent with the prior quarter’s reading.', date:'Jul 2026', status:'Reviewed', metric:'88.3%'},
+    {branch:'SSD', type:'Escalation', headline:'Counselling wait-times exceed target', detail:'Student Support was flagged in the latest quality audit — average wait time is now 9 days against a 5-day target.', date:'Jul 2026', status:'Pending review', metric:'9 days'},
+  ],
+};
+
+/* ============================= NAV / TITLES ============================= */
+const NAV = [
+  {id:'dashboard', label:'Overview', mono:'OV'},
+  {id:'roster', label:'Executive Council', mono:'EC'},
+  {id:'audits', label:'Quality Check Panels', mono:'QC'},
+  {id:'reports', label:'Strategic Alignment', mono:'SA'},
+];
+const TITLES = {
+  dashboard:{title:'Governance overview', desc:'Fixed executive leadership, cross-branch quality standing, and the live reporting channel into the Management Committee.'},
+  roster:{title:'Fixed Executive Council & Committee Roster', desc:'The College CEO and COO anchor the council as permanent leadership heads. Management Committee seats are dynamic — appointed by branch, with fixed terms.'},
+  audits:{title:'Operational Quality Check Panels', desc:'Live compliance metrics across all 9 operational branches: Operations, Academics, BD, Finance, HR, RTE, SSD, IT Support and Resource Management.'},
+  reports:{title:'Strategic Alignment Node', desc:'Research output benchmarks, placement statistics and educational quality indicators, fed directly to the Management Committee for review.'},
+};
+
+/* ============================= DASHBOARD ============================= */
+function latestAuditByBranch(){
+  const seen = {};
+  const latest = [];
+  state.audits.forEach(a=>{ if(!seen[a.branch]){ seen[a.branch]=true; latest.push(a); } });
+  return latest;
+}
+function renderDashboard(){
+  const latest = latestAuditByBranch();
+  const qualityIndex = latest.reduce((a,r)=>a+r.score,0)/latest.length;
+  const flagged = latest.filter(r=>r.score<85).length;
+  const fixedFilled = state.roster.filter(r=>r.type==='Fixed' && r.status==='Active').length;
+  const vacantSeats = state.roster.filter(r=>r.type==='Dynamic' && r.status==='Vacant').length;
+  const pendingReports = state.reports.filter(r=>r.status==='Pending review').length;
+
+  return `
+    <div class="dash-strip kpi-row">
+      <div class="kpi"><div class="num">${fixedFilled} / 2</div><div class="label">Fixed leadership seats filled</div></div>
+      <div class="kpi"><div class="num">${qualityIndex.toFixed(1)}%</div><div class="label">Composite quality index</div></div>
+      <div class="kpi"><div class="num">${flagged} / 9</div><div class="label">Branches flagged below target</div></div>
+      <div class="kpi"><div class="num">${pendingReports}</div><div class="label">Reports awaiting committee review</div></div>
+    </div>
+
+    <div class="section-head"><h2>Branch quality standing</h2><span class="hint">Most recent audit per branch · click a tile to open the full panel</span></div>
+    <div class="branch-grid">
+      ${BRANCHES.map(b=>{
+        const a = latest.find(x=>x.branch===b);
+        const s = a ? a.score : null;
+        return `<div class="branch-tile" style="cursor:pointer;" onclick="navigate('audits')">
+          <div class="name">${b}</div>
+          <div class="score ${s!==null && s<85?'flag':''}">${s!==null?s+'%':'—'}</div>
+          <span class="tag ${s!==null && s<85?'dim':''}">${s!==null?(s>=85?'Pass':'Flagged'):'No data'}</span>
+        </div>`;
+      }).join('')}
+    </div>
+
+    <div class="section-head"><h2>Governance & reporting modules</h2><span class="hint">3 areas of oversight</span></div>
+    <div class="dash-grid">
+      <div class="dash-card" onclick="navigate('roster')">
+        <div class="mono">EC</div>
+        <h4>${TITLES.roster.title}</h4>
+        <p>${TITLES.roster.desc}</p>
+        <div class="metric">${state.roster.filter(r=>r.status==='Active').length} / ${state.roster.length}</div>
+        <div class="metric-label">Seats currently filled</div>
+      </div>
+      <div class="dash-card" onclick="navigate('audits')">
+        <div class="mono">QC</div>
+        <h4>${TITLES.audits.title}</h4>
+        <p>${TITLES.audits.desc}</p>
+        <div class="metric">${qualityIndex.toFixed(1)}%</div>
+        <div class="metric-label">Composite quality index</div>
+      </div>
+      <div class="dash-card" onclick="navigate('reports')">
+        <div class="mono">SA</div>
+        <h4>${TITLES.reports.title}</h4>
+        <p>${TITLES.reports.desc}</p>
+        <div class="metric">${vacantSeats + pendingReports}</div>
+        <div class="metric-label">Vacant seats + pending items needing attention</div>
+      </div>
+    </div>
+  `;
+}
+
+/* ============================= FEATURE 1: EXECUTIVE COUNCIL & ROSTER ============================= */
+function renderRoster(){
+  const rows = state.roster;
+  const fixedFilled = rows.filter(r=>r.type==='Fixed' && r.status==='Active').length;
+  const activeDynamic = rows.filter(r=>r.type==='Dynamic' && r.status==='Active').length;
+  const vacant = rows.filter(r=>r.status==='Vacant').length;
+  return `
+    <div class="kpi-row">
+      <div class="kpi"><div class="num">${fixedFilled} / 2</div><div class="label">Fixed leadership seats</div><div class="delta">College CEO &amp; COO</div></div>
+      <div class="kpi"><div class="num">${activeDynamic}</div><div class="label">Active committee seats</div></div>
+      <div class="kpi"><div class="num">${vacant}</div><div class="label">Vacant committee seats</div></div>
+      <div class="kpi"><div class="num">11 mo</div><div class="label">Avg. committee term length</div></div>
+    </div>
+    <div class="section-head"><h2>Permanent leadership</h2><span class="hint">Cannot be reassigned from this panel</span></div>
+    ${renderRosterTable(rows.filter(r=>r.type==='Fixed'))}
+    <div class="section-head"><h2>Management Committee — dynamic seats</h2><span class="hint">${rows.filter(r=>r.type==='Dynamic').length} seats · one per operational branch</span></div>
+    ${renderRosterTable(rows.filter(r=>r.type==='Dynamic'))}
+  `;
+}
+function renderRosterTable(rows){
+  return `<div class="table-wrap"><table class="ledger"><thead><tr>
+    <th>Name</th><th>Role</th><th>Type</th><th>Branch</th><th>Term</th><th>Status</th>
+  </tr></thead><tbody>
+    ${rows.map((r)=>`<tr onclick="openRosterDetail(${state.roster.indexOf(r)})">
+      <td>${r.name}</td>
+      <td>${r.role}</td>
+      <td><span class="tag ${r.type==='Dynamic'?'dim':''}">${r.type}</span></td>
+      <td>${r.branch}</td>
+      <td>${r.termStart} ${r.termEnd!=='—'?'– '+r.termEnd:''}</td>
+      <td>${r.status==='Active'?'<span class="tag">Active</span>': r.status==='Vacant'?'<span class="tag dim">Vacant</span>':'<span class="tag dim">Rotated out</span>'}</td>
+    </tr>`).join('')}
+  </tbody></table></div>`;
+}
+function openRosterModal(){
+  $('#modal-root').innerHTML = `<div class="overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <h3>Appoint committee member</h3>
+      <div class="sub">Fill a dynamic Management Committee seat. Fixed leadership seats (CEO, COO) are not editable here.</div>
+      <form onsubmit="submitRoster(event)">
+        <div class="field"><label>Name</label><input name="name" required placeholder="e.g. Wei Zhang"></div>
+        <div class="field"><label>Branch represented</label>
+          <select name="branch">${BRANCHES.map(b=>`<option>${b}</option>`).join('')}</select>
+        </div>
+        <div class="field"><label>Term start</label><input name="termStart" required placeholder="e.g. Oct 2026"></div>
+        <div class="field"><label>Term end</label><input name="termEnd" required placeholder="e.g. Sep 2027"></div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
+          <button type="submit" class="btn">Appoint member</button>
+        </div>
+      </form>
+    </div>
+  </div>`;
+}
+function submitRoster(e){
+  e.preventDefault();
+  const f = e.target;
+  const branch = f.branch.value;
+  // if a vacant seat exists for this branch, fill it; otherwise add a new dynamic seat
+  const vacantIdx = state.roster.findIndex(r=>r.type==='Dynamic' && r.branch===branch && r.status==='Vacant');
+  if(vacantIdx>-1){
+    state.roster[vacantIdx] = {...state.roster[vacantIdx], name:f.name.value, termStart:f.termStart.value, termEnd:f.termEnd.value, status:'Active'};
+  } else {
+    state.roster.push({name:f.name.value, role:`Management Committee — ${branch} Rep.`, type:'Dynamic', branch, termStart:f.termStart.value, termEnd:f.termEnd.value, status:'Active'});
+  }
+  closeModal();
+  if(state.active==='roster') renderContent();
+  toast('Committee member appointed.');
+}
+function openRosterDetail(idx){
+  const r = state.roster[idx];
+  const isFixed = r.type==='Fixed';
+  $('#drawer-root').innerHTML = `<div class="drawer-overlay" onclick="if(event.target===this)closeDrawer()">
+    <div class="drawer">
+      <div class="drawer-top"><div><div class="eyebrow">${r.type==='Fixed'?'Permanent leadership':'Management Committee'}</div><h3>${r.name}</h3></div><button class="close-x" onclick="closeDrawer()">&times;</button></div>
+      <div class="kv"><span class="k">Role</span><span class="v">${r.role}</span></div>
+      <div class="kv"><span class="k">Branch</span><span class="v">${r.branch}</span></div>
+      <div class="kv"><span class="k">Term</span><span class="v">${r.termStart}${r.termEnd!=='—'?' – '+r.termEnd:''}</span></div>
+      <div class="kv"><span class="k">Status</span><span class="v">${r.status}</span></div>
+      ${isFixed ? `<div class="notice">${r.role} is a fixed executive council head. This seat is permanent and cannot be reassigned or rotated from this panel.</div>` : ''}
+      <div class="drawer-actions">
+        ${!isFixed && r.status==='Active' ? `<button class="btn" onclick="endTerm(${idx})">End term</button>` : ''}
+        ${!isFixed && r.status==='Vacant' ? `<button class="btn" onclick="closeDrawer();openRosterModal();">Appoint to this seat</button>` : ''}
+        <button class="btn btn-outline" onclick="closeDrawer()">Close</button>
+      </div>
+    </div>
+  </div>`;
+}
+function endTerm(idx){
+  state.roster[idx].status = 'Vacant';
+  state.roster[idx].name = '—';
+  state.roster[idx].termStart = '—';
+  state.roster[idx].termEnd = '—';
+  closeDrawer();
+  if(state.active==='roster') renderContent();
+  toast('Term ended — seat is now vacant.');
+}
+
+/* ============================= FEATURE 2: OPERATIONAL QUALITY CHECK PANELS ============================= */
+function renderAudits(){
+  const latest = latestAuditByBranch();
+  const qualityIndex = latest.reduce((a,r)=>a+r.score,0)/latest.length;
+  const passing = latest.filter(r=>r.score>=85).length;
+  const flagged = latest.length - passing;
+  return `
+    <div class="kpi-row">
+      <div class="kpi"><div class="num">${qualityIndex.toFixed(1)}%</div><div class="label">Composite quality index</div></div>
+      <div class="kpi"><div class="num">${passing} / 9</div><div class="label">Branches passing (≥85%)</div></div>
+      <div class="kpi"><div class="num">${flagged} / 9</div><div class="label">Branches flagged</div></div>
+      <div class="kpi"><div class="num">${state.audits.length}</div><div class="label">Audits logged this cycle</div></div>
+    </div>
+    <div class="section-head"><h2>Score by branch</h2><span class="hint">Most recent audit result</span></div>
+    <div class="chart-wrap">${barChart('audits-chart', latest.map(r=>r.branch.split(' ')[0]), [{name:'Score %', values:latest.map(r=>r.score)}])}</div>
+    <div class="section-head"><h2>Audit log</h2><span class="hint">${state.audits.length} entries · most recent first · click a row for full detail</span></div>
+    <div class="table-wrap"><table class="ledger"><thead><tr>
+      <th>Branch</th><th>Score</th><th>Date</th><th>Findings</th><th>Trend</th><th>Status</th>
+    </tr></thead><tbody>
+      ${state.audits.map((a,i)=>`<tr onclick="openAuditDetail(${i})">
+        <td>${a.branch}</td>
+        <td class="num">${a.score}%</td>
+        <td>${a.date}</td>
+        <td class="num">${a.findings}</td>
+        <td>${a.trend}</td>
+        <td>${a.score>=85?'<span class="tag">Pass</span>':'<span class="tag dim">Flagged</span>'}</td>
+      </tr>`).join('')}
+    </tbody></table></div>
+  `;
+}
+function openAuditModal(){
+  $('#modal-root').innerHTML = `<div class="overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <h3>Run quality audit</h3>
+      <div class="sub">Log a new compliance and quality audit result for an operational branch.</div>
+      <form onsubmit="submitAudit(event)">
+        <div class="field"><label>Branch</label><select name="branch">${BRANCHES.map(b=>`<option>${b}</option>`).join('')}</select></div>
+        <div class="field"><label>Score (%)</label><input name="score" type="number" min="0" max="100" required placeholder="0–100"></div>
+        <div class="field"><label>Open findings</label><input name="findings" type="number" min="0" placeholder="0"></div>
+        <div class="field"><label>Auditor</label><input name="auditor" placeholder="e.g. Management Committee"></div>
+        <div class="field"><label>Notes</label><textarea name="notes" placeholder="Summary of findings"></textarea></div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
+          <button type="submit" class="btn">Log audit</button>
+        </div>
+      </form>
+    </div>
+  </div>`;
+}
+function submitAudit(e){
+  e.preventDefault();
+  const f = e.target;
+  state.audits.unshift({
+    branch:f.branch.value, score:+f.score.value||0, date:'Sep 2026',
+    findings:+f.findings.value||0, auditor:f.auditor.value||'Management Committee',
+    notes:f.notes.value||'', trend:'Stable'
+  });
+  closeModal();
+  if(state.active==='audits') renderContent();
+  toast('Audit logged.');
+}
+function openAuditDetail(i){
+  const a = state.audits[i];
+  $('#drawer-root').innerHTML = `<div class="drawer-overlay" onclick="if(event.target===this)closeDrawer()">
+    <div class="drawer">
+      <div class="drawer-top"><div><div class="eyebrow">${BRANCH_FULL[a.branch]||a.branch}</div><h3>Quality audit — ${a.date}</h3></div><button class="close-x" onclick="closeDrawer()">&times;</button></div>
+      <div class="kv"><span class="k">Score</span><span class="v">${a.score}%</span></div>
+      <div class="kv"><span class="k">Open findings</span><span class="v">${a.findings}</span></div>
+      <div class="kv"><span class="k">Trend</span><span class="v">${a.trend}</span></div>
+      <div class="kv"><span class="k">Auditor</span><span class="v">${a.auditor}</span></div>
+      <div class="kv"><span class="k">Status</span><span class="v">${a.score>=85?'Pass':'Flagged'}</span></div>
+      ${a.notes?`<div class="kv"><span class="k">Notes</span><span class="v">${a.notes}</span></div>`:''}
+      <ul class="checklist">
+        <li>Documentation and record-keeping reviewed</li>
+        <li>Staff credentialing and training verified</li>
+        <li>Service-level targets checked against branch KPIs</li>
+        <li>Prior-cycle findings followed up</li>
+      </ul>
+      <div class="drawer-actions">
+        <button class="btn" onclick="escalateAudit(${i})">Escalate to Committee</button>
+        <button class="btn btn-outline" onclick="closeDrawer()">Close</button>
+      </div>
+    </div>
+  </div>`;
+}
+function escalateAudit(i){
+  const a = state.audits[i];
+  state.reports.unshift({
+    branch:a.branch, type:'Escalation',
+    headline:`Quality audit flag — ${a.branch}`,
+    detail:a.notes || `${a.branch} scored ${a.score}% in the latest quality check, with ${a.findings} open findings.`,
+    date:'Sep 2026', status:'Pending review', metric:a.score+'%'
+  });
+  closeDrawer();
+  if(state.active==='audits') renderContent();
+  toast('Escalated to the Strategic Alignment Node.');
+}
+
+/* ============================= FEATURE 3: STRATEGIC ALIGNMENT NODE ============================= */
+function renderReports(){
+  const rows = state.reports;
+  const pending = rows.filter(r=>r.status==='Pending review').length;
+  const byType = REPORT_TYPES.map(t=>rows.filter(r=>r.type===t).length);
+  return `
+    <div class="kpi-row">
+      <div class="kpi"><div class="num">+18%</div><div class="label">Research output, YoY</div></div>
+      <div class="kpi"><div class="num">82%</div><div class="label">Placement rate, 6-month</div></div>
+      <div class="kpi"><div class="num">88.3%</div><div class="label">Educational quality composite</div></div>
+      <div class="kpi"><div class="num">${pending}</div><div class="label">Pending committee review</div></div>
+    </div>
+    <div class="section-head"><h2>Reports by type</h2><span class="hint">All items on the reporting channel</span></div>
+    <div class="chart-wrap">${barChart('reports-chart', REPORT_TYPES.map(t=>t.split(' ')[0]), [{name:'Items', values:byType}])}</div>
+    <div class="section-head"><h2>Reporting channel</h2><span class="hint">${rows.length} items · most recent first · click a row for full detail</span></div>
+    <div class="table-wrap"><table class="ledger"><thead><tr>
+      <th>Branch</th><th>Type</th><th>Headline</th><th>Date</th><th>Status</th>
+    </tr></thead><tbody>
+      ${rows.map((r,i)=>`<tr onclick="openReportDetail(${i})">
+        <td>${r.branch}</td>
+        <td><span class="tag ${r.type==='Escalation'?'':'dim'}">${r.type}</span></td>
+        <td>${r.headline}</td>
+        <td>${r.date}</td>
+        <td>${r.status==='Reviewed'?'<span class="tag dim">Reviewed</span>':'<span class="tag">Pending review</span>'}</td>
+      </tr>`).join('')}
+    </tbody></table></div>
+  `;
+}
+function openReportModal(){
+  $('#modal-root').innerHTML = `<div class="overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <h3>Submit report to committee</h3>
+      <div class="sub">Feed a research, placement or quality indicator directly to the Management Committee.</div>
+      <form onsubmit="submitReport(event)">
+        <div class="field"><label>Source branch</label><select name="branch">${BRANCHES.map(b=>`<option>${b}</option>`).join('')}</select></div>
+        <div class="field"><label>Type</label><select name="type">${REPORT_TYPES.map(t=>`<option>${t}</option>`).join('')}</select></div>
+        <div class="field"><label>Headline</label><input name="headline" required placeholder="e.g. Internship conversion rate up 6pt"></div>
+        <div class="field"><label>Detail</label><textarea name="detail" placeholder="Context and supporting detail"></textarea></div>
+        <div class="field"><label>Metric value (optional)</label><input name="metric" placeholder="e.g. 74%"></div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
+          <button type="submit" class="btn">Submit report</button>
+        </div>
+      </form>
+    </div>
+  </div>`;
+}
+function submitReport(e){
+  e.preventDefault();
+  const f = e.target;
+  state.reports.unshift({
+    branch:f.branch.value, type:f.type.value, headline:f.headline.value,
+    detail:f.detail.value||'', date:'Sep 2026', status:'Pending review', metric:f.metric.value||'—'
+  });
+  closeModal();
+  if(state.active==='reports') renderContent();
+  toast('Report submitted to the Management Committee.');
+}
+function openReportDetail(i){
+  const r = state.reports[i];
+  $('#drawer-root').innerHTML = `<div class="drawer-overlay" onclick="if(event.target===this)closeDrawer()">
+    <div class="drawer">
+      <div class="drawer-top"><div><div class="eyebrow">${r.branch} · ${r.type}</div><h3>${r.headline}</h3></div><button class="close-x" onclick="closeDrawer()">&times;</button></div>
+      <div class="kv"><span class="k">Metric</span><span class="v">${r.metric}</span></div>
+      <div class="kv"><span class="k">Date</span><span class="v">${r.date}</span></div>
+      <div class="kv"><span class="k">Status</span><span class="v">${r.status}</span></div>
+      ${r.detail?`<div class="kv"><span class="k">Detail</span><span class="v">${r.detail}</span></div>`:''}
+      <div class="drawer-actions">
+        ${r.status==='Pending review' ? `<button class="btn" onclick="markReviewed(${i})">Mark reviewed</button>` : ''}
+        <button class="btn btn-outline" onclick="closeDrawer()">Close</button>
+      </div>
+    </div>
+  </div>`;
+}
+function markReviewed(i){
+  state.reports[i].status = 'Reviewed';
+  closeDrawer();
+  if(state.active==='reports') renderContent();
+  toast('Marked reviewed by the Management Committee.');
+}
+
+/* ============================= TOP-LEVEL RENDER ============================= */
+function renderSidebar(){
+  $('#sidebar').innerHTML = `
+    <div class="brand">
+      <div class="brand-mark">ING College OS</div>
+      <div class="brand-sub">Management Committee Console — Northgate College</div>
+    </div>
+    <nav class="nav">
+      ${NAV.map(n=>`<button class="nav-item" data-id="${n.id}" onclick="navigate('${n.id}')"><span class="nav-mono">${n.mono}</span>${n.label}</button>`).join('')}
+    </nav>
+    <div class="sidebar-foot">
+      <div class="who">Signed in as Management Committee</div>
+      Northgate College · ING Network
+    </div>
+  `;
+}
+function renderTopbar(){
+  const t = TITLES[state.active];
+  let actionsHtml = '';
+  if(state.active==='roster') actionsHtml = `<button class="btn" onclick="openRosterModal()">+ Appoint committee member</button>`;
+  else if(state.active==='audits') actionsHtml = `<button class="btn" onclick="openAuditModal()">+ Run quality audit</button>`;
+  else if(state.active==='reports') actionsHtml = `<button class="btn" onclick="openReportModal()">+ Submit report</button>`;
+  $('#topbar').innerHTML = `
+    <div>
+      <div class="title-row"><button class="menu-btn" onclick="toggleSidebar()">&#9776;</button><h1>${t.title}</h1></div>
+      <div class="desc">${t.desc}</div>
+    </div>
+    <div class="actions">${actionsHtml}</div>
+  `;
+}
+function renderContent(){
+  let html = '';
+  if(state.active==='dashboard') html = renderDashboard();
+  else if(state.active==='roster') html = renderRoster();
+  else if(state.active==='audits') html = renderAudits();
+  else if(state.active==='reports') html = renderReports();
+  $('#content').innerHTML = html;
+}
+function navigate(id){
+  state.active = id;
+  document.querySelectorAll('.nav-item').forEach(el=>{
+    el.classList.toggle('active', el.getAttribute('data-id')===id);
+  });
+  renderTopbar();
+  renderContent();
+  closeModal(); closeDrawer();
+  document.getElementById('sidebar').classList.remove('open');
+  window.scrollTo(0,0);
+}
+function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); }
+
+/* ============================= INIT ============================= */
+renderSidebar();
+navigate('dashboard');
+</script>
+</body>
+</html>

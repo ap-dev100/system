@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ING ERP — Human Resources</title>
+<style>
+  :root{
+    --surface-1:#fafafa;
+    --surface-2:#f2f2f2;
+    --border:#e6e6e6;
+    --border-strong:#cfcfcf;
+    --text-primary:#111111;
+    --text-secondary:#5a5a5e;
+    --text-muted:#9a9a9e;
+    --fill-primary:#000000;
+    --on-primary:#ffffff;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--surface-2);color:var(--text-primary);}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;background:#fff;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:10px;}
+  .topbar .who{font-size:12px;color:var(--text-secondary);}
+  .topbar .who strong{color:var(--text-primary);font-weight:600;}
+  .app{display:flex;min-height:100vh;}
+  .sidebar{width:225px;flex-shrink:0;background:var(--surface-1);border-right:1px solid var(--border);padding:18px 12px;overflow-y:auto;}
+  .brand{display:flex;align-items:center;gap:10px;padding:0 8px 14px;}
+  .brand .mark{width:24px;height:24px;border-radius:6px;background:var(--fill-primary);flex-shrink:0;}
+  .brand .name{font-size:13px;font-weight:600;line-height:1.3;}
+  .brand .role{font-size:11px;color:var(--text-muted);line-height:1.3;}
+  .nav-item{display:block;padding:7px 10px;border-radius:7px;font-size:13px;color:var(--text-secondary);cursor:pointer;margin-bottom:2px;}
+  .nav-item:hover{background:var(--surface-2);}
+  .nav-item.active{background:var(--fill-primary);color:var(--on-primary);}
+  .nav-divider{border-top:1px solid var(--border);margin:10px 4px;}
+  .group{margin-bottom:12px;}
+  .group-label{font-size:11px;font-weight:600;color:var(--text-muted);margin:0 0 4px 10px;}
+  .main{flex:1;padding:32px 36px;min-width:0;}
+  .page{display:none;}
+  .page.active{display:block;}
+  .page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:12px;}
+  h1{font-size:22px;margin:0;font-weight:600;}
+  .subtitle{font-size:13px;color:var(--text-secondary);margin:5px 0 0;}
+  .section-label{font-size:12px;font-weight:600;color:var(--text-muted);margin:0 0 8px;}
+  button.primary{background:var(--fill-primary);color:var(--on-primary);border:none;border-radius:8px;padding:10px 16px;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;}
+  button.secondary{background:#fff;color:var(--text-primary);border:1px solid var(--border-strong);border-radius:8px;padding:10px 16px;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;}
+  .link-btn{background:none;border:none;color:var(--text-primary);font-size:12px;font-weight:600;text-decoration:underline;cursor:pointer;padding:0;white-space:nowrap;}
+  .toolbar{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;align-items:center;}
+  input[type=text], input[type=number], input[type=date], select, textarea{border:1px solid var(--border-strong);border-radius:8px;padding:10px 12px;font-size:13px;background:#fff;color:var(--text-primary);font-family:inherit;}
+  input[type=text]{flex:1;min-width:160px;}
+  select{width:170px;}
+  .badge{font-size:11px;padding:2px 9px;border-radius:999px;white-space:nowrap;}
+  .badge.filled{background:var(--fill-primary);color:var(--on-primary);}
+  .badge.outline{border:1px solid var(--border-strong);color:var(--text-secondary);}
+  .badge.dashed{border:1px dashed var(--border-strong);color:var(--text-secondary);}
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+  .stat-grid.cols-3{grid-template-columns:repeat(3,1fr);}
+  .stat-card{border:1px solid var(--border);border-radius:var(--radius);background:#fff;padding:16px 18px;}
+  .stat-value{font-size:22px;font-weight:700;}
+  .stat-label{font-size:12px;color:var(--text-secondary);margin-top:4px;}
+  .list{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:#fff;}
+  .list-row{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;gap:14px;border-bottom:1px solid var(--border);}
+  .list-row:last-child{border-bottom:none;}
+  .list-row .primary-text{font-size:14px;font-weight:600;}
+  .list-row .secondary-text{font-size:12px;color:var(--text-secondary);margin-top:3px;}
+  .list-row .right{display:flex;align-items:center;gap:10px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;}
+  .table-wrap{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:#fff;overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;}
+  th,td{padding:11px 13px;font-size:13px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;}
+  th{font-weight:600;color:var(--text-secondary);background:var(--surface-1);font-size:12px;}
+  tbody tr:last-child td{border-bottom:none;}
+  td.num{text-align:right;font-variant-numeric:tabular-nums;}
+  .org-level{margin-left:20px;border-left:1px solid var(--border-strong);padding-left:14px;margin-top:6px;}
+  .org-node{font-size:13px;padding:4px 0;}
+  .check-row{display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:10px;}
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:50;align-items:center;justify-content:center;padding:20px;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:#fff;border-radius:12px;max-width:460px;width:100%;max-height:86vh;overflow-y:auto;border:1px solid var(--border-strong);}
+  .modal-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);}
+  .modal-header h3{margin:0;font-size:16px;}
+  .modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-secondary);line-height:1;padding:4px;}
+  .modal-body{padding:18px 20px;}
+  .modal-footer{display:flex;justify-content:flex-end;gap:8px;padding:14px 20px;border-top:1px solid var(--border);}
+  .form-group{margin-bottom:14px;}
+  .form-group label{display:block;font-size:12px;color:var(--text-secondary);margin-bottom:5px;font-weight:600;}
+  .form-group input, .form-group select, .form-group textarea{width:100%;}
+  .form-group textarea{resize:vertical;min-height:70px;}
+  .form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px;}
+  .form-row-2 input, .form-row-2 select{width:100%;}
+  @media (max-width:640px){ .sidebar{display:none;} .main{padding:22px;} .stat-grid{grid-template-columns:1fr 1fr;} }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="who">Signed in as <strong>Ms. Anjana Bhattarai</strong> — HR Manager</div>
+  <div class="who">Employee lifecycle, performance, and recruitment</div>
+</div>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="mark"></div><div><div class="name">ING ERP</div><div class="role">Human Resources</div></div></div>
+    <div class="nav-item active" data-page="dashboard" onclick="showPage('dashboard', this)">Dashboard</div>
+    <div class="nav-divider"></div>
+    <nav>
+      <div class="group"><p class="group-label">Lifecycle</p>
+        <div class="nav-item" data-page="lifecycle" onclick="showPage('lifecycle', this)">Employee archives</div>
+        <div class="nav-item" data-page="onboarding" onclick="showPage('onboarding', this)">New hire onboarding</div>
+        <div class="nav-item" data-page="exitinterview" onclick="showPage('exitinterview', this)">Exit interviews</div>
+      </div>
+      <div class="group"><p class="group-label">Recruitment</p>
+        <div class="nav-item" data-page="applicants" onclick="showPage('applicants', this)">Applicant tracking</div>
+        <div class="nav-item" data-page="orgchart" onclick="showPage('orgchart', this)">Org chart</div>
+        <div class="nav-item" data-page="succession" onclick="showPage('succession', this)">Succession planning</div>
+      </div>
+      <div class="group"><p class="group-label">Performance</p>
+        <div class="nav-item" data-page="appraisals" onclick="showPage('appraisals', this)">Annual appraisals</div>
+        <div class="nav-item" data-page="quarterlyreview" onclick="showPage('quarterlyreview', this)">90-day reviews</div>
+      </div>
+      <div class="group"><p class="group-label">Time &amp; leave</p>
+        <div class="nav-item" data-page="leave" onclick="showPage('leave', this)">Leave allocation</div>
+        <div class="nav-item" data-page="attendance" onclick="showPage('attendance', this)">Attendance sync</div>
+        <div class="nav-item" data-page="remotework" onclick="showPage('remotework', this)">Remote work</div>
+      </div>
+      <div class="group"><p class="group-label">Development &amp; benefits</p>
+        <div class="nav-item" data-page="profdev" onclick="showPage('profdev', this)">Professional development</div>
+        <div class="nav-item" data-page="benefits" onclick="showPage('benefits', this)">Benefits</div>
+        <div class="nav-item" data-page="salarybench" onclick="showPage('salarybench', this)">Salary benchmarking</div>
+      </div>
+      <div class="group"><p class="group-label">Compliance</p>
+        <div class="nav-item" data-page="grievance" onclick="showPage('grievance', this)">Grievance registry</div>
+        <div class="nav-item" data-page="compliance" onclick="showPage('compliance', this)">Compliance reports</div>
+      </div>
+    </nav>
+  </aside>
+
+  <main class="main">
+
+    <section class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div><h1>HR overview</h1><p class="subtitle">Employee lifecycle across all departments</p></div>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-value">24</div><div class="stat-label">Total staff</div></div>
+        <div class="stat-card"><div class="stat-value">3</div><div class="stat-label">Open positions</div></div>
+        <div class="stat-card"><div class="stat-value">5</div><div class="stat-label">Reviews due this month</div></div>
+        <div class="stat-card"><div class="stat-value">1</div><div class="stat-label">Onboarding in progress</div></div>
+      </div>
+      <div class="list" style="margin-bottom:20px;">
+        <div class="list-row"><div><div class="primary-text">Dr. Sita Poudel is mid-onboarding</div><div class="secondary-text">R&amp;D Wing — training module still pending</div></div><div class="right"><button class="link-btn" onclick="goTo('onboarding')">Open</button></div></div>
+        <div class="list-row"><div><div class="primary-text">5 quarterly 90-day reviews due</div><div class="secondary-text">Including Dr. Sita Poudel and Prakriti Sunar</div></div><div class="right"><button class="link-btn" onclick="goTo('quarterlyreview')">Review</button></div></div>
+        <div class="list-row"><div><div class="primary-text">1 grievance case open</div><div class="secondary-text">Under confidential investigation</div></div><div class="right"><button class="link-btn" onclick="goTo('grievance')">Open</button></div></div>
+      </div>
+      <div class="toolbar">
+        <button class="secondary" onclick="openNewHire()">+ New hire</button>
+        <button class="secondary" onclick="openPostJob()">+ Post job opening</button>
+        <button class="secondary" onclick="openLogLeave()">+ Log leave request</button>
+      </div>
+    </section>
+
+    <section class="page" id="page-lifecycle">
+      <div class="page-header">
+        <div><h1>Employee Lifecycle Archives</h1><p class="subtitle">Contracts, reference checks, promotions, separations</p></div>
+      </div>
+      <div class="toolbar"><input type="text" placeholder="Search staff" oninput="filterRows(this,'#lifecycle-list','.list-row')"></div>
+      <div class="list" id="lifecycle-list">
+        <div class="list-row"><div><div class="primary-text">Dr. Meera Joshi</div><div class="secondary-text">Academics — Faculty — joined Jan 2022</div></div><div class="right"><span class="badge filled">Active</span><button class="link-btn" onclick="viewProfile(this)">Profile</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Dr. Anil Sharma</div><div class="secondary-text">Module Leader — Faculty — joined Aug 2019</div></div><div class="right"><span class="badge filled">Active</span><button class="link-btn" onclick="viewProfile(this)">Profile</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Dr. Priya Basnet</div><div class="secondary-text">R&amp;D Wing — Coordinator — joined Mar 2021</div></div><div class="right"><span class="badge filled">Active</span><button class="link-btn" onclick="viewProfile(this)">Profile</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Dr. Sita Poudel</div><div class="secondary-text">R&amp;D Wing — Faculty — joined Sep 2026</div></div><div class="right"><span class="badge dashed">Onboarding</span><button class="link-btn" onclick="viewProfile(this)">Profile</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Ms. Alisha Thapa</div><div class="secondary-text">BD — DMU Manager — joined Feb 2023</div></div><div class="right"><span class="badge filled">Active</span><button class="link-btn" onclick="viewProfile(this)">Profile</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Ms. Reema Gurung</div><div class="secondary-text">BD — Sales Unit Manager — joined Jun 2020</div></div><div class="right"><span class="badge filled">Active</span><button class="link-btn" onclick="viewProfile(this)">Profile</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Ms. Kavita Rana</div><div class="secondary-text">BD — Branding &amp; PR Manager — joined Nov 2021</div></div><div class="right"><span class="badge filled">Active</span><button class="link-btn" onclick="viewProfile(this)">Profile</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Mr. Deepak Karki</div><div class="secondary-text">IT Support Manager — joined Apr 2018</div></div><div class="right"><span class="badge filled">Active</span><button class="link-btn" onclick="viewProfile(this)">Profile</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Mr. Rajan Shakya</div><div class="secondary-text">Finance Manager — joined Jul 2017</div></div><div class="right"><span class="badge filled">Active</span><button class="link-btn" onclick="viewProfile(this)">Profile</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Mr. Sanjay Rai</div><div class="secondary-text">Placement Officer — joined May 2022</div></div><div class="right"><span class="badge filled">Active</span><button class="link-btn" onclick="viewProfile(this)">Profile</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Dr. Sunil Rana</div><div class="secondary-text">FYP Supervisor — Faculty — joined Jan 2020</div></div><div class="right"><span class="badge filled">Active</span><button class="link-btn" onclick="viewProfile(this)">Profile</button></div></div>
+      </div>
+      <p class="secondary-text" style="margin-top:10px;">Showing 11 of 24 staff.</p>
+    </section>
+
+    <section class="page" id="page-onboarding">
+      <div class="page-header">
+        <div><h1>New Hire Onboarding Steps</h1><p class="subtitle">Workspace, assets, email, and training</p></div>
+        <button class="primary" onclick="openNewHire()">+ New hire</button>
+      </div>
+      <div class="section-label">Dr. Sita Poudel — R&amp;D Wing, started Sep 2026</div>
+      <div class="list" style="margin-bottom:20px;">
+        <div class="list-row"><div class="primary-text">Workspace setup</div><div class="right"><span class="badge filled">Complete</span></div></div>
+        <div class="list-row"><div class="primary-text">Asset delivery (laptop, ID card)</div><div class="right"><span class="badge filled">Complete</span></div></div>
+        <div class="list-row"><div class="primary-text">Email and system access created</div><div class="right"><span class="badge filled">Complete — see IT Support provisioning</span></div></div>
+        <div class="list-row"><div class="primary-text">Basic compliance training</div><div class="right"><span class="badge dashed">Pending</span><button class="link-btn" onclick="completeOnboardingStep(this)">Mark complete</button></div></div>
+      </div>
+      <p class="secondary-text">Once all steps are complete, a 90-day review is automatically scheduled — see 90-Day Reviews.</p>
+    </section>
+
+    <section class="page" id="page-exitinterview">
+      <div class="page-header">
+        <div><h1>Exit Interview Analyzer</h1><p class="subtitle">Patterns from resignations to improve retention</p></div>
+        <button class="primary" onclick="openLogExit()">+ Log exit interview</button>
+      </div>
+      <div class="list" id="exitinterview-list">
+        <div class="list-row"><div><div class="primary-text">Mr. Bishnu Adhikari</div><div class="secondary-text">IT technician — resigned Jun 2026</div></div><div class="right"><span class="badge outline">Career growth limited</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Ms. Sarika Bhandari</div><div class="secondary-text">Marketing assistant — resigned Mar 2026</div></div><div class="right"><span class="badge outline">Relocated to Kathmandu</span></div></div>
+      </div>
+      <p class="secondary-text" style="margin-top:10px;">"Career growth" has been the most common theme across the last 3 exits.</p>
+    </section>
+
+    <section class="page" id="page-applicants">
+      <div class="page-header">
+        <div><h1>Applicant Tracking Pipeline</h1><p class="subtitle">Job postings, resume sorting, interview coordination</p></div>
+        <button class="primary" onclick="openPostJob()">+ Post job opening</button>
+      </div>
+      <div class="list" id="applicants-list">
+        <div class="list-row"><div><div class="primary-text">Assistant Professor — Computer Science</div><div class="secondary-text">12 applicants</div></div><div class="right"><span class="badge dashed">Interviewing</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Lab Assistant — Physics</div><div class="secondary-text">5 applicants</div></div><div class="right"><span class="badge outline">Screening</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Marketing Coordinator</div><div class="secondary-text">8 applicants</div></div><div class="right"><span class="badge filled">Offer extended</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-orgchart">
+      <div class="page-header">
+        <div><h1>Organizational Chart Mapping</h1><p class="subtitle">Reporting lines and open vacancies</p></div>
+      </div>
+      <div class="list" style="padding:18px;">
+        <div class="org-node"><strong>ING CEO</strong></div>
+        <div class="org-level">
+          <div class="org-node">College CEO</div>
+          <div class="org-level">
+            <div class="org-node">Operations Head</div>
+            <div class="org-level">
+              <div class="org-node">Academics — Dr. Meera Joshi and faculty</div>
+              <div class="org-node">Module Leader — Dr. Anil Sharma</div>
+              <div class="org-node">R&amp;D Wing — Dr. Priya Basnet</div>
+              <div class="org-node">Business Development — Alisha Thapa, Reema Gurung, Kavita Rana</div>
+              <div class="org-node">IT Support — Deepak Karki</div>
+              <div class="org-node">Finance — Rajan Shakya</div>
+              <div class="org-node">HR — Anjana Bhattarai</div>
+              <div class="org-node">Placement — Sanjay Rai</div>
+              <div class="org-node" style="color:var(--text-muted);">Physics Lab Assistant — <span class="badge outline">Open vacancy</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="page-succession">
+      <div class="page-header">
+        <div><h1>Succession Planning Dashboard</h1><p class="subtitle">High-performing staff for future leadership roles</p></div>
+        <button class="primary" onclick="openFlagSuccession()">+ Flag for succession</button>
+      </div>
+      <div class="list" id="succession-list">
+        <div class="list-row"><div><div class="primary-text">Dr. Anil Sharma</div><div class="secondary-text">Flagged for Course Leader track</div></div><div class="right"><span class="badge filled">Ready in 1 year</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Ms. Alisha Thapa</div><div class="secondary-text">Flagged for Operations Head track</div></div><div class="right"><span class="badge dashed">Ready in 2 years</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-appraisals">
+      <div class="page-header">
+        <div><h1>Performance Appraisal Workflow</h1><p class="subtitle">Annual reviews, competency checks, goal setting</p></div>
+      </div>
+      <div class="list" id="appraisals-list">
+        <div class="list-row"><div><div class="primary-text">Dr. Meera Joshi</div><div class="secondary-text">Annual review — completed Jul 2026</div></div><div class="right"><span class="secondary-text">4.6 / 5</span><span class="badge filled">Completed</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Dr. Anil Sharma</div><div class="secondary-text">Annual review — completed Aug 2026</div></div><div class="right"><span class="secondary-text">4.8 / 5</span><span class="badge filled">Completed</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Ms. Reema Gurung</div><div class="secondary-text">Annual review — due this month</div></div><div class="right"><span class="badge dashed">Due</span><button class="link-btn" onclick="startAppraisal(this)">Start review</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-quarterlyreview">
+      <div class="page-header">
+        <div><h1>Quarterly 3-Month Performance Review Portal</h1><p class="subtitle">90-day checks completed by Department Heads</p></div>
+      </div>
+      <div class="list" id="quarterlyreview-list">
+        <div class="list-row"><div><div class="primary-text">Dr. Sita Poudel</div><div class="secondary-text">Reviewer: Dr. Priya Basnet — due Dec 2026</div></div><div class="right"><span class="badge outline">Scheduled</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Prakriti Sunar</div><div class="secondary-text">Reviewer: Ms. Reema Gurung — due Sep 30</div></div><div class="right"><span class="badge dashed">Due</span><button class="link-btn" onclick="completeQuarterly(this)">Complete review</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Sabin Oli (intern)</div><div class="secondary-text">Reviewer: Ms. Reema Gurung — due Sep 30</div></div><div class="right"><span class="badge dashed">Due</span><button class="link-btn" onclick="completeQuarterly(this)">Complete review</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-leave">
+      <div class="page-header">
+        <div><h1>Leave Allocation Manager</h1><p class="subtitle">Vacation, sick leave, and parental time-off balances</p></div>
+        <button class="primary" onclick="openLogLeave()">+ Log leave request</button>
+      </div>
+      <div class="table-wrap">
+        <table id="leave-table">
+          <thead><tr><th>Staff</th><th>Annual leave balance</th><th>Sick leave used</th><th>Parental leave used</th></tr></thead>
+          <tbody>
+            <tr><td>Dr. Meera Joshi</td><td class="num">12 days</td><td class="num">3 days</td><td class="num">0</td></tr>
+            <tr><td>Mr. Deepak Karki</td><td class="num">8 days</td><td class="num">1 day</td><td class="num">0</td></tr>
+            <tr><td>Ms. Kavita Rana</td><td class="num">15 days</td><td class="num">0</td><td class="num">0</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="page" id="page-attendance">
+      <div class="page-header">
+        <div><h1>Time and Attendance Sync</h1><p class="subtitle">Pulled from biometric check-ins and timesheets</p></div>
+      </div>
+      <div class="stat-grid cols-3">
+        <div class="stat-card"><div class="stat-value">21 / 24</div><div class="stat-label">Checked in today</div></div>
+        <div class="stat-card"><div class="stat-value">2</div><div class="stat-label">On approved leave</div></div>
+        <div class="stat-card"><div class="stat-value">1</div><div class="stat-label">Not yet checked in</div></div>
+      </div>
+      <div class="list">
+        <div class="list-row"><div class="primary-text">Dr. Meera Joshi</div><div class="right"><span class="secondary-text">Checked in 9:02 AM</span></div></div>
+        <div class="list-row"><div class="primary-text">Mr. Deepak Karki</div><div class="right"><span class="secondary-text">Checked in 8:45 AM</span></div></div>
+        <div class="list-row"><div class="primary-text">Ms. Alisha Thapa</div><div class="right"><span class="badge outline">Not yet checked in</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-remotework">
+      <div class="page-header">
+        <div><h1>Remote Work Tracker</h1><p class="subtitle">Agreements, productivity, and home office setups</p></div>
+        <button class="primary" onclick="openNewRemoteAgreement()">+ New agreement</button>
+      </div>
+      <div class="list" id="remotework-list">
+        <div class="list-row"><div><div class="primary-text">Ms. Alisha Thapa</div><div class="secondary-text">Hybrid — 2 days remote per week</div></div><div class="right"><span class="badge filled">Active</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Mr. Rajan Shakya</div><div class="secondary-text">Occasional — 1 day remote per month</div></div><div class="right"><span class="badge filled">Active</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-profdev">
+      <div class="page-header">
+        <div><h1>Professional Development Portal</h1><p class="subtitle">Certifications, credentials, and compliance courses</p></div>
+        <button class="primary" onclick="openLogTraining()">+ Log training</button>
+      </div>
+      <div class="list" id="profdev-list">
+        <div class="list-row"><div><div class="primary-text">Dr. Meera Joshi</div><div class="secondary-text">Advanced Pedagogy Certificate</div></div><div class="right"><span class="badge filled">Completed</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Mr. Deepak Karki</div><div class="secondary-text">ITIL v4 Foundation</div></div><div class="right"><span class="badge dashed">In progress</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Ms. Reema Gurung</div><div class="secondary-text">Sales Leadership Certification</div></div><div class="right"><span class="badge filled">Completed</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-benefits">
+      <div class="page-header">
+        <div><h1>Benefits Administration Console</h1><p class="subtitle">Health plans, wellness, and retirement</p></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Staff</th><th>Health plan</th><th>Wellness program</th><th>Retirement contribution</th></tr></thead>
+          <tbody>
+            <tr><td>Dr. Meera Joshi</td><td>Premium</td><td>Enrolled</td><td class="num">8%</td></tr>
+            <tr><td>Mr. Deepak Karki</td><td>Standard</td><td>Not enrolled</td><td class="num">6%</td></tr>
+            <tr><td>Ms. Kavita Rana</td><td>Premium</td><td>Enrolled</td><td class="num">8%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="page" id="page-salarybench">
+      <div class="page-header">
+        <div><h1>Salary Benchmarking Matrix</h1><p class="subtitle">Internal distribution against industry averages</p></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Role</th><th>Internal average</th><th>Industry average</th><th>Variance</th></tr></thead>
+          <tbody>
+            <tr><td>Faculty</td><td class="num">NPR 125,000</td><td class="num">NPR 130,000</td><td class="num">-3.8%</td></tr>
+            <tr><td>Department Manager</td><td class="num">NPR 140,000</td><td class="num">NPR 135,000</td><td class="num">+3.7%</td></tr>
+            <tr><td>Support Staff</td><td class="num">NPR 55,000</td><td class="num">NPR 58,000</td><td class="num">-5.2%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="page" id="page-grievance">
+      <div class="page-header">
+        <div><h1>Disciplinary Grievance Registry</h1><p class="subtitle">Confidential investigations and resolutions</p></div>
+        <button class="primary" onclick="openNewGrievance()">+ Log case</button>
+      </div>
+      <div class="list" id="grievance-list">
+        <div class="list-row"><div><div class="primary-text">Workplace conduct complaint</div><div class="secondary-text">Case #GR-014 — details restricted</div></div><div class="right"><span class="badge dashed">Under investigation</span><button class="link-btn" onclick="viewGrievance(this)">View case</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-compliance">
+      <div class="page-header">
+        <div><h1>Compliance Report Generator</h1><p class="subtitle">Government employment, diversity, and equity filings</p></div>
+      </div>
+      <div class="list" id="compliance-list">
+        <div class="list-row"><div><div class="primary-text">Government Employment Filing</div><div class="secondary-text">Q3 2026</div></div><div class="right"><span class="badge filled">Filed</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Diversity &amp; Equity Report</div><div class="secondary-text">Annual 2026 — due Oct 1</div></div><div class="right"><span class="badge dashed">Due soon</span><button class="link-btn" onclick="generateReport(this)">Generate now</button></div></div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this) closeModal()">
+  <div class="modal">
+    <div class="modal-header"><h3 id="modal-title"></h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer" id="modal-footer"></div>
+  </div>
+</div>
+
+<script>
+var modalContext = null;
+
+function showPage(id, el){
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
+  if(el) el.classList.add('active');
+}
+function goTo(id){
+  showPage(id, document.querySelector('.nav-item[data-page="' + id + '"]'));
+}
+function filterRows(inputEl, containerSelector, rowSelector){
+  var q = inputEl.value.toLowerCase();
+  document.querySelectorAll(containerSelector + ' ' + rowSelector).forEach(function(row){
+    row.style.display = row.textContent.toLowerCase().indexOf(q) > -1 ? '' : 'none';
+  });
+}
+
+/* ---------- modal shell ---------- */
+function openModal(title, bodyHtml, footerHtml){
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = bodyHtml;
+  document.getElementById('modal-footer').innerHTML = footerHtml || '<button class="secondary" onclick="closeModal()">Close</button>';
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal(){
+  document.getElementById('modal-overlay').classList.remove('open');
+  modalContext = null;
+}
+function formInput(label,id,val,type){
+  type = type || 'text';
+  return '<div class="form-group"><label>' + label + '</label><input type="' + type + '" id="' + id + '" value="' + (val===undefined?'':val) + '"></div>';
+}
+function formTextarea(label,id){
+  return '<div class="form-group"><label>' + label + '</label><textarea id="' + id + '"></textarea></div>';
+}
+function formSelect(label,id,opts){
+  var o = opts.map(function(x){ return '<option>' + x + '</option>'; }).join('');
+  return '<div class="form-group"><label>' + label + '</label><select id="' + id + '">' + o + '</select></div>';
+}
+
+/* ---------- lifecycle / hiring ---------- */
+function openNewHire(){
+  openModal('New hire',
+    formInput('Name','nh-name','') +
+    '<div class="form-row-2">' + formInput('Department','nh-dept','') + formInput('Role','nh-role','') + '</div>',
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveNewHire()">Add to archive</button>'
+  );
+}
+function saveNewHire(){
+  var name = document.getElementById('nh-name').value || 'Unnamed hire';
+  var dept = document.getElementById('nh-dept').value || 'Unspecified department';
+  var role = document.getElementById('nh-role').value || 'Unspecified role';
+  var list = document.getElementById('lifecycle-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + name + '</div><div class="secondary-text">' + dept + ' — ' + role + ' — joining now</div></div><div class="right"><span class="badge dashed">Onboarding</span><button class="link-btn" onclick="viewProfile(this)">Profile</button></div>';
+  list.appendChild(row);
+  closeModal();
+}
+function viewProfile(btn){
+  var row = btn.closest('.list-row');
+  var name = row.querySelector('.primary-text').textContent;
+  openModal('Profile — ' + name,
+    '<div class="list-row" style="border:none;padding:6px 0;"><span>Contract</span><span class="secondary-text">On file</span></div>' +
+    '<div class="list-row" style="border:none;padding:6px 0;"><span>Reference checks</span><span class="secondary-text">Complete</span></div>' +
+    '<div class="list-row" style="border:none;padding:6px 0;"><span>Promotion history</span><span class="secondary-text">No changes on record</span></div>',
+    '<button class="primary" onclick="closeModal()">Close</button>'
+  );
+}
+
+/* ---------- onboarding ---------- */
+function completeOnboardingStep(btn){
+  var row = btn.closest('.list-row');
+  row.querySelector('.right').innerHTML = '<span class="badge filled">Complete</span>';
+  openModal('Onboarding complete', '<p style="font-size:13px;">Dr. Sita Poudel\'s onboarding checklist is now fully complete. A 90-day review has been scheduled automatically.</p>', '<button class="primary" onclick="closeModal()">Done</button>');
+}
+
+/* ---------- exit interviews ---------- */
+function openLogExit(){
+  openModal('Log exit interview',
+    formInput('Employee name','le2-name','') +
+    formInput('Role','le2-role','') +
+    formTextarea('Key themes','le2-theme'),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveExit()">Save</button>'
+  );
+}
+function saveExit(){
+  var name = document.getElementById('le2-name').value || 'Unnamed employee';
+  var role = document.getElementById('le2-role').value || 'Unspecified role';
+  var theme = document.getElementById('le2-theme').value || 'No theme recorded';
+  var list = document.getElementById('exitinterview-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + name + '</div><div class="secondary-text">' + role + ' — logged just now</div></div><div class="right"><span class="badge outline">' + theme + '</span></div>';
+  list.appendChild(row);
+  closeModal();
+}
+
+/* ---------- applicant tracking ---------- */
+function openPostJob(){
+  openModal('Post job opening',
+    formInput('Position title','pj-title','') +
+    formInput('Department','pj-dept',''),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveJob()">Post</button>'
+  );
+}
+function saveJob(){
+  var title = document.getElementById('pj-title').value || 'Untitled position';
+  var list = document.getElementById('applicants-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + title + '</div><div class="secondary-text">0 applicants</div></div><div class="right"><span class="badge outline">Open</span></div>';
+  list.appendChild(row);
+  closeModal();
+}
+
+/* ---------- succession planning ---------- */
+function openFlagSuccession(){
+  openModal('Flag for succession',
+    formInput('Staff member','fs-name','') +
+    formInput('Target track','fs-track','e.g. Course Leader, Operations Head'),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveSuccession()">Flag</button>'
+  );
+}
+function saveSuccession(){
+  var name = document.getElementById('fs-name').value || 'Unnamed staff member';
+  var track = document.getElementById('fs-track').value || 'Unspecified track';
+  var list = document.getElementById('succession-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + name + '</div><div class="secondary-text">Flagged for ' + track + ' track</div></div><div class="right"><span class="badge dashed">Newly flagged</span></div>';
+  list.appendChild(row);
+  closeModal();
+}
+
+/* ---------- appraisals ---------- */
+function startAppraisal(btn){
+  var row = btn.closest('.list-row');
+  row.querySelector('.right').innerHTML = '<span class="badge dashed">In progress</span>';
+  btn.remove();
+}
+
+/* ---------- quarterly reviews ---------- */
+function completeQuarterly(btn){
+  var row = btn.closest('.list-row');
+  row.querySelector('.right').innerHTML = '<span class="badge filled">Completed</span>';
+  btn.remove();
+}
+
+/* ---------- leave ---------- */
+function openLogLeave(){
+  openModal('Log leave request',
+    formInput('Staff member','ll-name','') +
+    '<div class="form-row-2">' + formSelect('Type','ll-type',['Annual','Sick','Parental']) + formInput('Days','ll-days','1') + '</div>',
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveLeave()">Log</button>'
+  );
+}
+function saveLeave(){
+  var name = document.getElementById('ll-name').value || 'Unspecified staff member';
+  var type = document.getElementById('ll-type').value;
+  var days = document.getElementById('ll-days').value || '1';
+  openModal('Leave logged', '<p style="font-size:13px;">' + days + ' day(s) of ' + type + ' leave recorded for ' + name + '.</p>', '<button class="primary" onclick="closeModal()">Done</button>');
+}
+
+/* ---------- remote work ---------- */
+function openNewRemoteAgreement(){
+  openModal('New remote work agreement',
+    formInput('Staff member','nr-name','') +
+    '<div class="form-row-2">' + formSelect('Type','nr-type',['Hybrid','Full remote','Occasional']) + formInput('Days per week','nr-days','') + '</div>',
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveRemote()">Save</button>'
+  );
+}
+function saveRemote(){
+  var name = document.getElementById('nr-name').value || 'Unnamed staff member';
+  var type = document.getElementById('nr-type').value;
+  var days = document.getElementById('nr-days').value || '1';
+  var list = document.getElementById('remotework-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + name + '</div><div class="secondary-text">' + type + ' — ' + days + ' days remote per week</div></div><div class="right"><span class="badge filled">Active</span></div>';
+  list.appendChild(row);
+  closeModal();
+}
+
+/* ---------- professional development ---------- */
+function openLogTraining(){
+  openModal('Log training',
+    formInput('Staff member','lt-name','') +
+    formInput('Training / certificate','lt-cert',''),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveTraining()">Log</button>'
+  );
+}
+function saveTraining(){
+  var name = document.getElementById('lt-name').value || 'Unnamed staff member';
+  var cert = document.getElementById('lt-cert').value || 'Untitled training';
+  var list = document.getElementById('profdev-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + name + '</div><div class="secondary-text">' + cert + '</div></div><div class="right"><span class="badge dashed">In progress</span></div>';
+  list.appendChild(row);
+  closeModal();
+}
+
+/* ---------- grievance ---------- */
+function openNewGrievance(){
+  openModal('Log case',
+    formTextarea('Case summary (confidential)','ng-summary'),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveGrievance()">Log case</button>'
+  );
+}
+function saveGrievance(){
+  var list = document.getElementById('grievance-list');
+  var count = list.querySelectorAll('.list-row').length;
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">New case</div><div class="secondary-text">Case #GR-0' + (15 + count) + ' — details restricted</div></div><div class="right"><span class="badge dashed">Under investigation</span><button class="link-btn" onclick="viewGrievance(this)">View case</button></div>';
+  list.appendChild(row);
+  closeModal();
+}
+function viewGrievance(btn){
+  openModal('Case access restricted', '<p style="font-size:13px;">This case is confidential. Only HR leadership and the assigned investigator can view full details.</p>', '<button class="primary" onclick="closeModal()">Close</button>');
+}
+
+/* ---------- compliance reports ---------- */
+function generateReport(btn){
+  var row = btn.closest('.list-row');
+  row.querySelector('.right').innerHTML = '<span class="badge filled">Filed</span>';
+  btn.remove();
+}
+</script>
+</body>
+</html>

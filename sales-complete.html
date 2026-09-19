@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ING ERP — BD Sales Unit &amp; Call Center</title>
+<style>
+  :root{
+    --surface-1:#fafafa;
+    --surface-2:#f2f2f2;
+    --border:#e6e6e6;
+    --border-strong:#cfcfcf;
+    --text-primary:#111111;
+    --text-secondary:#5a5a5e;
+    --text-muted:#9a9a9e;
+    --fill-primary:#000000;
+    --on-primary:#ffffff;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--surface-2);color:var(--text-primary);}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;background:#fff;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:10px;}
+  .topbar .who{font-size:12px;color:var(--text-secondary);}
+  .topbar .who strong{color:var(--text-primary);font-weight:600;}
+  .app{display:flex;min-height:100vh;}
+  .sidebar{width:225px;flex-shrink:0;background:var(--surface-1);border-right:1px solid var(--border);padding:18px 12px;overflow-y:auto;}
+  .brand{display:flex;align-items:center;gap:10px;padding:0 8px 14px;}
+  .brand .mark{width:24px;height:24px;border-radius:6px;background:var(--fill-primary);flex-shrink:0;}
+  .brand .name{font-size:13px;font-weight:600;line-height:1.3;}
+  .brand .role{font-size:11px;color:var(--text-muted);line-height:1.3;}
+  .nav-item{display:block;padding:7px 10px;border-radius:7px;font-size:13px;color:var(--text-secondary);cursor:pointer;margin-bottom:2px;}
+  .nav-item:hover{background:var(--surface-2);}
+  .nav-item.active{background:var(--fill-primary);color:var(--on-primary);}
+  .nav-divider{border-top:1px solid var(--border);margin:10px 4px;}
+  .group{margin-bottom:12px;}
+  .group-label{font-size:11px;font-weight:600;color:var(--text-muted);margin:0 0 4px 10px;}
+  .main{flex:1;padding:32px 36px;min-width:0;}
+  .page{display:none;}
+  .page.active{display:block;}
+  .page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:12px;}
+  h1{font-size:22px;margin:0;font-weight:600;}
+  .subtitle{font-size:13px;color:var(--text-secondary);margin:5px 0 0;}
+  .section-label{font-size:12px;font-weight:600;color:var(--text-muted);margin:0 0 8px;}
+  button.primary{background:var(--fill-primary);color:var(--on-primary);border:none;border-radius:8px;padding:10px 16px;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;}
+  button.secondary{background:#fff;color:var(--text-primary);border:1px solid var(--border-strong);border-radius:8px;padding:10px 16px;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;}
+  .link-btn{background:none;border:none;color:var(--text-primary);font-size:12px;font-weight:600;text-decoration:underline;cursor:pointer;padding:0;white-space:nowrap;}
+  .toolbar{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;align-items:center;}
+  input[type=text], input[type=number], input[type=date], select, textarea{border:1px solid var(--border-strong);border-radius:8px;padding:10px 12px;font-size:13px;background:#fff;color:var(--text-primary);font-family:inherit;}
+  input[type=text]{flex:1;min-width:160px;}
+  select{width:170px;}
+  .badge{font-size:11px;padding:2px 9px;border-radius:999px;white-space:nowrap;}
+  .badge.filled{background:var(--fill-primary);color:var(--on-primary);}
+  .badge.outline{border:1px solid var(--border-strong);color:var(--text-secondary);}
+  .badge.dashed{border:1px dashed var(--border-strong);color:var(--text-secondary);}
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+  .stat-grid.cols-3{grid-template-columns:repeat(3,1fr);}
+  .stat-card{border:1px solid var(--border);border-radius:var(--radius);background:#fff;padding:16px 18px;}
+  .stat-value{font-size:22px;font-weight:700;}
+  .stat-label{font-size:12px;color:var(--text-secondary);margin-top:4px;}
+  .list{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:#fff;}
+  .list-row{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;gap:14px;border-bottom:1px solid var(--border);}
+  .list-row:last-child{border-bottom:none;}
+  .list-row .primary-text{font-size:14px;font-weight:600;}
+  .list-row .secondary-text{font-size:12px;color:var(--text-secondary);margin-top:3px;}
+  .list-row .right{display:flex;align-items:center;gap:10px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;}
+  .table-wrap{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:#fff;overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;}
+  th,td{padding:11px 13px;font-size:13px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;}
+  th{font-weight:600;color:var(--text-secondary);background:var(--surface-1);font-size:12px;}
+  tbody tr:last-child td{border-bottom:none;}
+  td.num{text-align:right;font-variant-numeric:tabular-nums;}
+  .bar-track{background:var(--surface-2);border-radius:6px;height:8px;width:110px;overflow:hidden;flex-shrink:0;}
+  .bar-fill{background:var(--fill-primary);height:100%;}
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:50;align-items:center;justify-content:center;padding:20px;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:#fff;border-radius:12px;max-width:460px;width:100%;max-height:86vh;overflow-y:auto;border:1px solid var(--border-strong);}
+  .modal-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);}
+  .modal-header h3{margin:0;font-size:16px;}
+  .modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-secondary);line-height:1;padding:4px;}
+  .modal-body{padding:18px 20px;}
+  .modal-footer{display:flex;justify-content:flex-end;gap:8px;padding:14px 20px;border-top:1px solid var(--border);}
+  .form-group{margin-bottom:14px;}
+  .form-group label{display:block;font-size:12px;color:var(--text-secondary);margin-bottom:5px;font-weight:600;}
+  .form-group input, .form-group select, .form-group textarea{width:100%;}
+  .form-group textarea{resize:vertical;min-height:70px;}
+  .form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px;}
+  .form-row-2 input, .form-row-2 select{width:100%;}
+  .script-box{border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;background:#fff;margin-bottom:10px;}
+  .script-box p{font-size:13px;margin:6px 0 0;color:var(--text-primary);line-height:1.5;}
+  @media (max-width:640px){ .sidebar{display:none;} .main{padding:22px;} .stat-grid{grid-template-columns:1fr 1fr;} }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="who">Signed in as <strong>Ms. Reema Gurung</strong> — Sales &amp; Call Center Manager</div>
+  <div class="who">Business Development — Sales Unit, Call Center &amp; Intern Management</div>
+</div>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="mark"></div><div><div class="name">ING ERP</div><div class="role">BD — Sales Unit</div></div></div>
+    <div class="nav-item active" data-page="dashboard" onclick="showPage('dashboard', this)">Dashboard</div>
+    <div class="nav-divider"></div>
+    <nav>
+      <div class="group"><p class="group-label">Dialer &amp; routing</p>
+        <div class="nav-item" data-page="dialer" onclick="showPage('dialer', this)">Interactive dialer</div>
+        <div class="nav-item" data-page="routing" onclick="showPage('routing', this)">Lead scored routing</div>
+        <div class="nav-item" data-page="followup" onclick="showPage('followup', this)">Follow-up alerts</div>
+      </div>
+      <div class="group"><p class="group-label">Calls &amp; conversion</p>
+        <div class="nav-item" data-page="recordings" onclick="showPage('recordings', this)">Call recordings</div>
+        <div class="nav-item" data-page="funnel" onclick="showPage('funnel', this)">Conversion funnel</div>
+        <div class="nav-item" data-page="scripts" onclick="showPage('scripts', this)">Script overlays</div>
+      </div>
+      <div class="group"><p class="group-label">Performance</p>
+        <div class="nav-item" data-page="quota" onclick="showPage('quota', this)">Quota leaderboard</div>
+        <div class="nav-item" data-page="capacity" onclick="showPage('capacity', this)">Agent capacity</div>
+        <div class="nav-item" data-page="dailymetrics" onclick="showPage('dailymetrics', this)">Daily metrics</div>
+      </div>
+      <div class="group"><p class="group-label">Applications</p>
+        <div class="nav-item" data-page="applications" onclick="showPage('applications', this)">Application processing</div>
+        <div class="nav-item" data-page="feerules" onclick="showPage('feerules', this)">Fee structure rules</div>
+        <div class="nav-item" data-page="lostleads" onclick="showPage('lostleads', this)">Lost lead recovery</div>
+        <div class="nav-item" data-page="walkins" onclick="showPage('walkins', this)">Walk-in log</div>
+      </div>
+      <div class="group"><p class="group-label">Channels</p>
+        <div class="nav-item" data-page="livechat" onclick="showPage('livechat', this)">Live chat</div>
+        <div class="nav-item" data-page="campustours" onclick="showPage('campustours', this)">Campus tours</div>
+      </div>
+      <div class="group"><p class="group-label">Intern program</p>
+        <div class="nav-item" data-page="internrecruit" onclick="showPage('internrecruit', this)">Recruitment hub</div>
+        <div class="nav-item" data-page="internshifts" onclick="showPage('internshifts', this)">Shift roster</div>
+        <div class="nav-item" data-page="internappraisals" onclick="showPage('internappraisals', this)">Appraisals</div>
+        <div class="nav-item" data-page="interntimecards" onclick="showPage('interntimecards', this)">Timecards</div>
+        <div class="nav-item" data-page="interncomp" onclick="showPage('interncomp', this)">Compensation</div>
+      </div>
+    </nav>
+  </aside>
+
+  <main class="main">
+
+    <section class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div><h1>Sales &amp; Call Center overview</h1><p class="subtitle">Converting leads into applications</p></div>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-value">142</div><div class="stat-label">Calls today</div></div>
+        <div class="stat-card"><div class="stat-value">18%</div><div class="stat-label">Contact-to-application rate</div></div>
+        <div class="stat-card"><div class="stat-value">6</div><div class="stat-label">Active interns</div></div>
+        <div class="stat-card"><div class="stat-value">1</div><div class="stat-label">Consultants at capacity</div></div>
+      </div>
+      <div class="list" style="margin-bottom:20px;">
+        <div class="list-row"><div><div class="primary-text">5 callbacks due today, 2 overdue</div><div class="secondary-text">Deepika Rana, Sunil Bhattarai and 3 others</div></div><div class="right"><button class="link-btn" onclick="goTo('followup')">Review</button></div></div>
+        <div class="list-row"><div><div class="primary-text">3 applications in progress</div><div class="secondary-text">Sabina Lama, Sunil Bhattarai, Nirmal Shrestha</div></div><div class="right"><button class="link-btn" onclick="goTo('applications')">Open</button></div></div>
+        <div class="list-row"><div><div class="primary-text">2 intern timecards pending approval</div><div class="secondary-text">Sabin Oli, Kripa Rana</div></div><div class="right"><button class="link-btn" onclick="goTo('interntimecards')">Approve</button></div></div>
+      </div>
+      <div class="toolbar">
+        <button class="secondary" onclick="goTo('dialer')">Open dialer</button>
+        <button class="secondary" onclick="openNewApplication()">+ New application</button>
+        <button class="secondary" onclick="openScheduleTour()">+ Schedule campus tour</button>
+      </div>
+    </section>
+
+    <section class="page" id="page-dialer">
+      <div class="page-header">
+        <div><h1>Interactive Dialer Management</h1><p class="subtitle">Click-to-call queue with visual customer cards</p></div>
+      </div>
+      <div class="stat-grid cols-3">
+        <div class="stat-card"><div class="stat-value">8</div><div class="stat-label">Calls in queue</div></div>
+        <div class="stat-card"><div class="stat-value">45s</div><div class="stat-label">Avg wait time</div></div>
+        <div class="stat-card"><div class="stat-value">96</div><div class="stat-label">Calls answered today</div></div>
+      </div>
+      <div class="list" id="dialer-list">
+        <div class="list-row"><div><div class="primary-text">Nirmal Shrestha</div><div class="secondary-text">BSc Computer Science — scholarship micro-site</div></div><div class="right"><span class="badge filled">High priority</span><button class="link-btn" onclick="startCall(this)">Call now</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Sabina Lama</div><div class="secondary-text">BSc Computer Science — Open Day landing page</div></div><div class="right"><span class="badge filled">High priority</span><button class="link-btn" onclick="startCall(this)">Call now</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Ramesh KC</div><div class="secondary-text">BSc Business — Instagram</div></div><div class="right"><span class="badge dashed">Medium priority</span><button class="link-btn" onclick="startCall(this)">Call now</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Sunil Bhattarai</div><div class="secondary-text">BSc Computer Science — Google Ads</div></div><div class="right"><span class="badge dashed">Medium priority</span><button class="link-btn" onclick="startCall(this)">Call now</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Deepika Rana</div><div class="secondary-text">BA Business — referral</div></div><div class="right"><span class="badge dashed">Medium priority</span><button class="link-btn" onclick="startCall(this)">Call now</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-routing">
+      <div class="page-header">
+        <div><h1>Lead Scored Routing</h1><p class="subtitle">Warm leads routed automatically to top performers</p></div>
+      </div>
+      <div class="stat-grid cols-3">
+        <div class="stat-card"><div class="stat-value">34</div><div class="stat-label">Leads routed today</div></div>
+        <div class="stat-card"><div class="stat-value">8</div><div class="stat-label">High-value leads</div></div>
+        <div class="stat-card"><div class="stat-value">4s</div><div class="stat-label">Avg routing time</div></div>
+      </div>
+      <div class="list" id="routing-list">
+        <div class="list-row"><div><div class="primary-text">Nirmal Shrestha</div><div class="secondary-text">Score 92 — high intent, scholarship eligible</div></div><div class="right"><span class="secondary-text">Prakriti Sunar</span><button class="link-btn" onclick="reassignLead(this)">Reassign</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Sabina Lama</div><div class="secondary-text">Score 85 — visited fees page 3+ times</div></div><div class="right"><span class="secondary-text">Rohan Bista</span><button class="link-btn" onclick="reassignLead(this)">Reassign</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Ramesh KC</div><div class="secondary-text">Score 60 — social lead, medium engagement</div></div><div class="right"><span class="secondary-text">Alina Maharjan</span><button class="link-btn" onclick="reassignLead(this)">Reassign</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Sunil Bhattarai</div><div class="secondary-text">Score 58 — search lead, fee estimator used</div></div><div class="right"><span class="secondary-text">Sanjeev Khatri</span><button class="link-btn" onclick="reassignLead(this)">Reassign</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-followup">
+      <div class="page-header">
+        <div><h1>Follow-up Alert Timers</h1><p class="subtitle">Scheduled callback reminders</p></div>
+      </div>
+      <div class="stat-grid cols-3">
+        <div class="stat-card"><div class="stat-value">5</div><div class="stat-label">Due today</div></div>
+        <div class="stat-card"><div class="stat-value">2</div><div class="stat-label">Overdue</div></div>
+        <div class="stat-card"><div class="stat-value">12</div><div class="stat-label">Completed today</div></div>
+      </div>
+      <div class="list" id="followup-list">
+        <div class="list-row"><div><div class="primary-text">Sunil Bhattarai</div><div class="secondary-text">11:00 AM today — Rohan Bista</div></div><div class="right"><span class="badge outline">Overdue</span><button class="link-btn" onclick="completeFollowup(this)">Mark complete</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Kritika Thapa</div><div class="secondary-text">Yesterday 4:00 PM — Prakriti Sunar</div></div><div class="right"><span class="badge outline">Overdue</span><button class="link-btn" onclick="completeFollowup(this)">Mark complete</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Deepika Rana</div><div class="secondary-text">2:00 PM today — Alina Maharjan</div></div><div class="right"><span class="badge dashed">Due</span><button class="link-btn" onclick="completeFollowup(this)">Mark complete</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Ramesh KC</div><div class="secondary-text">4:30 PM today — Alina Maharjan</div></div><div class="right"><span class="badge dashed">Due</span><button class="link-btn" onclick="completeFollowup(this)">Mark complete</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Nirmal Shrestha</div><div class="secondary-text">5:00 PM today — Prakriti Sunar</div></div><div class="right"><span class="badge dashed">Due</span><button class="link-btn" onclick="completeFollowup(this)">Mark complete</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-recordings">
+      <div class="page-header">
+        <div><h1>Call Recording Repository</h1><p class="subtitle">Secure archive linked to prospect profiles</p></div>
+      </div>
+      <div class="stat-grid cols-3">
+        <div class="stat-card"><div class="stat-value">340</div><div class="stat-label">Recordings this week</div></div>
+        <div class="stat-card"><div class="stat-value">6m 20s</div><div class="stat-label">Avg call length</div></div>
+        <div class="stat-card"><div class="stat-value">3</div><div class="stat-label">Flagged for QA</div></div>
+      </div>
+      <div class="toolbar"><input type="text" placeholder="Search recordings" oninput="filterRows(this,'#recordings-list','.list-row')"></div>
+      <div class="list" id="recordings-list">
+        <div class="list-row"><div><div class="primary-text">Aisha Karki</div><div class="secondary-text">Prakriti Sunar — 8m 12s — Jun 2</div></div><div class="right"><span class="badge filled">Reviewed</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Bibek Rai</div><div class="secondary-text">Rohan Bista — 5m 40s — May 20</div></div><div class="right"><span class="badge filled">Reviewed</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Nirmal Shrestha</div><div class="secondary-text">Prakriti Sunar — 12m 05s — today</div></div><div class="right"><span class="badge dashed">Pending QA</span><button class="link-btn" onclick="reviewRecording(this)">Review</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Sunil Bhattarai</div><div class="secondary-text">Rohan Bista — 3m 55s — yesterday</div></div><div class="right"><span class="badge dashed">Pending QA</span><button class="link-btn" onclick="reviewRecording(this)">Review</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Kritika Thapa</div><div class="secondary-text">Sanjeev Khatri — 9m 30s — Jun 15</div></div><div class="right"><span class="badge filled">Reviewed</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-funnel">
+      <div class="page-header">
+        <div><h1>Conversion Rate Funnel</h1><p class="subtitle">From raw phone contact to signed application, this week</p></div>
+      </div>
+      <div class="list">
+        <div class="list-row"><div class="primary-text">Contacted</div><div class="right"><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div><span class="secondary-text">126</span></div></div>
+        <div class="list-row"><div class="primary-text">Interested</div><div class="right"><div class="bar-track"><div class="bar-fill" style="width:54%"></div></div><span class="secondary-text">68</span></div></div>
+        <div class="list-row"><div class="primary-text">Application started</div><div class="right"><div class="bar-track"><div class="bar-fill" style="width:32%"></div></div><span class="secondary-text">40</span></div></div>
+        <div class="list-row"><div class="primary-text">Application submitted</div><div class="right"><div class="bar-track"><div class="bar-fill" style="width:17%"></div></div><span class="secondary-text">22</span></div></div>
+        <div class="list-row"><div class="primary-text">Enrolled</div><div class="right"><div class="bar-track"><div class="bar-fill" style="width:7%"></div></div><span class="secondary-text">9</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-scripts">
+      <div class="page-header">
+        <div><h1>Script Overlay Panel</h1><p class="subtitle">On-screen rebuttals and objection handling</p></div>
+        <button class="primary" onclick="openNewScript()">+ New script</button>
+      </div>
+      <div id="scripts-list">
+        <div class="script-box"><strong>Price objection</strong><p>"I understand tuition is a big decision. We offer merit scholarships up to 30% and a staged payment plan — would it help if I checked what you might qualify for?"</p></div>
+        <div class="script-box"><strong>Comparing with a competitor</strong><p>"That's a great program too. What matters most to you — placement outcomes, faculty ratio, or campus facilities? I can walk you through how we compare on that specifically."</p></div>
+        <div class="script-box"><strong>Scholarship inquiry</strong><p>"We have merit-based and need-based options. Can I ask about your recent grades and household situation so I can point you to the right one?"</p></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-quota">
+      <div class="page-header">
+        <div><h1>Quota Management Dashboard</h1><p class="subtitle">Consultant performance against monthly goals</p></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Rank</th><th>Consultant</th><th>Calls made</th><th>Conversions</th><th>Quota</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>Prakriti Sunar</td><td class="num">220</td><td class="num">14</td><td class="num">140%</td></tr>
+            <tr><td>2</td><td>Rohan Bista</td><td class="num">190</td><td class="num">10</td><td class="num">100%</td></tr>
+            <tr><td>3</td><td>Sanjeev Khatri</td><td class="num">175</td><td class="num">9</td><td class="num">90%</td></tr>
+            <tr><td>4</td><td>Alina Maharjan</td><td class="num">160</td><td class="num">7</td><td class="num">70%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="page" id="page-capacity">
+      <div class="page-header">
+        <div><h1>Agent Capacity Gauges</h1><p class="subtitle">Shift load monitoring to prevent queue overload</p></div>
+      </div>
+      <div class="list">
+        <div class="list-row"><div class="primary-text">Alina Maharjan</div><div class="right"><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div><span class="secondary-text">10 / 10</span><span class="badge outline">At capacity</span></div></div>
+        <div class="list-row"><div class="primary-text">Prakriti Sunar</div><div class="right"><div class="bar-track"><div class="bar-fill" style="width:80%"></div></div><span class="secondary-text">8 / 10</span><span class="badge dashed">Near capacity</span></div></div>
+        <div class="list-row"><div class="primary-text">Sanjeev Khatri</div><div class="right"><div class="bar-track"><div class="bar-fill" style="width:60%"></div></div><span class="secondary-text">6 / 10</span><span class="badge filled">Available</span></div></div>
+        <div class="list-row"><div class="primary-text">Rohan Bista</div><div class="right"><div class="bar-track"><div class="bar-fill" style="width:50%"></div></div><span class="secondary-text">5 / 10</span><span class="badge filled">Available</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-dailymetrics">
+      <div class="page-header">
+        <div><h1>Daily Call Metric Exporter</h1><p class="subtitle">End-of-day automated reports</p></div>
+        <button class="primary" onclick="exportTodayReport()">Export today's report</button>
+      </div>
+      <div class="stat-grid cols-3">
+        <div class="stat-card"><div class="stat-value">142</div><div class="stat-label">Calls today</div></div>
+        <div class="stat-card"><div class="stat-value">12s</div><div class="stat-label">Avg answer speed</div></div>
+        <div class="stat-card"><div class="stat-value">6</div><div class="stat-label">Conversions today</div></div>
+      </div>
+      <div class="list" id="dailymetrics-list">
+        <div class="list-row"><div><div class="primary-text">Sep 8 report</div><div class="secondary-text">138 calls, 5 conversions</div></div><div class="right"><span class="badge filled">Sent</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Sep 7 report</div><div class="secondary-text">150 calls, 8 conversions</div></div><div class="right"><span class="badge filled">Sent</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Sep 6 report</div><div class="secondary-text">120 calls, 4 conversions</div></div><div class="right"><span class="badge filled">Sent</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-applications">
+      <div class="page-header">
+        <div><h1>Application Processing Interface</h1><p class="subtitle">Completing formal applications alongside the caller</p></div>
+        <button class="primary" onclick="openNewApplication()">+ New application</button>
+      </div>
+      <div class="list" id="applications-list">
+        <div class="list-row"><div><div class="primary-text">Sabina Lama</div><div class="secondary-text">BSc Computer Science — documents pending</div></div><div class="right"><span class="badge dashed">In progress</span><button class="link-btn" onclick="advanceApplication(this)">Continue</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Sunil Bhattarai</div><div class="secondary-text">BSc Computer Science — personal details started</div></div><div class="right"><span class="badge dashed">In progress</span><button class="link-btn" onclick="advanceApplication(this)">Continue</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Nirmal Shrestha</div><div class="secondary-text">BSc Computer Science — ready for submission</div></div><div class="right"><span class="badge outline">Documents complete</span><button class="link-btn" onclick="advanceApplication(this)">Submit</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Kritika Thapa</div><div class="secondary-text">BA Business — submitted, awaiting RTE review</div></div><div class="right"><span class="badge filled">Submitted</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-feerules">
+      <div class="page-header">
+        <div><h1>Fee Structure Enforcer</h1><p class="subtitle">Approved terms and discount limits by program</p></div>
+        <button class="secondary" onclick="openException()">Request exception</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Program</th><th>Standard fee</th><th>Max agent discount</th><th>Approval needed above</th></tr></thead>
+          <tbody>
+            <tr><td>BSc Computer Science</td><td class="num">NPR 480,000/yr</td><td class="num">10%</td><td class="num">10%</td></tr>
+            <tr><td>BA Business</td><td class="num">NPR 350,000/yr</td><td class="num">10%</td><td class="num">10%</td></tr>
+            <tr><td>BBA</td><td class="num">NPR 400,000/yr</td><td class="num">15%</td><td class="num">15%</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="secondary-text" style="margin-top:10px;">Agents cannot quote a discount above these limits without Finance sign-off.</p>
+    </section>
+
+    <section class="page" id="page-lostleads">
+      <div class="page-header">
+        <div><h1>Lost Lead Recovery Pipeline</h1><p class="subtitle">Re-engaging deferred or abandoned applicants</p></div>
+      </div>
+      <div class="stat-grid cols-3">
+        <div class="stat-card"><div class="stat-value">28</div><div class="stat-label">Deferred this term</div></div>
+        <div class="stat-card"><div class="stat-value">6</div><div class="stat-label">Recovered this term</div></div>
+        <div class="stat-card"><div class="stat-value">21%</div><div class="stat-label">Recovery rate</div></div>
+      </div>
+      <div class="list" id="lostleads-list">
+        <div class="list-row"><div><div class="primary-text">Priya Sharma</div><div class="secondary-text">Abandoned at document upload — last contact 4 months ago</div></div><div class="right"><button class="link-btn" onclick="recoverLead(this)">Re-engage</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Anmol Rai</div><div class="secondary-text">Deferred to next intake — last contact 8 months ago</div></div><div class="right"><button class="link-btn" onclick="recoverLead(this)">Re-engage</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Bishnu Thapa</div><div class="secondary-text">Already re-engaged by DMU — call scheduled</div></div><div class="right"><span class="badge dashed">In progress</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-walkins">
+      <div class="page-header">
+        <div><h1>Walk-in Consultation Log</h1><p class="subtitle">Desk check-ins for prospective students</p></div>
+        <button class="primary" onclick="openLogWalkin()">+ Log walk-in</button>
+      </div>
+      <div class="list" id="walkins-list">
+        <div class="list-row"><div><div class="primary-text">Sarita Bhandari</div><div class="secondary-text">Fee inquiry — 10:30 AM — Sanjeev Khatri</div></div><div class="right"><span class="badge filled">Completed</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Umesh Rana</div><div class="secondary-text">Program comparison — 11:15 AM — Alina Maharjan</div></div><div class="right"><span class="badge filled">Completed</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Walk-in, unregistered</div><div class="secondary-text">Waiting for consultant — arrived 2:05 PM</div></div><div class="right"><span class="badge dashed">Waiting</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-livechat">
+      <div class="page-header">
+        <div><h1>Live Chat Converger</h1><p class="subtitle">WhatsApp, website, and SMS in one view</p></div>
+      </div>
+      <div class="stat-grid cols-3">
+        <div class="stat-card"><div class="stat-value">6</div><div class="stat-label">Unread messages</div></div>
+        <div class="stat-card"><div class="stat-value">3</div><div class="stat-label">Channels connected</div></div>
+        <div class="stat-card"><div class="stat-value">2m</div><div class="stat-label">Avg first response</div></div>
+      </div>
+      <div class="list" id="livechat-list">
+        <div class="list-row"><div><div class="primary-text">Ramesh KC — WhatsApp</div><div class="secondary-text">"Is there a scholarship for BBA?"</div></div><div class="right"><span class="badge dashed">Unread</span><button class="link-btn" onclick="replyChat(this)">Reply</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Anonymous visitor — Website chat</div><div class="secondary-text">"What's the application deadline?"</div></div><div class="right"><span class="badge dashed">Unread</span><button class="link-btn" onclick="replyChat(this)">Reply</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Deepika Rana — SMS</div><div class="secondary-text">"Can I reschedule my call?"</div></div><div class="right"><span class="badge filled">Replied</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-campustours">
+      <div class="page-header">
+        <div><h1>Campus Tour Scheduler</h1><p class="subtitle">Student-led tours for visiting delegations</p></div>
+        <button class="primary" onclick="openScheduleTour()">+ Schedule tour</button>
+      </div>
+      <div class="list" id="campustours-list">
+        <div class="list-row"><div><div class="primary-text">Biratnagar High School delegation</div><div class="secondary-text">25 students — Sep 15 — guide: Sabin Oli</div></div><div class="right"><span class="badge filled">Confirmed</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Pokhara High School delegation</div><div class="secondary-text">18 students — Sep 22 — guide not yet assigned</div></div><div class="right"><span class="badge dashed">Guide needed</span><button class="link-btn" onclick="assignGuide(this)">Assign guide</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-internrecruit">
+      <div class="page-header">
+        <div><h1>Intern Recruitment Hub</h1><p class="subtitle">1st-year applications for part-time promotional roles</p></div>
+        <button class="primary" onclick="openNewApplicant()">+ Log applicant</button>
+      </div>
+      <div class="list" id="internrecruit-list">
+        <div class="list-row"><div><div class="primary-text">Bishesh Lama</div><div class="secondary-text">1st year, BSc Computer Science</div></div><div class="right"><span class="badge dashed">Interview scheduled</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Anushka Thapa</div><div class="secondary-text">1st year, BA Business</div></div><div class="right"><span class="badge dashed">Interview scheduled</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Roshan Gurung</div><div class="secondary-text">1st year, BBA</div></div><div class="right"><span class="badge outline">Applied</span><button class="link-btn" onclick="scheduleInterview(this)">Schedule interview</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Sabin Oli</div><div class="secondary-text">1st year, BSc Computer Science</div></div><div class="right"><span class="badge filled">Hired</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Manish Karki</div><div class="secondary-text">1st year, BA Business</div></div><div class="right"><span class="badge filled">Hired</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Kripa Rana</div><div class="secondary-text">1st year, BSc Computer Science</div></div><div class="right"><span class="badge filled">Hired</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-internshifts">
+      <div class="page-header">
+        <div><h1>Intern Shift Rosterer</h1><p class="subtitle">Scheduled around academic timetables</p></div>
+        <button class="primary" onclick="openAssignShift()">+ Assign shift</button>
+      </div>
+      <div class="list" id="internshifts-list">
+        <div class="list-row"><div><div class="primary-text">Sabin Oli</div><div class="secondary-text">Tue &amp; Thu, 2:00–5:00 PM — no timetable conflict</div></div><div class="right"><span class="badge filled">Confirmed</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Manish Karki</div><div class="secondary-text">Mon &amp; Wed, 3:00–6:00 PM — no timetable conflict</div></div><div class="right"><span class="badge filled">Confirmed</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Kripa Rana</div><div class="secondary-text">Fri, 10:00 AM–4:00 PM — checking against CS204 lab slot</div></div><div class="right"><span class="badge dashed">Checking conflict</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-internappraisals">
+      <div class="page-header">
+        <div><h1>Intern Performance Appraisal</h1><p class="subtitle">Communication growth and task efficiency</p></div>
+        <button class="primary" onclick="openNewAppraisal()">+ New appraisal</button>
+      </div>
+      <div class="list" id="internappraisals-list">
+        <div class="list-row"><div><div class="primary-text">Sabin Oli</div><div class="secondary-text">Communication 4.5/5 — task efficiency 4.2/5</div></div><div class="right"><span class="badge filled">Reviewed Sep 1</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Manish Karki</div><div class="secondary-text">Communication 3.8/5 — task efficiency 4.0/5</div></div><div class="right"><span class="badge filled">Reviewed Sep 1</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Kripa Rana</div><div class="secondary-text">First appraisal not yet completed</div></div><div class="right"><span class="badge outline">Due</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-interntimecards">
+      <div class="page-header">
+        <div><h1>Intern Timecard Validation</h1><p class="subtitle">Check-ins matched against location settings</p></div>
+      </div>
+      <div class="list" id="interntimecards-list">
+        <div class="list-row"><div><div class="primary-text">Sabin Oli</div><div class="secondary-text">Week of Sep 1 — 9 hours logged, location matched</div></div><div class="right"><span class="badge dashed">Pending</span><button class="link-btn" onclick="approveTimecard(this)">Approve</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Kripa Rana</div><div class="secondary-text">Week of Sep 1 — 6 hours logged, location matched</div></div><div class="right"><span class="badge dashed">Pending</span><button class="link-btn" onclick="approveTimecard(this)">Approve</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Manish Karki</div><div class="secondary-text">Week of Sep 1 — 9 hours logged, location matched</div></div><div class="right"><span class="badge filled">Approved</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-interncomp">
+      <div class="page-header">
+        <div><h1>Intern Compensation Pipeline</h1><p class="subtitle">Approved timecards routed to payroll</p></div>
+      </div>
+      <div class="list" id="interncomp-list">
+        <div class="list-row"><div><div class="primary-text">Manish Karki</div><div class="secondary-text">9 hours &times; NPR 300/hr — NPR 2,700</div></div><div class="right"><span class="badge dashed">Ready to send</span><button class="link-btn" onclick="sendToPayroll(this)">Send to payroll</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Sabin Oli</div><div class="secondary-text">8 hours &times; NPR 300/hr — NPR 2,400, sent last week</div></div><div class="right"><span class="badge filled">In payroll</span></div></div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this) closeModal()">
+  <div class="modal">
+    <div class="modal-header"><h3 id="modal-title"></h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer" id="modal-footer"></div>
+  </div>
+</div>
+
+<script>
+var modalContext = null;
+
+function showPage(id, el){
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
+  if(el) el.classList.add('active');
+}
+function goTo(id){
+  showPage(id, document.querySelector('.nav-item[data-page="' + id + '"]'));
+}
+function filterRows(inputEl, containerSelector, rowSelector){
+  var q = inputEl.value.toLowerCase();
+  document.querySelectorAll(containerSelector + ' ' + rowSelector).forEach(function(row){
+    row.style.display = row.textContent.toLowerCase().indexOf(q) > -1 ? '' : 'none';
+  });
+}
+
+/* ---------- modal shell ---------- */
+function openModal(title, bodyHtml, footerHtml){
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = bodyHtml;
+  document.getElementById('modal-footer').innerHTML = footerHtml || '<button class="secondary" onclick="closeModal()">Close</button>';
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal(){
+  document.getElementById('modal-overlay').classList.remove('open');
+  modalContext = null;
+}
+function formInput(label,id,val,type){
+  type = type || 'text';
+  return '<div class="form-group"><label>' + label + '</label><input type="' + type + '" id="' + id + '" value="' + (val===undefined?'':val) + '"></div>';
+}
+function formTextarea(label,id){
+  return '<div class="form-group"><label>' + label + '</label><textarea id="' + id + '"></textarea></div>';
+}
+function formSelect(label,id,opts){
+  var o = opts.map(function(x){ return '<option>' + x + '</option>'; }).join('');
+  return '<div class="form-group"><label>' + label + '</label><select id="' + id + '">' + o + '</select></div>';
+}
+var CONSULTANTS = ['Prakriti Sunar','Rohan Bista','Alina Maharjan','Sanjeev Khatri'];
+var INTERNS = ['Sabin Oli','Manish Karki','Kripa Rana','Bishesh Lama','Anushka Thapa','Roshan Gurung'];
+
+/* ---------- dialer ---------- */
+function startCall(btn){
+  var row = btn.closest('.list-row');
+  var name = row.querySelector('.primary-text').textContent;
+  modalContext = { row: row };
+  openModal('Calling ' + name, '<p style="font-size:13px;color:var(--text-secondary);">Dialing... connected.</p>' + formSelect('Call outcome','call-outcome',['Interested — schedule follow-up','Not interested','Voicemail left','Requested callback']),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="logCallOutcome()">Log outcome</button>'
+  );
+}
+function logCallOutcome(){
+  var outcome = document.getElementById('call-outcome').value;
+  var row = modalContext.row;
+  var right = row.querySelector('.right');
+  right.innerHTML = '<span class="badge filled">' + outcome.split(' —')[0] + '</span>';
+  closeModal();
+}
+
+/* ---------- routing ---------- */
+function reassignLead(btn){
+  var row = btn.closest('.list-row');
+  modalContext = { row: row };
+  openModal('Reassign lead', formSelect('New consultant','ra-consultant', CONSULTANTS), '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveReassign()">Reassign</button>');
+}
+function saveReassign(){
+  var consultant = document.getElementById('ra-consultant').value;
+  modalContext.row.querySelector('.secondary-text') && (modalContext.row.querySelector('.right').querySelector('.secondary-text').textContent = consultant);
+  closeModal();
+}
+
+/* ---------- follow-up ---------- */
+function completeFollowup(btn){
+  var row = btn.closest('.list-row');
+  row.querySelector('.right').innerHTML = '<span class="badge filled">Completed</span>';
+}
+
+/* ---------- recordings ---------- */
+function reviewRecording(btn){
+  var row = btn.closest('.list-row');
+  var badge = row.querySelector('.badge');
+  badge.textContent = 'Reviewed';
+  badge.className = 'badge filled';
+  btn.remove();
+}
+
+/* ---------- scripts ---------- */
+function openNewScript(){
+  openModal('New script',
+    formInput('Scenario name','ns-name','') +
+    formTextarea('Script text','ns-text'),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveScript()">Save</button>'
+  );
+}
+function saveScript(){
+  var name = document.getElementById('ns-name').value || 'Untitled scenario';
+  var text = document.getElementById('ns-text').value || 'Script content to be finalized.';
+  var list = document.getElementById('scripts-list');
+  var box = document.createElement('div');
+  box.className = 'script-box';
+  box.innerHTML = '<strong>' + name + '</strong><p>' + text + '</p>';
+  list.appendChild(box);
+  closeModal();
+}
+
+/* ---------- daily metrics ---------- */
+function exportTodayReport(){
+  var list = document.getElementById('dailymetrics-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">Sep 9 report</div><div class="secondary-text">142 calls, 6 conversions</div></div><div class="right"><span class="badge filled">Sent</span></div>';
+  list.prepend(row);
+  openModal('Report exported', '<p style="font-size:13px;">Today\'s call volume, answer speed, and conversion metrics have been emailed to the Sales &amp; Call Center Manager and Operations Head.</p>', '<button class="primary" onclick="closeModal()">Done</button>');
+}
+
+/* ---------- applications ---------- */
+function openNewApplication(){
+  openModal('New application',
+    formInput('Applicant name','na-name','') +
+    formSelect('Program','na-program',['BSc Computer Science','BA Business','BBA']),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveApplication()">Start application</button>'
+  );
+}
+function saveApplication(){
+  var name = document.getElementById('na-name').value || 'Unnamed applicant';
+  var program = document.getElementById('na-program').value;
+  var list = document.getElementById('applications-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + name + '</div><div class="secondary-text">' + program + ' — personal details started</div></div><div class="right"><span class="badge dashed">In progress</span><button class="link-btn" onclick="advanceApplication(this)">Continue</button></div>';
+  list.appendChild(row);
+  closeModal();
+}
+function advanceApplication(btn){
+  var row = btn.closest('.list-row');
+  var badge = row.querySelector('.badge');
+  if(badge.textContent === 'In progress'){
+    badge.textContent = 'Documents complete';
+    badge.className = 'badge outline';
+    btn.textContent = 'Submit';
+  } else {
+    badge.textContent = 'Submitted';
+    badge.className = 'badge filled';
+    btn.remove();
+  }
+}
+
+/* ---------- fee rules ---------- */
+function openException(){
+  openModal('Request discount exception',
+    formSelect('Program','fe-program',['BSc Computer Science','BA Business','BBA']) +
+    formInput('Requested discount %','fe-pct','') +
+    formTextarea('Justification','fe-reason'),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="closeModal()">Send to Finance for approval</button>'
+  );
+}
+
+/* ---------- lost leads ---------- */
+function recoverLead(btn){
+  var row = btn.closest('.list-row');
+  row.querySelector('.right').innerHTML = '<span class="badge dashed">Re-engagement call scheduled</span>';
+}
+
+/* ---------- walk-ins ---------- */
+function openLogWalkin(){
+  openModal('Log walk-in',
+    formInput('Visitor name','lw-name','') +
+    formInput('Purpose','lw-purpose','e.g. fee inquiry') +
+    formSelect('Consultant','lw-consultant', CONSULTANTS),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveWalkin()">Log</button>'
+  );
+}
+function saveWalkin(){
+  var name = document.getElementById('lw-name').value || 'Unnamed visitor';
+  var purpose = document.getElementById('lw-purpose').value || 'General inquiry';
+  var consultant = document.getElementById('lw-consultant').value;
+  var list = document.getElementById('walkins-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  var now = new Date();
+  row.innerHTML = '<div><div class="primary-text">' + name + '</div><div class="secondary-text">' + purpose + ' — ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2,'0') + ' — ' + consultant + '</div></div><div class="right"><span class="badge filled">In progress</span></div>';
+  list.appendChild(row);
+  closeModal();
+}
+
+/* ---------- live chat ---------- */
+function replyChat(btn){
+  var row = btn.closest('.list-row');
+  openModal('Reply', formTextarea('Message','rc-message'), '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="sendChatReply()">Send</button>');
+  modalContext = { row: row };
+}
+function sendChatReply(){
+  var row = modalContext.row;
+  row.querySelector('.right').innerHTML = '<span class="badge filled">Replied</span>';
+  closeModal();
+}
+
+/* ---------- campus tours ---------- */
+function openScheduleTour(){
+  openModal('Schedule campus tour',
+    formInput('Delegation name','st-name','') +
+    '<div class="form-row-2">' + formInput('Group size','st-size','') + formInput('Date','st-date','','date') + '</div>' +
+    formSelect('Guide','st-guide', INTERNS),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveTour()">Schedule</button>'
+  );
+}
+function saveTour(){
+  var name = document.getElementById('st-name').value || 'Untitled delegation';
+  var size = document.getElementById('st-size').value || '—';
+  var date = document.getElementById('st-date').value || 'TBC';
+  var guide = document.getElementById('st-guide').value;
+  var list = document.getElementById('campustours-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + name + '</div><div class="secondary-text">' + size + ' students — ' + date + ' — guide: ' + guide + '</div></div><div class="right"><span class="badge filled">Confirmed</span></div>';
+  list.appendChild(row);
+  closeModal();
+}
+function assignGuide(btn){
+  var row = btn.closest('.list-row');
+  modalContext = { row: row };
+  openModal('Assign guide', formSelect('Intern guide','ag-guide', INTERNS), '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveGuide()">Assign</button>');
+}
+function saveGuide(){
+  var guide = document.getElementById('ag-guide').value;
+  var row = modalContext.row;
+  row.querySelector('.secondary-text').textContent = row.querySelector('.secondary-text').textContent.replace('guide not yet assigned', 'guide: ' + guide);
+  row.querySelector('.right').innerHTML = '<span class="badge filled">Confirmed</span>';
+  closeModal();
+}
+
+/* ---------- intern recruitment ---------- */
+function openNewApplicant(){
+  openModal('Log applicant',
+    formInput('Applicant name','ia-name','') +
+    formSelect('Program','ia-program',['BSc Computer Science','BA Business','BBA']),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveApplicant()">Save</button>'
+  );
+}
+function saveApplicant(){
+  var name = document.getElementById('ia-name').value || 'Unnamed applicant';
+  var program = document.getElementById('ia-program').value;
+  var list = document.getElementById('internrecruit-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + name + '</div><div class="secondary-text">1st year, ' + program + '</div></div><div class="right"><span class="badge outline">Applied</span><button class="link-btn" onclick="scheduleInterview(this)">Schedule interview</button></div>';
+  list.appendChild(row);
+  closeModal();
+}
+function scheduleInterview(btn){
+  var row = btn.closest('.list-row');
+  var badge = row.querySelector('.badge');
+  badge.textContent = 'Interview scheduled';
+  badge.className = 'badge dashed';
+  btn.remove();
+}
+
+/* ---------- intern shifts ---------- */
+function openAssignShift(){
+  openModal('Assign shift',
+    formSelect('Intern','as-intern', INTERNS) +
+    formInput('Days &amp; times','as-times','e.g. Tue and Thu, 2:00-5:00 PM'),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveShift()">Assign</button>'
+  );
+}
+function saveShift(){
+  var intern = document.getElementById('as-intern').value;
+  var times = document.getElementById('as-times').value || 'Schedule TBC';
+  var list = document.getElementById('internshifts-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + intern + '</div><div class="secondary-text">' + times + ' — checking timetable conflict</div></div><div class="right"><span class="badge dashed">Checking conflict</span></div>';
+  list.appendChild(row);
+  closeModal();
+}
+
+/* ---------- intern appraisals ---------- */
+function openNewAppraisal(){
+  openModal('New appraisal',
+    formSelect('Intern','ap-intern', INTERNS) +
+    '<div class="form-row-2">' + formInput('Communication score (/5)','ap-comm','') + formInput('Task efficiency (/5)','ap-eff','') + '</div>',
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveAppraisal()">Save</button>'
+  );
+}
+function saveAppraisal(){
+  var intern = document.getElementById('ap-intern').value;
+  var comm = document.getElementById('ap-comm').value || '—';
+  var eff = document.getElementById('ap-eff').value || '—';
+  var list = document.getElementById('internappraisals-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + intern + '</div><div class="secondary-text">Communication ' + comm + '/5 — task efficiency ' + eff + '/5</div></div><div class="right"><span class="badge filled">Reviewed just now</span></div>';
+  list.appendChild(row);
+  closeModal();
+}
+
+/* ---------- intern timecards ---------- */
+function approveTimecard(btn){
+  var row = btn.closest('.list-row');
+  var badge = row.querySelector('.badge');
+  badge.textContent = 'Approved';
+  badge.className = 'badge filled';
+  btn.remove();
+}
+
+/* ---------- intern compensation ---------- */
+function sendToPayroll(btn){
+  var row = btn.closest('.list-row');
+  var badge = row.querySelector('.badge');
+  badge.textContent = 'In payroll';
+  badge.className = 'badge filled';
+  btn.remove();
+  openModal('Sent to payroll', '<p style="font-size:13px;">This intern\'s validated hours have been routed to the Finance payroll module for disbursement.</p>', '<button class="primary" onclick="closeModal()">Done</button>');
+}
+</script>
+</body>
+</html>

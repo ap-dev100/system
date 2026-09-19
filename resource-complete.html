@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ING ERP — Resource Department</title>
+<style>
+  :root{
+    --surface-1:#fafafa;
+    --surface-2:#f2f2f2;
+    --border:#e6e6e6;
+    --border-strong:#cfcfcf;
+    --text-primary:#111111;
+    --text-secondary:#5a5a5e;
+    --text-muted:#9a9a9e;
+    --fill-primary:#000000;
+    --on-primary:#ffffff;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--surface-2);color:var(--text-primary);}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;background:#fff;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:10px;}
+  .topbar .who{font-size:12px;color:var(--text-secondary);}
+  .topbar .who strong{color:var(--text-primary);font-weight:600;}
+  .app{display:flex;min-height:100vh;}
+  .sidebar{width:225px;flex-shrink:0;background:var(--surface-1);border-right:1px solid var(--border);padding:18px 12px;overflow-y:auto;}
+  .brand{display:flex;align-items:center;gap:10px;padding:0 8px 14px;}
+  .brand .mark{width:24px;height:24px;border-radius:6px;background:var(--fill-primary);flex-shrink:0;}
+  .brand .name{font-size:13px;font-weight:600;line-height:1.3;}
+  .brand .role{font-size:11px;color:var(--text-muted);line-height:1.3;}
+  .nav-item{display:block;padding:7px 10px;border-radius:7px;font-size:13px;color:var(--text-secondary);cursor:pointer;margin-bottom:2px;}
+  .nav-item:hover{background:var(--surface-2);}
+  .nav-item.active{background:var(--fill-primary);color:var(--on-primary);}
+  .nav-divider{border-top:1px solid var(--border);margin:10px 4px;}
+  .group{margin-bottom:12px;}
+  .group-label{font-size:11px;font-weight:600;color:var(--text-muted);margin:0 0 4px 10px;}
+  .main{flex:1;padding:32px 36px;min-width:0;}
+  .page{display:none;}
+  .page.active{display:block;}
+  .page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:12px;}
+  h1{font-size:22px;margin:0;font-weight:600;}
+  .subtitle{font-size:13px;color:var(--text-secondary);margin:5px 0 0;}
+  .section-label{font-size:12px;font-weight:600;color:var(--text-muted);margin:0 0 8px;}
+  button.primary{background:var(--fill-primary);color:var(--on-primary);border:none;border-radius:8px;padding:10px 16px;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;}
+  button.secondary{background:#fff;color:var(--text-primary);border:1px solid var(--border-strong);border-radius:8px;padding:10px 16px;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;}
+  .link-btn{background:none;border:none;color:var(--text-primary);font-size:12px;font-weight:600;text-decoration:underline;cursor:pointer;padding:0;white-space:nowrap;}
+  .toolbar{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;align-items:center;}
+  input[type=text], input[type=number], input[type=date], select, textarea{border:1px solid var(--border-strong);border-radius:8px;padding:10px 12px;font-size:13px;background:#fff;color:var(--text-primary);font-family:inherit;}
+  input[type=text]{flex:1;min-width:160px;}
+  select{width:170px;}
+  .badge{font-size:11px;padding:2px 9px;border-radius:999px;white-space:nowrap;}
+  .badge.filled{background:var(--fill-primary);color:var(--on-primary);}
+  .badge.outline{border:1px solid var(--border-strong);color:var(--text-secondary);}
+  .badge.dashed{border:1px dashed var(--border-strong);color:var(--text-secondary);}
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+  .stat-grid.cols-3{grid-template-columns:repeat(3,1fr);}
+  .stat-card{border:1px solid var(--border);border-radius:var(--radius);background:#fff;padding:16px 18px;}
+  .stat-value{font-size:22px;font-weight:700;}
+  .stat-label{font-size:12px;color:var(--text-secondary);margin-top:4px;}
+  .list{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:#fff;}
+  .list-row{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;gap:14px;border-bottom:1px solid var(--border);}
+  .list-row:last-child{border-bottom:none;}
+  .list-row .primary-text{font-size:14px;font-weight:600;}
+  .list-row .secondary-text{font-size:12px;color:var(--text-secondary);margin-top:3px;}
+  .list-row .right{display:flex;align-items:center;gap:10px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;}
+  .table-wrap{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:#fff;overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;}
+  th,td{padding:11px 13px;font-size:13px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;}
+  th{font-weight:600;color:var(--text-secondary);background:var(--surface-1);font-size:12px;}
+  tbody tr:last-child td{border-bottom:none;}
+  td.num{text-align:right;font-variant-numeric:tabular-nums;}
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:50;align-items:center;justify-content:center;padding:20px;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:#fff;border-radius:12px;max-width:460px;width:100%;max-height:86vh;overflow-y:auto;border:1px solid var(--border-strong);}
+  .modal-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);}
+  .modal-header h3{margin:0;font-size:16px;}
+  .modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-secondary);line-height:1;padding:4px;}
+  .modal-body{padding:18px 20px;}
+  .modal-footer{display:flex;justify-content:flex-end;gap:8px;padding:14px 20px;border-top:1px solid var(--border);}
+  .form-group{margin-bottom:14px;}
+  .form-group label{display:block;font-size:12px;color:var(--text-secondary);margin-bottom:5px;font-weight:600;}
+  .form-group input, .form-group select, .form-group textarea{width:100%;}
+  .form-group textarea{resize:vertical;min-height:70px;}
+  .form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px;}
+  .form-row-2 input, .form-row-2 select{width:100%;}
+  @media (max-width:640px){ .sidebar{display:none;} .main{padding:22px;} .stat-grid{grid-template-columns:1fr 1fr;} }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="who">Signed in as <strong>Mr. Suresh Lama</strong> — Resource Department Manager</div>
+  <div class="who">Physical infrastructure, procurement, and logistics</div>
+</div>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="mark"></div><div><div class="name">ING ERP</div><div class="role">Resource Dept</div></div></div>
+    <div class="nav-item active" data-page="dashboard" onclick="showPage('dashboard', this)">Dashboard</div>
+    <div class="nav-divider"></div>
+    <nav>
+      <div class="group"><p class="group-label">Procurement</p>
+        <div class="nav-item" data-page="procurement" onclick="showPage('procurement', this)">Procurement routing</div>
+        <div class="nav-item" data-page="supplierperf" onclick="showPage('supplierperf', this)">Supplier performance</div>
+        <div class="nav-item" data-page="vendorcontracts" onclick="showPage('vendorcontracts', this)">Vendor contracts</div>
+      </div>
+      <div class="group"><p class="group-label">Facilities</p>
+        <div class="nav-item" data-page="maintenance" onclick="showPage('maintenance', this)">Preventative maintenance</div>
+        <div class="nav-item" data-page="utility" onclick="showPage('utility', this)">Utility consumption</div>
+        <div class="nav-item" data-page="spaceutil" onclick="showPage('spaceutil', this)">Space utilization</div>
+      </div>
+      <div class="group"><p class="group-label">Assets &amp; safety</p>
+        <div class="nav-item" data-page="assetdisposal" onclick="showPage('assetdisposal', this)">Asset disposal</div>
+        <div class="nav-item" data-page="hazmat" onclick="showPage('hazmat', this)">Hazardous materials</div>
+        <div class="nav-item" data-page="insurance" onclick="showPage('insurance', this)">Insurance policies</div>
+        <div class="nav-item" data-page="keyaccess" onclick="showPage('keyaccess', this)">Key access control</div>
+      </div>
+      <div class="group"><p class="group-label">Events &amp; fleet</p>
+        <div class="nav-item" data-page="events" onclick="showPage('events', this)">Event logistics</div>
+        <div class="nav-item" data-page="fleet" onclick="showPage('fleet', this)">Fleet management</div>
+      </div>
+      <div class="group"><p class="group-label">Operations</p>
+        <div class="nav-item" data-page="inventory" onclick="showPage('inventory', this)">Inventory alerts</div>
+        <div class="nav-item" data-page="catering" onclick="showPage('catering', this)">Catering services</div>
+        <div class="nav-item" data-page="capex" onclick="showPage('capex', this)">Capital expenditure</div>
+      </div>
+    </nav>
+  </aside>
+
+  <main class="main">
+
+    <section class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div><h1>Resource Department overview</h1><p class="subtitle">Infrastructure, procurement, and logistics</p></div>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-value">2</div><div class="stat-label">Open procurement requests</div></div>
+        <div class="stat-card"><div class="stat-value">3</div><div class="stat-label">Low stock items</div></div>
+        <div class="stat-card"><div class="stat-value">2</div><div class="stat-label">Maintenance due this week</div></div>
+        <div class="stat-card"><div class="stat-value">1</div><div class="stat-label">Contract expiring soon</div></div>
+      </div>
+      <div class="list" style="margin-bottom:20px;">
+        <div class="list-row"><div><div class="primary-text">Lab PC replacement ready to fulfill</div><div class="secondary-text">Approved by Finance, ordered from Dell Nepal</div></div><div class="right"><button class="link-btn" onclick="goTo('procurement')">Open</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Fire extinguisher inspection due</div><div class="secondary-text">Main Building — due Sep 14</div></div><div class="right"><button class="link-btn" onclick="goTo('maintenance')">Open</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Campus Security contract expires in 20 days</div><div class="secondary-text">Renewal needed</div></div><div class="right"><button class="link-btn" onclick="goTo('vendorcontracts')">Review</button></div></div>
+      </div>
+      <div class="toolbar">
+        <button class="secondary" onclick="openNewProcurement()">+ New procurement request</button>
+        <button class="secondary" onclick="openLogMaintenance()">+ Log maintenance</button>
+        <button class="secondary" onclick="openBookEvent()">+ Book event space</button>
+      </div>
+    </section>
+
+    <section class="page" id="page-procurement">
+      <div class="page-header">
+        <div><h1>Procurement Lifecycle Routing</h1><p class="subtitle">Supplier entry, validation, and delivery confirmation</p></div>
+        <button class="primary" onclick="openNewProcurement()">+ New request</button>
+      </div>
+      <div class="list" id="procurement-list">
+        <div class="list-row"><div><div class="primary-text">Lab PC replacement (5 units)</div><div class="secondary-text">Dell Nepal — approved by Finance, awaiting delivery</div></div><div class="right"><span class="badge dashed">In transit</span><button class="link-btn" onclick="confirmDelivery(this)">Confirm delivery</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Merch restock — ING Hoodies</div><div class="secondary-text">Local apparel supplier — for Branding &amp; PR</div></div><div class="right"><span class="badge dashed">In transit</span><button class="link-btn" onclick="confirmDelivery(this)">Confirm delivery</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Cleaning supplies, Q3</div><div class="secondary-text">CleanCo Nepal</div></div><div class="right"><span class="badge filled">Delivered</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-supplierperf">
+      <div class="page-header">
+        <div><h1>Supplier Performance Matrix</h1><p class="subtitle">Delivery speed, quality, and price consistency</p></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Supplier</th><th>On-time delivery</th><th>Quality score</th><th>Price consistency</th></tr></thead>
+          <tbody>
+            <tr><td>Dell Nepal</td><td class="num">92%</td><td class="num">4.5 / 5</td><td>Stable</td></tr>
+            <tr><td>Kathmandu Print House</td><td class="num">88%</td><td class="num">4.2 / 5</td><td>Stable</td></tr>
+            <tr><td>CleanCo Nepal</td><td class="num">95%</td><td class="num">4.7 / 5</td><td>Stable</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="page" id="page-vendorcontracts">
+      <div class="page-header">
+        <div><h1>Vendor Contract Expiry Timer</h1><p class="subtitle">Renewal alerts for security, catering, and cleaning</p></div>
+      </div>
+      <div class="list" id="vendorcontracts-list">
+        <div class="list-row"><div><div class="primary-text">Campus Security Services</div><div class="secondary-text">Expires Oct 2, 2026 — 20 days remaining</div></div><div class="right"><span class="badge outline">Renewal needed</span><button class="link-btn" onclick="initiateRenewal(this)">Initiate renewal</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Kathmandu Print House</div><div class="secondary-text">Expires Mar 2027</div></div><div class="right"><span class="badge filled">OK</span></div></div>
+        <div class="list-row"><div><div class="primary-text">CleanCo Nepal</div><div class="secondary-text">Expires Jun 2027</div></div><div class="right"><span class="badge filled">OK</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-maintenance">
+      <div class="page-header">
+        <div><h1>Preventative Maintenance Planner</h1><p class="subtitle">Recurring work orders</p></div>
+        <button class="primary" onclick="openLogMaintenance()">+ Log maintenance</button>
+      </div>
+      <div class="list" id="maintenance-list">
+        <div class="list-row"><div><div class="primary-text">Fire extinguisher inspection</div><div class="secondary-text">Main Building — due Sep 14</div></div><div class="right"><span class="badge dashed">Due</span><button class="link-btn" onclick="completeMaintenance(this)">Mark complete</button></div></div>
+        <div class="list-row"><div><div class="primary-text">HVAC servicing</div><div class="secondary-text">IT Building — Sep 20</div></div><div class="right"><span class="badge outline">Scheduled</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Fire drill</div><div class="secondary-text">All buildings — Oct 1</div></div><div class="right"><span class="badge outline">Scheduled</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-utility">
+      <div class="page-header">
+        <div><h1>Utility Consumption Dashboard</h1><p class="subtitle">Power, water, and fuel usage by building</p></div>
+      </div>
+      <div class="stat-grid cols-3">
+        <div class="stat-card"><div class="stat-value">27,500 kWh</div><div class="stat-label">Total power this month</div></div>
+        <div class="stat-card"><div class="stat-value">900 kL</div><div class="stat-label">Total water this month</div></div>
+        <div class="stat-card"><div class="stat-value">NPR 33,000</div><div class="stat-label">Fleet fuel this month</div></div>
+      </div>
+      <div class="list">
+        <div class="list-row"><div><div class="primary-text">Main Building</div><div class="secondary-text">Power stable — water stable</div></div><div class="right"><span class="secondary-text">12,400 kWh, 340 kL</span></div></div>
+        <div class="list-row"><div><div class="primary-text">IT Building (Server Room)</div><div class="secondary-text">Power trending up — HPC cluster load increasing</div></div><div class="right"><span class="secondary-text">8,900 kWh, 40 kL</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Hostel Block B</div><div class="secondary-text">Power stable — water stable</div></div><div class="right"><span class="secondary-text">6,200 kWh, 520 kL</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-spaceutil">
+      <div class="page-header">
+        <div><h1>Space Utilization Analytics</h1><p class="subtitle">Identifying underused teaching spaces</p></div>
+      </div>
+      <div class="list">
+        <div class="list-row"><div><div class="primary-text">Room B204</div><div class="secondary-text">CS204 lectures and exams</div></div><div class="right"><span class="badge filled">78% utilized</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Room A110</div><div class="secondary-text">CS210 lectures</div></div><div class="right"><span class="badge dashed">65% utilized</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Room C101</div><div class="secondary-text">Rarely booked this term</div></div><div class="right"><span class="badge outline">12% utilized — underused</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-assetdisposal">
+      <div class="page-header">
+        <div><h1>Asset Disposal Records</h1><p class="subtitle">Decommissioning, sale, and scrapping</p></div>
+        <button class="primary" onclick="openNewDisposal()">+ New disposal record</button>
+      </div>
+      <div class="list" id="assetdisposal-list">
+        <div class="list-row"><div><div class="primary-text">Old Lab PC #3</div><div class="secondary-text">SN-12045 — flagged disposed in IT Support's asset registry</div></div><div class="right"><span class="badge dashed">Pending certified recycling</span><button class="link-btn" onclick="confirmDisposal(this)">Confirm disposal</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Old projector, Room A110</div><div class="secondary-text">Sold to staff, Aug 2026</div></div><div class="right"><span class="badge filled">Completed</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-hazmat">
+      <div class="page-header">
+        <div><h1>Hazardous Material Tracker</h1><p class="subtitle">Lab chemicals and electronics disposal compliance</p></div>
+        <button class="primary" onclick="openNewHazmat()">+ Log material</button>
+      </div>
+      <div class="list" id="hazmat-list">
+        <div class="list-row"><div><div class="primary-text">Lab chemicals — Chemistry</div><div class="secondary-text">Science Lab — scheduled disposal Oct 2026</div></div><div class="right"><span class="badge filled">Compliant</span></div></div>
+        <div class="list-row"><div><div class="primary-text">E-waste — old lab PCs</div><div class="secondary-text">IT Storage — includes Old Lab PC #3</div></div><div class="right"><span class="badge dashed">Pending certified disposal</span><button class="link-btn" onclick="schedulePickup(this)">Schedule pickup</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-insurance">
+      <div class="page-header">
+        <div><h1>Insurance Policy Repository</h1><p class="subtitle">Coverage, claims, and renewal cycles</p></div>
+        <button class="primary" onclick="openNewPolicy()">+ New policy</button>
+      </div>
+      <div class="list" id="insurance-list">
+        <div class="list-row"><div><div class="primary-text">Campus Property Insurance</div><div class="secondary-text">Nepal Insurance Co — NPR 50,000,000 coverage</div></div><div class="right"><span class="secondary-text">Renews Jan 2027</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Vehicle Fleet Insurance</div><div class="secondary-text">Nepal Insurance Co — NPR 5,000,000 coverage</div></div><div class="right"><span class="secondary-text">Renews Mar 2027</span></div></div>
+        <div class="list-row"><div><div class="primary-text">HPC Cluster Equipment Insurance</div><div class="secondary-text">Himal Insurance — NPR 2,000,000 coverage</div></div><div class="right"><span class="secondary-text">Renews Dec 2026</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-keyaccess">
+      <div class="page-header">
+        <div><h1>Key Access Control Registry</h1><p class="subtitle">Physical keys and digital keycard levels</p></div>
+        <button class="primary" onclick="openIssueKey()">+ Issue key or keycard</button>
+      </div>
+      <div class="list" id="keyaccess-list">
+        <div class="list-row"><div><div class="primary-text">Dr. Meera Joshi</div><div class="secondary-text">Physical key: Room B204 — keycard: Faculty level</div></div><div class="right"><span class="badge filled">Active</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Mr. Bikash Shrestha</div><div class="secondary-text">Physical key: CS204 Lab — keycard: Lab Assistant level</div></div><div class="right"><span class="badge filled">Active</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Mr. Deepak Karki</div><div class="secondary-text">Physical key: Server Room — keycard: IT Admin level</div></div><div class="right"><span class="badge filled">Active</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-events">
+      <div class="page-header">
+        <div><h1>Campus Event Logistics Framework</h1><p class="subtitle">Space, tech, and security setups</p></div>
+        <button class="primary" onclick="openBookEvent()">+ New event</button>
+      </div>
+      <div class="list" id="events-list">
+        <div class="list-row"><div><div class="primary-text">Open Day Sep 2026</div><div class="secondary-text">Main Quad — AV setup, tents — co-managed with BD / DMU</div></div><div class="right"><span class="badge filled">Confirmed</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Biratnagar HS Career Fair</div><div class="secondary-text">Off-campus — booth equipment shipped — co-managed with Branding &amp; PR</div></div><div class="right"><span class="badge filled">Confirmed</span></div></div>
+        <div class="list-row"><div><div class="primary-text">ING Annual Research Symposium</div><div class="secondary-text">Auditorium — AV, catering — co-managed with R&amp;D Wing</div></div><div class="right"><span class="badge dashed">Planning</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-fleet">
+      <div class="page-header">
+        <div><h1>Fleet Management Log</h1><p class="subtitle">Maintenance, drivers, and fuel expense</p></div>
+      </div>
+      <div class="list" id="fleet-list">
+        <div class="list-row"><div><div class="primary-text">Campus Van #1</div><div class="secondary-text">Driver: Mr. Hari Tamang — NPR 18,000 fuel this month</div></div><div class="right"><span class="badge filled">Serviced Aug 2026</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Campus Van #2</div><div class="secondary-text">Driver: Mr. Bikram Rai — NPR 15,000 fuel this month</div></div><div class="right"><span class="badge dashed">Service due</span><button class="link-btn" onclick="scheduleService(this)">Schedule service</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-inventory">
+      <div class="page-header">
+        <div><h1>Inventory Stock Alerter</h1><p class="subtitle">Campus supplies, stationery, and cleaning materials</p></div>
+      </div>
+      <div class="table-wrap">
+        <table id="inventory-table">
+          <thead><tr><th>Item</th><th>Stock</th><th>Reorder threshold</th><th>Status</th><th></th></tr></thead>
+          <tbody>
+            <tr><td>Printer paper (reams)</td><td class="num">40</td><td class="num">100</td><td><span class="badge outline">Low stock</span></td><td><button class="link-btn" onclick="reorderInventory(this)">Reorder</button></td></tr>
+            <tr><td>Cleaning supplies</td><td class="num">200</td><td class="num">50</td><td><span class="badge filled">OK</span></td><td></td></tr>
+            <tr><td>Office stationery kits</td><td class="num">15</td><td class="num">30</td><td><span class="badge outline">Low stock</span></td><td><button class="link-btn" onclick="reorderInventory(this)">Reorder</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="page" id="page-catering">
+      <div class="page-header">
+        <div><h1>Catering Service Overseer</h1><p class="subtitle">Stock and compliance for dining outlets</p></div>
+      </div>
+      <div class="list" id="catering-list">
+        <div class="list-row"><div><div class="primary-text">Main Cafeteria</div><div class="secondary-text">Stock OK — last health inspection passed, Sep 1</div></div><div class="right"><span class="badge filled">Compliant</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Coffee Shop, Library</div><div class="secondary-text">Low on cups — last inspection passed</div></div><div class="right"><span class="badge dashed">Low stock</span><button class="link-btn" onclick="reorderCatering(this)">Reorder</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-capex">
+      <div class="page-header">
+        <div><h1>Capital Expenditure Planner</h1><p class="subtitle">Multi-year investment projections</p></div>
+        <button class="primary" onclick="openNewCapex()">+ New project</button>
+      </div>
+      <div class="list" id="capex-list">
+        <div class="list-row"><div><div class="primary-text">New Library Wing</div><div class="secondary-text">Est. NPR 15,000,000 — 2027</div></div><div class="right"><span class="badge dashed">Planning</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Lab Modernization — CS Department</div><div class="secondary-text">Est. NPR 3,000,000 — 2026</div></div><div class="right"><span class="badge filled">Approved</span></div></div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this) closeModal()">
+  <div class="modal">
+    <div class="modal-header"><h3 id="modal-title"></h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer" id="modal-footer"></div>
+  </div>
+</div>
+
+<script>
+var modalContext = null;
+
+function showPage(id, el){
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
+  if(el) el.classList.add('active');
+}
+function goTo(id){
+  showPage(id, document.querySelector('.nav-item[data-page="' + id + '"]'));
+}
+
+/* ---------- modal shell ---------- */
+function openModal(title, bodyHtml, footerHtml){
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = bodyHtml;
+  document.getElementById('modal-footer').innerHTML = footerHtml || '<button class="secondary" onclick="closeModal()">Close</button>';
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal(){
+  document.getElementById('modal-overlay').classList.remove('open');
+  modalContext = null;
+}
+function formInput(label,id,val,type){
+  type = type || 'text';
+  return '<div class="form-group"><label>' + label + '</label><input type="' + type + '" id="' + id + '" value="' + (val===undefined?'':val) + '"></div>';
+}
+function formTextarea(label,id){
+  return '<div class="form-group"><label>' + label + '</label><textarea id="' + id + '"></textarea></div>';
+}
+function formSelect(label,id,opts){
+  var o = opts.map(function(x){ return '<option>' + x + '</option>'; }).join('');
+  return '<div class="form-group"><label>' + label + '</label><select id="' + id + '">' + o + '</select></div>';
+}
+
+/* ---------- procurement ---------- */
+function openNewProcurement(){
+  openModal('New procurement request',
+    formInput('Item / description','np-item','') +
+    '<div class="form-row-2">' + formInput('Supplier','np-supplier','') + formInput('Requested by department','np-dept','') + '</div>',
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveProcurement()">Submit</button>'
+  );
+}
+function saveProcurement(){
+  var item = document.getElementById('np-item').value || 'Untitled request';
+  var supplier = document.getElementById('np-supplier').value || 'Supplier TBC';
+  var dept = document.getElementById('np-dept').value || 'Unspecified department';
+  var list = document.getElementById('procurement-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + item + '</div><div class="secondary-text">' + supplier + ' — requested by ' + dept + '</div></div><div class="right"><span class="badge outline">Validation pending</span></div>';
+  list.appendChild(row);
+  closeModal();
+}
+function confirmDelivery(btn){
+  var row = btn.closest('.list-row');
+  row.querySelector('.right').innerHTML = '<span class="badge filled">Delivered</span>';
+  btn.remove();
+}
+
+/* ---------- vendor contracts ---------- */
+function initiateRenewal(btn){
+  var row = btn.closest('.list-row');
+  row.querySelector('.right').innerHTML = '<span class="badge dashed">Renewal in progress</span>';
+  btn.remove();
+}
+
+/* ---------- maintenance ---------- */
+function openLogMaintenance(){
+  openModal('Log maintenance',
+    formInput('Task','lm-task','') +
+    '<div class="form-row-2">' + formInput('Building','lm-building','') + formInput('Due date','lm-due','','date') + '</div>',
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveMaintenance()">Schedule</button>'
+  );
+}
+function saveMaintenance(){
+  var task = document.getElementById('lm-task').value || 'Untitled task';
+  var building = document.getElementById('lm-building').value || 'Unspecified building';
+  var due = document.getElementById('lm-due').value || 'TBC';
+  var list = document.getElementById('maintenance-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + task + '</div><div class="secondary-text">' + building + ' — due ' + due + '</div></div><div class="right"><span class="badge outline">Scheduled</span></div>';
+  list.appendChild(row);
+  closeModal();
+}
+function completeMaintenance(btn){
+  var row = btn.closest('.list-row');
+  row.querySelector('.right').innerHTML = '<span class="badge filled">Complete</span>';
+  btn.remove();
+}
+
+/* ---------- asset disposal ---------- */
+function openNewDisposal(){
+  openModal('New disposal record',
+    formInput('Asset','nd-asset','') +
+    formSelect('Method','nd-method',['Certified recycling','Sold to staff','Scrapped']),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveDisposal()">Log</button>'
+  );
+}
+function saveDisposal(){
+  var asset = document.getElementById('nd-asset').value || 'Untitled asset';
+  var method = document.getElementById('nd-method').value;
+  var list = document.getElementById('assetdisposal-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + asset + '</div><div class="secondary-text">' + method + ' — logged just now</div></div><div class="right"><span class="badge dashed">Pending</span></div>';
+  list.appendChild(row);
+  closeModal();
+}
+function confirmDisposal(btn){
+  var row = btn.closest('.list-row');
+  row.querySelector('.right').innerHTML = '<span class="badge filled">Completed</span>';
+  btn.remove();
+}
+
+/* ---------- hazardous materials ---------- */
+function openNewHazmat(){
+  openModal('Log hazardous material',
+    formInput('Material','nh-material','') +
+    formInput('Location','nh-location',''),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveHazmat()">Log</button>'
+  );
+}
+function saveHazmat(){
+  var material = document.getElementById('nh-material').value || 'Untitled material';
+  var location = document.getElementById('nh-location').value || 'Location TBC';
+  var list = document.getElementById('hazmat-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + material + '</div><div class="secondary-text">' + location + '</div></div><div class="right"><span class="badge dashed">Tracking</span></div>';
+  list.appendChild(row);
+  closeModal();
+}
+function schedulePickup(btn){
+  var row = btn.closest('.list-row');
+  row.querySelector('.right').innerHTML = '<span class="badge filled">Pickup scheduled</span>';
+  btn.remove();
+}
+
+/* ---------- insurance ---------- */
+function openNewPolicy(){
+  openModal('New policy',
+    formInput('Policy name','np2-name','') +
+    '<div class="form-row-2">' + formInput('Provider','np2-provider','') + formInput('Coverage amount','np2-coverage','') + '</div>',
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="savePolicy()">Save</button>'
+  );
+}
+function savePolicy(){
+  var name = document.getElementById('np2-name').value || 'Untitled policy';
+  var provider = document.getElementById('np2-provider').value || 'Unspecified provider';
+  var coverage = document.getElementById('np2-coverage').value || '0';
+  var list = document.getElementById('insurance-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + name + '</div><div class="secondary-text">' + provider + ' — NPR ' + coverage + ' coverage</div></div><div class="right"><span class="secondary-text">Renewal TBC</span></div>';
+  list.appendChild(row);
+  closeModal();
+}
+
+/* ---------- key access ---------- */
+function openIssueKey(){
+  openModal('Issue key or keycard',
+    formInput('Person','ik-person','') +
+    '<div class="form-row-2">' + formInput('Physical key','ik-key','e.g. Room B204') + formSelect('Keycard level','ik-level',['Faculty level','Lab Assistant level','IT Admin level','Staff level']) + '</div>',
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveKeyIssue()">Issue</button>'
+  );
+}
+function saveKeyIssue(){
+  var person = document.getElementById('ik-person').value || 'Unnamed person';
+  var key = document.getElementById('ik-key').value || 'No physical key';
+  var level = document.getElementById('ik-level').value;
+  var list = document.getElementById('keyaccess-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + person + '</div><div class="secondary-text">Physical key: ' + key + ' — keycard: ' + level + '</div></div><div class="right"><span class="badge filled">Active</span></div>';
+  list.appendChild(row);
+  closeModal();
+}
+
+/* ---------- events ---------- */
+function openBookEvent(){
+  openModal('New event',
+    formInput('Event name','be-name','') +
+    '<div class="form-row-2">' + formInput('Space','be-space','') + formInput('Co-managed with','be-comanage','e.g. BD, R&D Wing') + '</div>',
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveEvent()">Save</button>'
+  );
+}
+function saveEvent(){
+  var name = document.getElementById('be-name').value || 'Untitled event';
+  var space = document.getElementById('be-space').value || 'Space TBC';
+  var comanage = document.getElementById('be-comanage').value || 'no co-management flagged';
+  var list = document.getElementById('events-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + name + '</div><div class="secondary-text">' + space + ' — co-managed with ' + comanage + '</div></div><div class="right"><span class="badge dashed">Planning</span></div>';
+  list.appendChild(row);
+  closeModal();
+}
+
+/* ---------- fleet ---------- */
+function scheduleService(btn){
+  var row = btn.closest('.list-row');
+  row.querySelector('.right').innerHTML = '<span class="badge filled">Service scheduled</span>';
+  btn.remove();
+}
+
+/* ---------- inventory ---------- */
+function reorderInventory(btn){
+  var tr = btn.closest('tr');
+  var item = tr.children[0].textContent;
+  tr.children[3].innerHTML = '<span class="badge dashed">Reorder placed</span>';
+  btn.remove();
+}
+
+/* ---------- catering ---------- */
+function reorderCatering(btn){
+  var row = btn.closest('.list-row');
+  row.querySelector('.right').innerHTML = '<span class="badge filled">Reorder placed</span>';
+  btn.remove();
+}
+
+/* ---------- capex ---------- */
+function openNewCapex(){
+  openModal('New capital project',
+    formInput('Project name','ncx-name','') +
+    '<div class="form-row-2">' + formInput('Estimated cost','ncx-cost','') + formInput('Target year','ncx-year','') + '</div>',
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveCapex()">Save</button>'
+  );
+}
+function saveCapex(){
+  var name = document.getElementById('ncx-name').value || 'Untitled project';
+  var cost = document.getElementById('ncx-cost').value || '0';
+  var year = document.getElementById('ncx-year').value || 'TBC';
+  var list = document.getElementById('capex-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + name + '</div><div class="secondary-text">Est. NPR ' + cost + ' — ' + year + '</div></div><div class="right"><span class="badge dashed">Planning</span></div>';
+  list.appendChild(row);
+  closeModal();
+}
+</script>
+</body>
+</html>

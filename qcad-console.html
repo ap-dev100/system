@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QCAD Console — Group Quality Assurance</title>
+<style>
+:root{
+  --bg:#ffffff;
+  --ink:#111111;
+  --ink-soft:#5b5b5b;
+  --ink-faint:#9a9a9a;
+  --line:#dcdcdc;
+  --line-strong:#b7b7b7;
+  --fill:#f4f4f4;
+  --sidebar:#070707;
+  --sidebar-line:#242424;
+  --sidebar-ink:#cfcfcf;
+  --sidebar-ink-dim:#7a7a7a;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{font-family:var(--sans);color:var(--ink);background:var(--bg);font-size:14.5px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+button,input,select,textarea{font-family:inherit;}
+.app{display:flex;min-height:100vh;}
+
+.sidebar{width:264px;flex-shrink:0;background:var(--sidebar);color:var(--sidebar-ink);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.brand{padding:24px 22px 16px;border-bottom:1px solid var(--sidebar-line);}
+.brand-mark{font-family:var(--serif);font-size:18px;color:#fff;letter-spacing:.01em;}
+.brand-sub{font-size:10.7px;color:var(--sidebar-ink-dim);margin-top:5px;}
+.nav{flex:1;padding:10px 8px;overflow-y:auto;}
+.nav-item{display:flex;align-items:center;gap:10px;width:100%;padding:8px 11px;background:none;border:none;color:var(--sidebar-ink);font-size:12.6px;text-align:left;cursor:pointer;border-left:2px solid transparent;font-family:var(--sans);}
+.nav-item:hover{color:#fff;}
+.nav-item.active{color:#fff;border-left-color:#fff;background:rgba(255,255,255,.06);}
+.nav-mono{width:28px;height:19px;border:1px solid var(--sidebar-line);display:flex;align-items:center;justify-content:center;font-size:9px;letter-spacing:.02em;color:var(--sidebar-ink-dim);flex-shrink:0;}
+.nav-item.active .nav-mono{border-color:#fff;color:#fff;}
+.sidebar-foot{padding:14px 22px;border-top:1px solid var(--sidebar-line);font-size:11px;color:var(--sidebar-ink-dim);}
+.sidebar-foot .who{color:#e6e6e6;font-size:12px;margin-bottom:2px;}
+
+.main{flex:1;min-width:0;}
+.topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;padding:28px 40px 20px;border-bottom:1px solid var(--line);flex-wrap:wrap;}
+.topbar h1{font-family:var(--serif);font-weight:400;font-size:25px;margin:0;}
+.topbar .desc{font-size:13px;color:var(--ink-soft);margin-top:6px;max-width:660px;}
+.topbar .actions{display:flex;gap:10px;flex-shrink:0;padding-top:2px;flex-wrap:wrap;}
+.content{padding:32px 40px 90px;max-width:1180px;}
+
+.btn{font-family:var(--sans);font-size:13px;padding:9px 16px;border:1px solid var(--ink);background:var(--ink);color:#fff;cursor:pointer;white-space:nowrap;}
+.btn:hover{background:#000;}
+.btn-outline{background:transparent;color:var(--ink);border:1px solid var(--line-strong);}
+.btn-outline:hover{border-color:var(--ink);}
+.btn-small{padding:5px 11px;font-size:12px;}
+.btn-full{width:100%;}
+
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-bottom:38px;}
+.kpi{padding:20px 22px;border-left:1px solid var(--line);}
+.kpi:first-child{border-left:none;}
+.kpi .num{font-family:var(--serif);font-size:28px;font-variant-numeric:tabular-nums;}
+.kpi .label{font-size:11.6px;color:var(--ink-soft);margin-top:5px;}
+.kpi .delta{font-size:11px;margin-top:7px;color:var(--ink-faint);}
+
+.section-head{display:flex;justify-content:space-between;align-items:baseline;margin:44px 0 14px;flex-wrap:wrap;gap:6px;}
+.section-head h2{font-family:var(--serif);font-weight:400;font-size:18px;margin:0;}
+.section-head .hint{font-size:11.8px;color:var(--ink-faint);}
+
+.chart-wrap{border:1px solid var(--line);padding:22px 24px 16px;}
+.legend{display:flex;gap:20px;font-size:12px;color:var(--ink-soft);margin-top:12px;flex-wrap:wrap;}
+.legend span{display:inline-flex;align-items:center;gap:6px;}
+.swatch{width:10px;height:10px;display:inline-block;border:1px solid var(--ink);}
+
+.table-wrap{overflow-x:auto;border-bottom:1px solid var(--line);}
+table.ledger{width:100%;border-collapse:collapse;font-size:13px;min-width:560px;}
+table.ledger th{text-align:left;font-weight:500;color:var(--ink-soft);font-size:11.2px;padding:0 14px 10px;border-bottom:1px solid var(--ink);white-space:nowrap;}
+table.ledger td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top;}
+table.ledger tbody tr{cursor:pointer;}
+table.ledger tbody tr:hover{background:var(--fill);}
+table.ledger td.num, table.ledger th.num{text-align:right;font-variant-numeric:tabular-nums;}
+.tag{display:inline-block;font-size:10.6px;padding:2.5px 8px;border:1px solid var(--ink);white-space:nowrap;}
+.tag.dim{border-color:var(--line-strong);color:var(--ink-soft);}
+
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);}
+.dash-card{background:#fff;padding:20px;cursor:pointer;}
+.dash-card:hover{background:var(--fill);}
+.dash-card .mono{width:32px;height:22px;border:1px solid var(--ink);display:flex;align-items:center;justify-content:center;font-size:9.5px;margin-bottom:14px;}
+.dash-card h4{font-family:var(--serif);font-weight:400;font-size:15px;margin:0 0 6px;}
+.dash-card p{font-size:11.8px;color:var(--ink-soft);margin:0 0 12px;min-height:44px;}
+.dash-card .metric{font-family:var(--serif);font-size:19px;}
+.dash-card .metric-label{font-size:10.8px;color:var(--ink-faint);}
+
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.32);display:flex;align-items:center;justify-content:center;z-index:80;padding:20px;}
+.modal{background:#fff;width:500px;max-width:100%;max-height:92vh;overflow-y:auto;padding:30px 32px;border:1px solid var(--ink);}
+.modal h3{font-family:var(--serif);font-weight:400;font-size:21px;margin:0 0 4px;}
+.modal .sub{font-size:12.5px;color:var(--ink-soft);margin-bottom:22px;}
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:11.8px;color:var(--ink-soft);margin-bottom:6px;}
+.field input, .field select, .field textarea{width:100%;padding:9px 10px;border:1px solid var(--line-strong);font-family:var(--sans);font-size:13.5px;background:#fff;color:var(--ink);}
+.field input:focus, .field select:focus, .field textarea:focus{outline:2px solid var(--ink);outline-offset:1px;}
+.field textarea{min-height:70px;resize:vertical;}
+.check-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px;}
+.check-row{display:flex;align-items:center;gap:8px;font-size:13px;}
+.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:24px;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+
+.drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.25);z-index:70;display:flex;justify-content:flex-end;}
+.drawer{width:440px;max-width:94vw;background:#fff;height:100%;overflow-y:auto;padding:32px 34px;border-left:1px solid var(--ink);}
+.drawer .eyebrow{font-size:11.5px;color:var(--ink-faint);margin-bottom:6px;}
+.drawer h3{font-family:var(--serif);font-size:21px;font-weight:400;margin:0 0 18px;}
+.kv{display:flex;justify-content:space-between;gap:16px;padding:11px 0;border-bottom:1px solid var(--line);font-size:13px;}
+.kv .k{color:var(--ink-soft);flex-shrink:0;}
+.kv .v{text-align:right;}
+.drawer-actions{display:flex;gap:10px;margin-top:26px;flex-wrap:wrap;}
+.close-x{background:none;border:none;font-size:20px;color:var(--ink-soft);cursor:pointer;line-height:1;padding:0;}
+.drawer-top{display:flex;justify-content:space-between;align-items:flex-start;}
+.notice{border:1px solid var(--line-strong);padding:14px 16px;font-size:12.5px;color:var(--ink-soft);margin-top:18px;}
+.mini-list{list-style:none;padding:0;margin:16px 0 0;}
+.mini-list li{padding:11px 0;border-bottom:1px solid var(--line);font-size:12.8px;display:flex;justify-content:space-between;align-items:center;gap:10px;}
+
+.toast{position:fixed;bottom:26px;right:26px;background:#111;color:#fff;padding:13px 20px;font-size:13px;z-index:100;border:1px solid #000;}
+.empty{padding:40px 0;text-align:center;color:var(--ink-faint);font-size:13px;border:1px dashed var(--line-strong);}
+.menu-btn{display:none;border:1px solid var(--line-strong);background:#fff;padding:8px 10px;cursor:pointer;margin-right:12px;}
+.title-row{display:flex;align-items:center;}
+.lede{font-size:13px;color:var(--ink-soft);margin:-8px 0 26px;max-width:680px;}
+
+@media (max-width:820px){
+  .sidebar{position:fixed;z-index:60;transform:translateX(-100%);transition:transform .2s;}
+  .sidebar.open{transform:translateX(0);}
+  .topbar,.content{padding-left:20px;padding-right:20px;}
+  .menu-btn{display:inline-flex !important;}
+  .two-col{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <main class="main">
+    <div class="topbar" id="topbar"></div>
+    <div class="content" id="content"></div>
+  </main>
+</div>
+<div id="modal-root"></div>
+<div id="drawer-root"></div>
+<div id="toast-root"></div>
+
+<script>
+/* ============================= UTILITIES ============================= */
+const $ = sel => document.querySelector(sel);
+const num = n => Math.round(n).toLocaleString('en-US');
+const pct = n => (Math.round(n*10)/10) + '%';
+function toast(msg){
+  const root = $('#toast-root');
+  root.innerHTML = `<div class="toast">${msg}</div>`;
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(()=>{ root.innerHTML=''; }, 2600);
+}
+function closeModal(){ $('#modal-root').innerHTML=''; }
+function closeDrawer(){ $('#drawer-root').innerHTML=''; }
+
+/* ============================= CHART ============================= */
+function barChart(id, labels, series){
+  const w = Math.max(600, labels.length*Math.max(78, series.length*44));
+  const h = 205, padL=8, padB=30, padT=16, padR=8;
+  const max = Math.max(1, ...series.flatMap(s=>s.values)) * 1.18;
+  const groupW = (w-padL-padR)/labels.length;
+  const barW = Math.min(28, (groupW-16)/series.length);
+  let bars='';
+  labels.forEach((lab,li)=>{
+    const gx = padL + li*groupW + (groupW - (barW*series.length+(series.length-1)*6))/2;
+    series.forEach((s,si)=>{
+      const val = s.values[li];
+      const bh = (val/max)*(h-padT-padB);
+      const bx = gx + si*(barW+6);
+      const by = h-padB-bh;
+      const fillId = si===0? `url(#${id}-f0)` : si===1? `url(#${id}-f1)` : `url(#${id}-f2)`;
+      bars += `<rect x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(bh,0).toFixed(1)}" fill="${fillId}" stroke="#111" stroke-width="0.6"/>`;
+      bars += `<text x="${(bx+barW/2).toFixed(1)}" y="${(by-5).toFixed(1)}" font-size="9" text-anchor="middle" fill="#5b5b5b" font-family="sans-serif">${s.fmt?s.fmt(val):val}</text>`;
+    });
+    bars += `<text x="${(gx + (barW*series.length+(series.length-1)*6)/2).toFixed(1)}" y="${h-10}" font-size="9.4" text-anchor="middle" fill="#5b5b5b" font-family="sans-serif">${lab}</text>`;
+  });
+  bars += `<line x1="${padL}" y1="${h-padB}" x2="${w-padR}" y2="${h-padB}" stroke="#111" stroke-width="1"/>`;
+  return `<svg viewBox="0 0 ${w} ${h}" style="width:100%;height:${h}px;display:block;">
+    <defs>
+      <pattern id="${id}-f1" width="6" height="6" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"><rect width="6" height="6" fill="#fff"/><line x1="0" y1="0" x2="0" y2="6" stroke="#111" stroke-width="2.6"/></pattern>
+      <pattern id="${id}-f0" width="2" height="2" patternUnits="userSpaceOnUse"><rect width="2" height="2" fill="#111"/></pattern>
+      <pattern id="${id}-f2" width="2" height="2" patternUnits="userSpaceOnUse"><rect width="2" height="2" fill="#c7c7c7"/></pattern>
+    </defs>
+    ${bars}
+  </svg>`;
+}
+function chartLegend(series){
+  return `<div class="legend">${series.map((s,i)=>`<span><span class="swatch" style="background:${i===0?'#111':i===1?'repeating-linear-gradient(45deg,#111,#111 2px,#fff 2px,#fff 4px)':'#c7c7c7'}"></span>${s.name}</span>`).join('')}</div>`;
+}
+
+/* ============================= CONSTANTS ============================= */
+const COLLEGES = ['Northgate College','Riverside Technical College','Meridian Institute of Technology','Ashfield Community College','Cedar Valley College','Fairview Polytechnic'];
+
+/* ============================= STATE / MOCK DATA ============================= */
+const state = {
+  active:'dashboard',
+  auditPanels:[
+    {college:'Northgate College', academic:88, financial:82, operational:90, synced:'Sep 2026'},
+    {college:'Riverside Technical College', academic:85, financial:79, operational:84, synced:'Sep 2026'},
+    {college:'Meridian Institute of Technology', academic:91, financial:88, operational:87, synced:'Aug 2026'},
+    {college:'Ashfield Community College', academic:76, financial:71, operational:74, synced:'Aug 2026'},
+    {college:'Cedar Valley College', academic:83, financial:80, operational:81, synced:'Sep 2026'},
+    {college:'Fairview Polytechnic', academic:89, financial:85, operational:88, synced:'Sep 2026'},
+  ],
+  benchmarks:[
+    {college:'Northgate College', avgGrade:82, passRate:88, curriculum:94, trend:'Stable'},
+    {college:'Riverside Technical College', avgGrade:79, passRate:84, curriculum:89, trend:'Improving'},
+    {college:'Meridian Institute of Technology', avgGrade:85, passRate:91, curriculum:96, trend:'Stable'},
+    {college:'Ashfield Community College', avgGrade:74, passRate:77, curriculum:81, trend:'Declining'},
+    {college:'Cedar Valley College', avgGrade:80, passRate:85, curriculum:90, trend:'Stable'},
+    {college:'Fairview Polytechnic', avgGrade:83, passRate:89, curriculum:93, trend:'Improving'},
+  ],
+  audits:[
+    {college:'Ashfield Community College', finding:'Incomplete grade-appeal documentation for Q2', severity:'High', deadline:'30 Sep 2026', status:'Open'},
+    {college:'Riverside Technical College', finding:'Lab safety signage out of date', severity:'Medium', deadline:'15 Oct 2026', status:'In progress'},
+    {college:'Northgate College', finding:'Minor gap in staff credential file for 2 hires', severity:'Low', deadline:'01 Oct 2026', status:'In progress'},
+    {college:'Cedar Valley College', finding:'Attendance records not reconciled monthly', severity:'Medium', deadline:'20 Sep 2026', status:'Resolved'},
+    {college:'Fairview Polytechnic', finding:'Fire drill log missing for one quarter', severity:'High', deadline:'25 Sep 2026', status:'Overdue'},
+  ],
+  gradeAnomalies:[
+    {college:'Ashfield Community College', course:'Intro to Business Law', highPct:41, failPct:19, flag:'Yes', reviewedBy:'Unreviewed'},
+    {college:'Meridian Institute of Technology', course:'Advanced Pathophysiology', highPct:22, failPct:4, flag:'No', reviewedBy:'QCAD Reviewer'},
+    {college:'Riverside Technical College', course:'Applied Robotics II', highPct:38, failPct:2, flag:'Yes', reviewedBy:'Unreviewed'},
+    {college:'Northgate College', course:'Culinary Fundamentals', highPct:29, failPct:6, flag:'No', reviewedBy:'QCAD Reviewer'},
+    {college:'Fairview Polytechnic', course:'Structural Engineering Basics', highPct:18, failPct:23, flag:'Yes', reviewedBy:'Unreviewed'},
+  ],
+  staffQual:[
+    {name:'Dr. Amara Osei', college:'Northgate College', dept:'Nursing', credential:'MSN, RN License', status:'Verified', expiry:'Jun 2028'},
+    {name:'Ben Whitfield', college:'Riverside Technical College', dept:'IT & Computing', credential:'BSc Computer Science', status:'Verified', expiry:'—'},
+    {name:'Carla Nunes', college:'Ashfield Community College', dept:'Business', credential:'MBA', status:'Pending', expiry:'—'},
+    {name:'Derek Osman', college:'Meridian Institute of Technology', dept:'Health Sciences', credential:'PhD Physiology', status:'Verified', expiry:'Mar 2027'},
+    {name:'Elena Cruz', college:'Cedar Valley College', dept:'Culinary Arts', credential:'Culinary Diploma + Cert.', status:'Expired', expiry:'Jan 2026'},
+    {name:'Farid Haidari', college:'Fairview Polytechnic', dept:'Engineering', credential:'MEng Structural', status:'Verified', expiry:'Nov 2027'},
+  ],
+  retention:[
+    {college:'Northgate College', dropout:6.8, deferral:3.1, transfer:2.0, trend:'Stable'},
+    {college:'Riverside Technical College', dropout:8.2, deferral:4.0, transfer:2.6, trend:'Declining'},
+    {college:'Meridian Institute of Technology', dropout:4.9, deferral:2.2, transfer:1.4, trend:'Improving'},
+    {college:'Ashfield Community College', dropout:11.4, deferral:5.6, transfer:3.8, trend:'Declining'},
+    {college:'Cedar Valley College', dropout:7.1, deferral:3.4, transfer:2.1, trend:'Stable'},
+    {college:'Fairview Polytechnic', dropout:6.0, deferral:2.8, transfer:1.9, trend:'Improving'},
+  ],
+  syllabus:[
+    {college:'Northgate College', program:'Business Administration', weeks:14, alignment:96, status:'Aligned'},
+    {college:'Riverside Technical College', program:'IT & Computing', weeks:14, alignment:88, status:'Minor gaps'},
+    {college:'Ashfield Community College', program:'Culinary Arts', weeks:12, alignment:71, status:'Major gaps'},
+    {college:'Meridian Institute of Technology', program:'Nursing', weeks:15, alignment:94, status:'Aligned'},
+    {college:'Cedar Valley College', program:'Early Childhood Education', weeks:14, alignment:90, status:'Aligned'},
+    {college:'Fairview Polytechnic', program:'Robotics Engineering', weeks:14, alignment:83, status:'Minor gaps'},
+  ],
+  evaluations:[
+    {college:'Northgate College', subject:'Business Administration faculty', responses:412, rating:4.1, trend:'Stable'},
+    {college:'Riverside Technical College', subject:'IT & Computing faculty', responses:298, rating:3.8, trend:'Improving'},
+    {college:'Ashfield Community College', subject:'Culinary Arts faculty', responses:180, rating:3.4, trend:'Declining'},
+    {college:'Meridian Institute of Technology', subject:'Nursing faculty', responses:365, rating:4.4, trend:'Stable'},
+    {college:'Cedar Valley College', subject:'Early Childhood Ed faculty', responses:210, rating:4.2, trend:'Improving'},
+    {college:'Fairview Polytechnic', subject:'Engineering faculty', responses:250, rating:4.0, trend:'Stable'},
+  ],
+  riskAlerts:[
+    {college:'Ashfield Community College', metric:'Dropout rate', value:'11.4%', threshold:'8.0%', severity:'High', status:'Active'},
+    {college:'Ashfield Community College', metric:'Curriculum alignment', value:'71%', threshold:'85%', severity:'Medium', status:'Active'},
+    {college:'Riverside Technical College', metric:'Financial health index', value:'79', threshold:'80', severity:'Low', status:'Acknowledged'},
+    {college:'Fairview Polytechnic', metric:'Audit finding overdue', value:'1 overdue', threshold:'0 overdue', severity:'High', status:'Active'},
+    {college:'Cedar Valley College', metric:'Grade anomaly unresolved', value:'1 flagged', threshold:'0 flagged', severity:'Medium', status:'Resolved'},
+  ],
+  trends:[
+    {year:'2022', performance:79, compliance:81},
+    {year:'2023', performance:81, compliance:83},
+    {year:'2024', performance:83, compliance:85},
+    {year:'2025', performance:82, compliance:87},
+    {year:'2026', performance:85, compliance:89},
+  ],
+  corrective:[
+    {college:'Ashfield Community College', mandate:'Reduce dropout rate below 8%', owner:'Ashfield Academic Dean', deadline:'Dec 2026', completion:35, status:'At risk'},
+    {college:'Riverside Technical College', mandate:'Update lab safety signage network-wide', owner:'Riverside Facilities', deadline:'15 Oct 2026', completion:60, status:'On track'},
+    {college:'Fairview Polytechnic', mandate:'File missing fire drill log + remediation plan', owner:'Fairview Compliance', deadline:'25 Sep 2026', completion:10, status:'Overdue'},
+    {college:'Cedar Valley College', mandate:'Reconcile attendance records monthly', owner:'Cedar Valley Registrar', deadline:'Complete', completion:100, status:'Complete'},
+    {college:'Northgate College', mandate:'Close staff credential file gaps', owner:'Northgate HR', deadline:'01 Oct 2026', completion:80, status:'On track'},
+  ],
+  policies:[
+    {title:'Updated Grade Appeal Procedure v3', summary:'Standardizes the grade-appeal window to 10 business days across all colleges, with mandatory QCAD notification on appeals over C-average modules.', effective:'01 Oct 2026', colleges: COLLEGES.map(c=>({college:c, ack: c!=='Ashfield Community College' && c!=='Fairview Polytechnic'})), status:'Distributing'},
+    {title:'Minimum Staff Credential Verification Cycle', summary:'Requires all teaching staff credentials to be re-verified every 24 months, with expired credentials auto-flagged to HR.', effective:'01 Jan 2027', colleges: COLLEGES.map(c=>({college:c, ack:true})), status:'Fully acknowledged'},
+  ],
+  extAudit:[
+    {college:'Northgate College', standard:'National Accreditation Framework v4', internal:91, required:85, status:'Meets'},
+    {college:'Riverside Technical College', standard:'National Accreditation Framework v4', internal:84, required:85, status:'Below'},
+    {college:'Meridian Institute of Technology', standard:'Health Programs Accreditation Code', internal:93, required:88, status:'Meets'},
+    {college:'Ashfield Community College', standard:'National Accreditation Framework v4', internal:76, required:85, status:'Below'},
+    {college:'Cedar Valley College', standard:'National Accreditation Framework v4', internal:88, required:85, status:'Meets'},
+    {college:'Fairview Polytechnic', standard:'Engineering Programs Accreditation Code', internal:90, required:87, status:'Meets'},
+  ],
+  peerReview:[
+    {college:'Northgate College', faculty:'Dr. Priya Nandakumar', observer:'QCAD Peer Reviewer', score:4.6, training:'No', date:'Jul 2026'},
+    {college:'Ashfield Community College', faculty:'Carla Nunes', observer:'QCAD Peer Reviewer', score:3.1, training:'Yes', date:'Aug 2026'},
+    {college:'Riverside Technical College', faculty:'Ben Whitfield', observer:'QCAD Peer Reviewer', score:3.8, training:'No', date:'Jun 2026'},
+    {college:'Meridian Institute of Technology', faculty:'Derek Osman', observer:'QCAD Peer Reviewer', score:4.4, training:'No', date:'Jul 2026'},
+    {college:'Fairview Polytechnic', faculty:'Farid Haidari', observer:'QCAD Peer Reviewer', score:3.4, training:'Yes', date:'Aug 2026'},
+  ],
+  whistleblower:[
+    {id:'WB-2026-0301', college:'Ashfield Community College', category:'Academic Integrity', date:'12 Aug 2026', status:'Under investigation', description:'Report of coursework grading inconsistency favoring specific students in one module.'},
+    {id:'WB-2026-0245', college:'Riverside Technical College', category:'Safety', date:'02 Jul 2026', status:'Resolved', description:'Lab equipment reported unsafe; resolved after facilities inspection and repair.'},
+  ],
+};
+
+/* ============================= NAV / TITLES ============================= */
+const NAV = [
+  {id:'dashboard', label:'Overview', mono:'OV'},
+  {id:'auditPanels', label:'Cross-Tenant Audit Panels', mono:'AP'},
+  {id:'benchmarks', label:'Quality Benchmarkers', mono:'QB'},
+  {id:'audits', label:'Audit Workflow', mono:'AW'},
+  {id:'gradeAnomalies', label:'Grade Distribution Tracker', mono:'GD'},
+  {id:'staffQual', label:'Staff Qualification Verifier', mono:'SQ'},
+  {id:'retention', label:'Student Retention Analytics', mono:'SR'},
+  {id:'syllabus', label:'Syllabus Alignment Checker', mono:'SA'},
+  {id:'evaluations', label:'Standardized Evaluations', mono:'SE'},
+  {id:'riskAlerts', label:'Compliance Risk Alerts', mono:'CR'},
+  {id:'trends', label:'Historical Trend Visualizer', mono:'HT'},
+  {id:'corrective', label:'Corrective Action Tracking', mono:'CA'},
+  {id:'policies', label:'Policy Distribution', mono:'PD'},
+  {id:'extAudit', label:'External Audit Prep', mono:'EA'},
+  {id:'peerReview', label:'Peer Review Aggregator', mono:'PR'},
+  {id:'whistleblower', label:'Whistleblower Channel', mono:'WB'},
+];
+const TITLES = {
+  dashboard:{title:'Group quality assurance overview', desc:'Cross-tenant view rights across all 6 ING network colleges — academic, financial, operational and compliance posture in one place.'},
+  auditPanels:{title:'Cross-Tenant Audit Panels', desc:'Standard dashboards pulling academic, financial and operational metrics from all colleges simultaneously.'},
+  benchmarks:{title:'Educational Quality Benchmarkers', desc:'Grading trends, pass rates and curriculum timelines tracked across every campus.'},
+  audits:{title:'Audit Workflow Management', desc:'Findings, corrections and compliance deadlines tracked for each college through to resolution.'},
+  gradeAnomalies:{title:'Grade Distribution Trackers', desc:'Anomaly flags for unusual grade distributions — excessive high grades or unusually high failure rates.'},
+  staffQual:{title:'Staff Qualification Verifiers', desc:'Group credential system confirming all assigned teachers hold valid certifications and degrees.'},
+  retention:{title:'Student Retention Analytics', desc:'Cross-tenant dropout, deferral and transfer tracking to isolate weak performance areas.'},
+  syllabus:{title:'Syllabus Alignment Checkers', desc:'Weekly lesson delivery compared against approved group learning guidelines, by program.'},
+  evaluations:{title:'Standardized Evaluation Monitors', desc:'Cross-campus survey aggregation tracking student feedback on module and teacher quality.'},
+  riskAlerts:{title:'Compliance Risk Alerters', desc:'Automated flags warning when a college falls below critical operational or educational thresholds.'},
+  trends:{title:'Historical Trend Visualizers', desc:'Multi-year data models showing network-wide performance and compliance paths over time.'},
+  corrective:{title:'Corrective Action Tracking', desc:'Accountability dashboard monitoring how effectively individual colleges execute mandated changes.'},
+  policies:{title:'Policy Distribution Channels', desc:'Push updated quality guidelines to every tenant dashboard and track college-by-college acknowledgment.'},
+  extAudit:{title:'External Audit Prep Trackers', desc:'Internal metrics matched against national educational regulatory standards ahead of external review.'},
+  peerReview:{title:'Peer Review Aggregators', desc:'Faculty observation results tracked group-wide to identify training needs.'},
+  whistleblower:{title:'Anonymized Whistleblower Channel', desc:'Secure reporting pathway for staff or students to report quality or ethical violations. Reporter identity is never collected.'},
+};
+
+/* ============================= GENERIC FEATURE CONFIGS ============================= */
+const FEATURES = {
+  auditPanels:{
+    dataKey:'auditPanels', tableTitle:'College snapshot',
+    kpis: rows => {
+      const composite = rows.map(r=>(r.academic+r.financial+r.operational)/3);
+      const avg = composite.reduce((a,v)=>a+v,0)/rows.length;
+      const below = composite.filter(v=>v<80).length;
+      return [
+        {value:rows.length, label:'Colleges monitored'},
+        {value:avg.toFixed(1), label:'Avg. composite score'},
+        {value:below, label:'Colleges below 80 composite'},
+        {value:'Sep 2026', label:'Last network sync'},
+      ];
+    },
+    chart: rows => ({labels: rows.map(r=>r.college.split(' ')[0]), series:[
+      {name:'Academic', values:rows.map(r=>r.academic)},
+      {name:'Financial', values:rows.map(r=>r.financial)},
+      {name:'Operational', values:rows.map(r=>r.operational)},
+    ]}),
+    columns:[
+      {key:'college', label:'College'},
+      {key:'academic', label:'Academic', align:'num', fmt:pct},
+      {key:'financial', label:'Financial', align:'num', fmt:pct},
+      {key:'operational', label:'Operational', align:'num', fmt:pct},
+      {key:'synced', label:'Last synced'},
+    ],
+    form:{ actionLabel:'+ Log metric snapshot', title:'Log metric snapshot', sub:'Record a refreshed academic, financial and operational reading for a college.',
+      fields:[
+        {key:'college', label:'College', type:'select', options:COLLEGES},
+        {key:'academic', label:'Academic index (%)', type:'number'},
+        {key:'financial', label:'Financial health (%)', type:'number'},
+        {key:'operational', label:'Operational score (%)', type:'number'},
+      ],
+      build: v => ({college:v.college, academic:+v.academic||0, financial:+v.financial||0, operational:+v.operational||0, synced:'Sep 2026'})
+    },
+    rowAction:{ label:'Flag for compliance review', apply:(row)=>{ state.riskAlerts.unshift({college:row.college, metric:'Composite audit score', value:Math.round((row.academic+row.financial+row.operational)/3)+'', threshold:'80', severity:'Medium', status:'Active'}); toast('Flagged and pushed to Compliance Risk Alerts.'); } },
+  },
+  benchmarks:{
+    dataKey:'benchmarks', tableTitle:'Benchmark readings',
+    kpis: rows => {
+      const avgPass = rows.reduce((a,r)=>a+r.passRate,0)/rows.length;
+      const top = rows.reduce((a,r)=>r.passRate>a.passRate?r:a);
+      return [
+        {value:pct(avgPass), label:'Network avg. pass rate'},
+        {value:top.college.split(' ')[0], label:'Top-performing college'},
+        {value:rows.filter(r=>r.trend==='Declining').length, label:'Colleges trending down'},
+        {value:rows.filter(r=>r.curriculum>=90).length, label:'Curriculum on-track (≥90%)'},
+      ];
+    },
+    chart: rows => ({labels: rows.map(r=>r.college.split(' ')[0]), series:[
+      {name:'Pass rate %', values:rows.map(r=>r.passRate)},
+      {name:'Curriculum %', values:rows.map(r=>r.curriculum)},
+    ]}),
+    columns:[
+      {key:'college', label:'College'},
+      {key:'avgGrade', label:'Avg. grade', align:'num', fmt:pct},
+      {key:'passRate', label:'Pass rate', align:'num', fmt:pct},
+      {key:'curriculum', label:'Curriculum on-track', align:'num', fmt:pct},
+      {key:'trend', label:'Trend'},
+    ],
+    form:{ actionLabel:'+ Log benchmark reading', title:'Log benchmark reading', sub:'Add a refreshed grading and curriculum reading for a college.',
+      fields:[
+        {key:'college', label:'College', type:'select', options:COLLEGES},
+        {key:'avgGrade', label:'Average grade (%)', type:'number'},
+        {key:'passRate', label:'Pass rate (%)', type:'number'},
+        {key:'curriculum', label:'Curriculum on-track (%)', type:'number'},
+      ],
+      build: v => ({college:v.college, avgGrade:+v.avgGrade||0, passRate:+v.passRate||0, curriculum:+v.curriculum||0, trend:'Stable'})
+    },
+  },
+  audits:{
+    dataKey:'audits', tableTitle:'Audit findings',
+    kpis: rows => [
+      {value:rows.filter(r=>r.status==='Open'||r.status==='In progress').length, label:'Open findings'},
+      {value:rows.filter(r=>r.status==='Overdue').length, label:'Overdue'},
+      {value:rows.filter(r=>r.status==='Resolved').length, label:'Resolved this quarter'},
+      {value:rows.filter(r=>r.severity==='High').length, label:'High severity findings'},
+    ],
+    chart: rows => ({labels:['High','Medium','Low'], series:[
+      {name:'Findings', values:['High','Medium','Low'].map(sv=>rows.filter(r=>r.severity===sv).length)},
+    ]}),
+    columns:[
+      {key:'college', label:'College'},
+      {key:'finding', label:'Finding'},
+      {key:'severity', label:'Severity', fmt:v=>`<span class="tag ${v==='High'?'':'dim'}">${v}</span>`},
+      {key:'deadline', label:'Deadline'},
+      {key:'status', label:'Status', fmt:v=>`<span class="tag ${v==='Resolved'?'dim':''}">${v}</span>`},
+    ],
+    form:{ actionLabel:'+ Log audit finding', title:'Log audit finding', sub:'Open a new inspection finding against a college, with a corrective deadline.',
+      fields:[
+        {key:'college', label:'College', type:'select', options:COLLEGES},
+        {key:'finding', label:'Finding', type:'text', placeholder:'e.g. Missing accessibility signage'},
+        {key:'severity', label:'Severity', type:'select', options:['High','Medium','Low']},
+        {key:'deadline', label:'Corrective deadline', type:'text', placeholder:'e.g. 15 Nov 2026'},
+      ],
+      build: v => ({college:v.college, finding:v.finding||'Untitled finding', severity:v.severity||'Medium', deadline:v.deadline||'—', status:'Open'})
+    },
+    rowAction:{ label:'Advance status', apply:(row)=>{ const order=['Open','In progress','Resolved']; const i=order.indexOf(row.status); row.status = i>-1 && i<2 ? order[i+1] : 'Resolved'; toast('Finding status advanced.'); } },
+  },
+  gradeAnomalies:{
+    dataKey:'gradeAnomalies', tableTitle:'Distribution checks',
+    kpis: rows => [
+      {value:rows.filter(r=>r.flag==='Yes').length, label:'Modules flagged'},
+      {value:new Set(rows.filter(r=>r.flag==='Yes').map(r=>r.college)).size, label:'Colleges with anomalies'},
+      {value:pct(rows.reduce((a,r)=>a+r.failPct,0)/rows.length), label:'Avg. network fail rate'},
+      {value:pct(rows.reduce((a,r)=>a+r.highPct,0)/rows.length), label:'Avg. network high-grade rate'},
+    ],
+    chart: rows => ({labels: rows.map(r=>r.college.split(' ')[0]), series:[
+      {name:'High grade %', values:rows.map(r=>r.highPct)},
+      {name:'Fail %', values:rows.map(r=>r.failPct)},
+    ]}),
+    columns:[
+      {key:'college', label:'College'},
+      {key:'course', label:'Course / module'},
+      {key:'highPct', label:'High grades', align:'num', fmt:pct},
+      {key:'failPct', label:'Fail rate', align:'num', fmt:pct},
+      {key:'flag', label:'Flagged', fmt:v=>v==='Yes'?'<span class="tag">Yes</span>':'<span class="tag dim">No</span>'},
+    ],
+    form:{ actionLabel:'+ Log distribution check', title:'Log distribution check', sub:'Record a grade distribution reading for a course or module.',
+      fields:[
+        {key:'college', label:'College', type:'select', options:COLLEGES},
+        {key:'course', label:'Course / module', type:'text', placeholder:'e.g. Organic Chemistry I'},
+        {key:'highPct', label:'High grades (%)', type:'number'},
+        {key:'failPct', label:'Fail rate (%)', type:'number'},
+      ],
+      build: v => { const h=+v.highPct||0, f=+v.failPct||0; return {college:v.college, course:v.course||'Untitled course', highPct:h, failPct:f, flag:(h>=35||f>=15)?'Yes':'No', reviewedBy:'Unreviewed'}; }
+    },
+    rowAction:{ label:'Mark reviewed', apply:(row)=>{ row.reviewedBy='QCAD Reviewer'; toast('Marked reviewed.'); } },
+  },
+  staffQual:{
+    dataKey:'staffQual', tableTitle:'Credential records',
+    kpis: rows => {
+      const verified = rows.filter(r=>r.status==='Verified').length;
+      return [
+        {value:pct((verified/rows.length)*100), label:'Staff verified'},
+        {value:rows.filter(r=>r.status==='Pending').length, label:'Pending verification'},
+        {value:rows.filter(r=>r.status==='Expired').length, label:'Expired credentials'},
+        {value:rows.length, label:'Total staff tracked'},
+      ];
+    },
+    chart: rows => ({labels:['Verified','Pending','Expired'], series:[
+      {name:'Staff', values:['Verified','Pending','Expired'].map(sv=>rows.filter(r=>r.status===sv).length)},
+    ]}),
+    columns:[
+      {key:'name', label:'Staff member'},
+      {key:'college', label:'College'},
+      {key:'dept', label:'Department'},
+      {key:'credential', label:'Credential'},
+      {key:'status', label:'Status', fmt:v=> v==='Verified'?'<span class="tag">Verified</span>': v==='Pending'?'<span class="tag dim">Pending</span>':'<span class="tag dim">Expired</span>'},
+    ],
+    form:{ actionLabel:'+ Log credential check', title:'Log credential check', sub:'Add a staff member to the group credential verification system.',
+      fields:[
+        {key:'name', label:'Staff name', type:'text', placeholder:'e.g. Wei Zhang'},
+        {key:'college', label:'College', type:'select', options:COLLEGES},
+        {key:'dept', label:'Department', type:'text', placeholder:'e.g. Business'},
+        {key:'credential', label:'Credential', type:'text', placeholder:'e.g. MSc Finance'},
+      ],
+      build: v => ({name:v.name||'Unnamed staff', college:v.college, dept:v.dept||'—', credential:v.credential||'—', status:'Pending', expiry:'—'})
+    },
+    rowAction:{ label:'Mark verified', apply:(row)=>{ row.status='Verified'; toast('Credential marked verified.'); } },
+  },
+  retention:{
+    dataKey:'retention', tableTitle:'Retention by college',
+    kpis: rows => {
+      const avgDrop = rows.reduce((a,r)=>a+r.dropout,0)/rows.length;
+      const worst = rows.reduce((a,r)=>r.dropout>a.dropout?r:a);
+      return [
+        {value:pct(avgDrop), label:'Network avg. dropout rate'},
+        {value:worst.college.split(' ')[0], label:'Highest-risk college'},
+        {value:rows.filter(r=>r.trend==='Improving').length, label:'Colleges improving'},
+        {value:rows.filter(r=>r.trend==='Declining').length, label:'Colleges declining'},
+      ];
+    },
+    chart: rows => ({labels: rows.map(r=>r.college.split(' ')[0]), series:[
+      {name:'Dropout %', values:rows.map(r=>r.dropout)},
+      {name:'Deferral %', values:rows.map(r=>r.deferral)},
+      {name:'Transfer %', values:rows.map(r=>r.transfer)},
+    ]}),
+    columns:[
+      {key:'college', label:'College'},
+      {key:'dropout', label:'Dropout rate', align:'num', fmt:pct},
+      {key:'deferral', label:'Deferral rate', align:'num', fmt:pct},
+      {key:'transfer', label:'Transfer rate', align:'num', fmt:pct},
+      {key:'trend', label:'Trend'},
+    ],
+    form:{ actionLabel:'+ Log retention reading', title:'Log retention reading', sub:'Refresh a college’s dropout, deferral and transfer figures.',
+      fields:[
+        {key:'college', label:'College', type:'select', options:COLLEGES},
+        {key:'dropout', label:'Dropout rate (%)', type:'number', step:'0.1'},
+        {key:'deferral', label:'Deferral rate (%)', type:'number', step:'0.1'},
+        {key:'transfer', label:'Transfer rate (%)', type:'number', step:'0.1'},
+      ],
+      build: v => ({college:v.college, dropout:+v.dropout||0, deferral:+v.deferral||0, transfer:+v.transfer||0, trend:'Stable'})
+    },
+  },
+  syllabus:{
+    dataKey:'syllabus', tableTitle:'Alignment checks',
+    kpis: rows => [
+      {value:pct(rows.reduce((a,r)=>a+r.alignment,0)/rows.length), label:'Avg. alignment'},
+      {value:rows.filter(r=>r.status==='Aligned').length, label:'Fully aligned programs'},
+      {value:rows.filter(r=>r.status==='Major gaps').length, label:'Programs with major gaps'},
+      {value:rows.length, label:'Checks this term'},
+    ],
+    chart: rows => ({labels: rows.map(r=>r.program.split(' ')[0]), series:[
+      {name:'Alignment %', values:rows.map(r=>r.alignment)},
+    ]}),
+    columns:[
+      {key:'college', label:'College'},
+      {key:'program', label:'Program'},
+      {key:'weeks', label:'Weeks reviewed', align:'num'},
+      {key:'alignment', label:'Alignment', align:'num', fmt:pct},
+      {key:'status', label:'Status', fmt:v=> v==='Aligned'?'<span class="tag">Aligned</span>': v==='Minor gaps'?'<span class="tag dim">Minor gaps</span>':'<span class="tag dim">Major gaps</span>'},
+    ],
+    form:{ actionLabel:'+ Log alignment check', title:'Log alignment check', sub:'Compare a program’s weekly lesson delivery against the approved group guidelines.',
+      fields:[
+        {key:'college', label:'College', type:'select', options:COLLEGES},
+        {key:'program', label:'Program', type:'text', placeholder:'e.g. Paralegal Studies'},
+        {key:'weeks', label:'Weeks reviewed', type:'number'},
+        {key:'alignment', label:'Alignment (%)', type:'number'},
+      ],
+      build: v => { const a=+v.alignment||0; return {college:v.college, program:v.program||'Untitled program', weeks:+v.weeks||0, alignment:a, status: a>=90?'Aligned': a>=80?'Minor gaps':'Major gaps'}; }
+    },
+    rowAction:{ label:'Request correction', apply:(row)=>{ toast('Correction request sent to ' + row.college + '.'); } },
+  },
+  evaluations:{
+    dataKey:'evaluations', tableTitle:'Survey aggregation',
+    kpis: rows => {
+      const avg = rows.reduce((a,r)=>a+r.rating,0)/rows.length;
+      const low = rows.reduce((a,r)=>r.rating<a.rating?r:a);
+      return [
+        {value:avg.toFixed(1)+' / 5', label:'Network avg. rating'},
+        {value:num(rows.reduce((a,r)=>a+r.responses,0)), label:'Total responses'},
+        {value:low.college.split(' ')[0], label:'Lowest-rated college'},
+        {value:rows.length, label:'Surveys aggregated this term'},
+      ];
+    },
+    chart: rows => ({labels: rows.map(r=>r.college.split(' ')[0]), series:[
+      {name:'Avg. rating (x20)', values:rows.map(r=>Math.round(r.rating*20))},
+    ]}),
+    columns:[
+      {key:'college', label:'College'},
+      {key:'subject', label:'Subject'},
+      {key:'responses', label:'Responses', align:'num'},
+      {key:'rating', label:'Avg. rating', align:'num', fmt:v=>v.toFixed(1)+' / 5'},
+      {key:'trend', label:'Trend'},
+    ],
+    form:{ actionLabel:'+ Log survey result', title:'Log survey result', sub:'Add an aggregated student feedback reading for a module or faculty group.',
+      fields:[
+        {key:'college', label:'College', type:'select', options:COLLEGES},
+        {key:'subject', label:'Subject', type:'text', placeholder:'e.g. Applied Sciences faculty'},
+        {key:'responses', label:'Response count', type:'number'},
+        {key:'rating', label:'Average rating (1–5)', type:'number', step:'0.1'},
+      ],
+      build: v => ({college:v.college, subject:v.subject||'Untitled subject', responses:+v.responses||0, rating:+v.rating||0, trend:'Stable'})
+    },
+  },
+  riskAlerts:{
+    dataKey:'riskAlerts', tableTitle:'Active & past alerts',
+    kpis: rows => [
+      {value:rows.filter(r=>r.status==='Active').length, label:'Active alerts'},
+      {value:rows.filter(r=>r.severity==='High'&&r.status==='Active').length, label:'High severity, active'},
+      {value:new Set(rows.filter(r=>r.status==='Active').map(r=>r.college)).size, label:'Colleges with an active alert'},
+      {value:rows.filter(r=>r.status==='Resolved').length, label:'Resolved'},
+    ],
+    chart: rows => ({labels:['High','Medium','Low'], series:[
+      {name:'Alerts', values:['High','Medium','Low'].map(sv=>rows.filter(r=>r.severity===sv).length)},
+    ]}),
+    columns:[
+      {key:'college', label:'College'},
+      {key:'metric', label:'Metric'},
+      {key:'value', label:'Current value'},
+      {key:'threshold', label:'Threshold'},
+      {key:'severity', label:'Severity', fmt:v=>`<span class="tag ${v==='High'?'':'dim'}">${v}</span>`},
+      {key:'status', label:'Status', fmt:v=> v==='Active'?'<span class="tag">Active</span>':'<span class="tag dim">'+v+'</span>'},
+    ],
+    form:{ actionLabel:'+ Log risk alert', title:'Log risk alert', sub:'Manually raise a compliance risk alert against a college.',
+      fields:[
+        {key:'college', label:'College', type:'select', options:COLLEGES},
+        {key:'metric', label:'Metric', type:'text', placeholder:'e.g. Staff attrition rate'},
+        {key:'value', label:'Current value', type:'text', placeholder:'e.g. 14%'},
+        {key:'threshold', label:'Threshold', type:'text', placeholder:'e.g. 10%'},
+        {key:'severity', label:'Severity', type:'select', options:['High','Medium','Low']},
+      ],
+      build: v => ({college:v.college, metric:v.metric||'Untitled metric', value:v.value||'—', threshold:v.threshold||'—', severity:v.severity||'Medium', status:'Active'})
+    },
+    rowAction:{ label:'Acknowledge', apply:(row)=>{ if(row.status==='Active'){ row.status='Acknowledged'; toast('Alert acknowledged.'); } else { row.status='Resolved'; toast('Alert resolved.'); } } },
+  },
+  corrective:{
+    dataKey:'corrective', tableTitle:'Mandated changes',
+    kpis: rows => [
+      {value:rows.length, label:'Mandates tracked'},
+      {value:rows.filter(r=>r.status==='Complete').length, label:'Complete'},
+      {value:rows.filter(r=>r.status==='At risk'||r.status==='Overdue').length, label:'At risk or overdue'},
+      {value:pct(rows.reduce((a,r)=>a+r.completion,0)/rows.length), label:'Avg. completion'},
+    ],
+    chart: rows => ({labels: rows.map(r=>r.college.split(' ')[0]), series:[
+      {name:'Completion %', values:rows.map(r=>r.completion)},
+    ]}),
+    columns:[
+      {key:'college', label:'College'},
+      {key:'mandate', label:'Mandate'},
+      {key:'owner', label:'Owner'},
+      {key:'deadline', label:'Deadline'},
+      {key:'completion', label:'Completion', align:'num', fmt:pct},
+      {key:'status', label:'Status', fmt:v=> v==='Complete'?'<span class="tag">Complete</span>': v==='On track'?'<span class="tag">On track</span>':'<span class="tag dim">'+v+'</span>'},
+    ],
+    form:{ actionLabel:'+ Log corrective action', title:'Log corrective action', sub:'Track a newly mandated change and assign an owning college.',
+      fields:[
+        {key:'college', label:'College', type:'select', options:COLLEGES},
+        {key:'mandate', label:'Mandate', type:'text', placeholder:'e.g. Implement weekly attendance reconciliation'},
+        {key:'owner', label:'Owner', type:'text', placeholder:'e.g. Registrar'},
+        {key:'deadline', label:'Deadline', type:'text', placeholder:'e.g. 30 Nov 2026'},
+      ],
+      build: v => ({college:v.college, mandate:v.mandate||'Untitled mandate', owner:v.owner||'Unassigned', deadline:v.deadline||'—', completion:0, status:'On track'})
+    },
+    rowAction:{ label:'Mark complete', apply:(row)=>{ row.completion=100; row.status='Complete'; toast('Corrective action marked complete.'); } },
+  },
+  extAudit:{
+    dataKey:'extAudit', tableTitle:'Regulatory comparison',
+    kpis: rows => [
+      {value:rows.filter(r=>r.status==='Meets').length + ' / ' + rows.length, label:'Colleges audit-ready'},
+      {value:pct(rows.reduce((a,r)=>a+(r.required-r.internal),0)/rows.length), label:'Avg. gap to standard'},
+      {value:new Set(rows.map(r=>r.standard)).size, label:'Standards tracked'},
+      {value:'Mar 2027', label:'Next external audit window'},
+    ],
+    chart: rows => ({labels: rows.map(r=>r.college.split(' ')[0]), series:[
+      {name:'Internal score', values:rows.map(r=>r.internal)},
+      {name:'Required score', values:rows.map(r=>r.required)},
+    ]}),
+    columns:[
+      {key:'college', label:'College'},
+      {key:'standard', label:'Regulatory standard'},
+      {key:'internal', label:'Internal score', align:'num', fmt:pct},
+      {key:'required', label:'Required score', align:'num', fmt:pct},
+      {key:'status', label:'Status', fmt:v=> v==='Meets'?'<span class="tag">Meets</span>':'<span class="tag dim">Below</span>'},
+    ],
+    form:{ actionLabel:'+ Log standard comparison', title:'Log standard comparison', sub:'Compare a college’s internal metric against a national regulatory standard.',
+      fields:[
+        {key:'college', label:'College', type:'select', options:COLLEGES},
+        {key:'standard', label:'Regulatory standard', type:'text', placeholder:'e.g. National Accreditation Framework v4'},
+        {key:'internal', label:'Internal score (%)', type:'number'},
+        {key:'required', label:'Required score (%)', type:'number'},
+      ],
+      build: v => { const i=+v.internal||0, r=+v.required||0; return {college:v.college, standard:v.standard||'Untitled standard', internal:i, required:r, status: i>=r?'Meets':'Below'}; }
+    },
+  },
+  peerReview:{
+    dataKey:'peerReview', tableTitle:'Observation log',
+    kpis: rows => [
+      {value:rows.length, label:'Observations logged'},
+      {value:(rows.reduce((a,r)=>a+r.score,0)/rows.length).toFixed(1)+' / 5', label:'Avg. observation score'},
+      {value:rows.filter(r=>r.training==='Yes').length, label:'Training needs flagged'},
+      {value:new Set(rows.map(r=>r.college)).size, label:'Colleges covered'},
+    ],
+    chart: rows => ({labels: rows.map(r=>r.faculty.split(' ')[0]), series:[
+      {name:'Score (x20)', values:rows.map(r=>Math.round(r.score*20))},
+    ]}),
+    columns:[
+      {key:'faculty', label:'Faculty member'},
+      {key:'college', label:'College'},
+      {key:'observer', label:'Observer'},
+      {key:'score', label:'Score', align:'num', fmt:v=>v.toFixed(1)+' / 5'},
+      {key:'training', label:'Training flagged', fmt:v=>v==='Yes'?'<span class="tag">Yes</span>':'<span class="tag dim">No</span>'},
+    ],
+    form:{ actionLabel:'+ Log peer observation', title:'Log peer observation', sub:'Record a faculty observation result from a group peer reviewer.',
+      fields:[
+        {key:'faculty', label:'Faculty member', type:'text', placeholder:'e.g. Jordan Blake'},
+        {key:'college', label:'College', type:'select', options:COLLEGES},
+        {key:'observer', label:'Observer', type:'text', placeholder:'e.g. QCAD Peer Reviewer'},
+        {key:'score', label:'Score (1–5)', type:'number', step:'0.1'},
+      ],
+      build: v => { const s=+v.score||0; return {faculty:v.faculty||'Unnamed faculty', college:v.college, observer:v.observer||'QCAD Peer Reviewer', score:s, training: s<3.5?'Yes':'No', date:'Sep 2026'}; }
+    },
+    rowAction:{ label:'Flag training need', apply:(row)=>{ row.training='Yes'; toast('Training need flagged.'); } },
+  },
+};
+
+/* ============================= DASHBOARD ============================= */
+function renderDashboard(){
+  const composite = state.auditPanels.map(r=>(r.academic+r.financial+r.operational)/3);
+  const avgComposite = composite.reduce((a,v)=>a+v,0)/composite.length;
+  const activeAlerts = state.riskAlerts.filter(r=>r.status==='Active').length;
+  const overdueAudits = state.audits.filter(r=>r.status==='Overdue').length;
+  const wbOpen = state.whistleblower.filter(r=>r.status!=='Resolved').length;
+
+  const cards = [
+    {id:'auditPanels', metric:avgComposite.toFixed(1), label:'Avg. composite score'},
+    {id:'benchmarks', metric:pct(state.benchmarks.reduce((a,r)=>a+r.passRate,0)/state.benchmarks.length), label:'Avg. pass rate'},
+    {id:'audits', metric:overdueAudits, label:'Overdue findings'},
+    {id:'gradeAnomalies', metric:state.gradeAnomalies.filter(r=>r.flag==='Yes').length, label:'Modules flagged'},
+    {id:'staffQual', metric:state.staffQual.filter(r=>r.status==='Expired').length, label:'Expired credentials'},
+    {id:'retention', metric:pct(state.retention.reduce((a,r)=>a+r.dropout,0)/state.retention.length), label:'Avg. dropout rate'},
+    {id:'syllabus', metric:state.syllabus.filter(r=>r.status==='Major gaps').length, label:'Major gap programs'},
+    {id:'evaluations', metric:(state.evaluations.reduce((a,r)=>a+r.rating,0)/state.evaluations.length).toFixed(1), label:'Avg. rating'},
+    {id:'riskAlerts', metric:activeAlerts, label:'Active risk alerts'},
+    {id:'trends', metric:state.trends[state.trends.length-1].performance, label:'Latest performance index'},
+    {id:'corrective', metric:state.corrective.filter(r=>r.status==='Overdue').length, label:'Overdue mandates'},
+    {id:'policies', metric:state.policies.length, label:'Policies distributed'},
+    {id:'extAudit', metric:state.extAudit.filter(r=>r.status==='Below').length, label:'Colleges below standard'},
+    {id:'peerReview', metric:state.peerReview.filter(r=>r.training==='Yes').length, label:'Training needs flagged'},
+    {id:'whistleblower', metric:wbOpen, label:'Open whistleblower cases'},
+  ];
+
+  return `
+    <div class="kpi-row">
+      <div class="kpi"><div class="num">${COLLEGES.length}</div><div class="label">Colleges under cross-tenant view</div></div>
+      <div class="kpi"><div class="num">${avgComposite.toFixed(1)}</div><div class="label">Network composite score</div></div>
+      <div class="kpi"><div class="num">${activeAlerts}</div><div class="label">Active compliance risk alerts</div></div>
+      <div class="kpi"><div class="num">${overdueAudits}</div><div class="label">Overdue audit findings</div></div>
+    </div>
+    <div class="section-head"><h2>All modules</h2><span class="hint">15 areas of group oversight · click any card to open</span></div>
+    <div class="dash-grid">
+      ${cards.map(c=>{
+        const t = TITLES[c.id];
+        const nav = NAV.find(n=>n.id===c.id);
+        return `<div class="dash-card" onclick="navigate('${c.id}')">
+          <div class="mono">${nav.mono}</div>
+          <h4>${t.title}</h4>
+          <p>${t.desc}</p>
+          <div class="metric">${c.metric}</div>
+          <div class="metric-label">${c.label}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+}
+
+/* ============================= SPECIAL VIEW: HISTORICAL TRENDS ============================= */
+FEATURES.trends = {
+  dataKey:'trends', tableTitle:'Yearly network readings',
+  kpis: rows => {
+    const latest = rows[rows.length-1], first = rows[0];
+    return [
+      {value:latest.performance, label:'Latest performance index'},
+      {value:(latest.performance-rows[rows.length-2].performance>=0?'+':'')+(latest.performance-rows[rows.length-2].performance), label:'Year-over-year change'},
+      {value:latest.compliance, label:'Latest compliance index'},
+      {value:(latest.performance-first.performance>=0?'+':'')+(latest.performance-first.performance), label:'5-year change'},
+    ];
+  },
+  chart: rows => ({labels: rows.map(r=>r.year), series:[
+    {name:'Performance index', values:rows.map(r=>r.performance)},
+    {name:'Compliance index', values:rows.map(r=>r.compliance)},
+  ]}),
+  columns:[
+    {key:'year', label:'Year'},
+    {key:'performance', label:'Performance index', align:'num'},
+    {key:'compliance', label:'Compliance index', align:'num'},
+  ],
+  form:{ actionLabel:'+ Log historical data point', title:'Log historical data point', sub:'Add a network-wide yearly performance and compliance reading.',
+    fields:[
+      {key:'year', label:'Year', type:'text', placeholder:'e.g. 2027'},
+      {key:'performance', label:'Performance index', type:'number'},
+      {key:'compliance', label:'Compliance index', type:'number'},
+    ],
+    build: v => ({year:v.year||'—', performance:+v.performance||0, compliance:+v.compliance||0})
+  },
+};
+
+/* ============================= SPECIAL VIEW: POLICY DISTRIBUTION ============================= */
+function renderPolicies(){
+  return `
+    <div class="kpi-row">
+      <div class="kpi"><div class="num">${state.policies.length}</div><div class="label">Policies distributed</div></div>
+      <div class="kpi"><div class="num">${state.policies.filter(p=>p.status==='Fully acknowledged').length}</div><div class="label">Fully acknowledged</div></div>
+      <div class="kpi"><div class="num">${state.policies.filter(p=>p.status==='Distributing').length}</div><div class="label">Still distributing</div></div>
+      <div class="kpi"><div class="num">${COLLEGES.length}</div><div class="label">Tenant dashboards reached</div></div>
+    </div>
+    <div class="section-head"><h2>Distributed policies</h2><span class="hint">Click a policy to view acknowledgment by college</span></div>
+    <div class="table-wrap"><table class="ledger"><thead><tr>
+      <th>Title</th><th>Effective</th><th>Acknowledged</th><th>Status</th>
+    </tr></thead><tbody>
+      ${state.policies.map((p,i)=>{
+        const ackCount = p.colleges.filter(c=>c.ack).length;
+        return `<tr onclick="openPolicyDetail(${i})">
+          <td>${p.title}</td><td>${p.effective}</td>
+          <td class="num">${ackCount} / ${p.colleges.length}</td>
+          <td>${p.status==='Fully acknowledged'?'<span class="tag">Fully acknowledged</span>':'<span class="tag dim">Distributing</span>'}</td>
+        </tr>`;
+      }).join('')}
+    </tbody></table></div>
+  `;
+}
+function openPolicyModal(){
+  $('#modal-root').innerHTML = `<div class="overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <h3>Push new policy</h3>
+      <div class="sub">Distribute an updated quality guideline instantly to every selected tenant dashboard.</div>
+      <form onsubmit="submitPolicy(event)">
+        <div class="field"><label>Title</label><input name="title" required placeholder="e.g. Revised Academic Integrity Guidelines"></div>
+        <div class="field"><label>Summary</label><textarea name="summary" required placeholder="What is changing, and why?"></textarea></div>
+        <div class="field"><label>Effective date</label><input name="effective" required placeholder="e.g. 01 Dec 2026"></div>
+        <div class="field"><label>Push to colleges</label>
+          <div class="check-grid">
+            ${COLLEGES.map((c)=>`<label class="check-row"><input type="checkbox" name="col" value="${c}" checked> ${c}</label>`).join('')}
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
+          <button type="submit" class="btn">Push policy</button>
+        </div>
+      </form>
+    </div>
+  </div>`;
+}
+function submitPolicy(e){
+  e.preventDefault();
+  const f = e.target;
+  const cols = Array.from(f.querySelectorAll('input[name="col"]:checked')).map(c=>c.value);
+  if(!cols.length){ toast('Select at least one college.'); return; }
+  state.policies.unshift({
+    title:f.title.value, summary:f.summary.value, effective:f.effective.value,
+    colleges: cols.map(c=>({college:c, ack:false})), status:'Distributing'
+  });
+  closeModal();
+  if(state.active==='policies') renderContent();
+  toast('Policy pushed to ' + cols.length + ' tenant dashboard(s).');
+}
+function openPolicyDetail(i){
+  const p = state.policies[i];
+  const ackCount = p.colleges.filter(c=>c.ack).length;
+  $('#drawer-root').innerHTML = `<div class="drawer-overlay" onclick="if(event.target===this)closeDrawer()">
+    <div class="drawer">
+      <div class="drawer-top"><div><div class="eyebrow">Policy · Effective ${p.effective}</div><h3>${p.title}</h3></div><button class="close-x" onclick="closeDrawer()">&times;</button></div>
+      <div class="kv"><span class="k">Summary</span><span class="v">${p.summary}</span></div>
+      <div class="kv"><span class="k">Acknowledged</span><span class="v">${ackCount} / ${p.colleges.length}</span></div>
+      <div class="section-head" style="margin-top:24px;"><h2 style="font-size:15px;">By college</h2></div>
+      <ul class="mini-list">
+        ${p.colleges.map((c,ci)=>`<li>
+          <span>${c.college}</span>
+          <span style="display:flex;align-items:center;gap:8px;">
+            ${c.ack?'<span class="tag">Acknowledged</span>':'<span class="tag dim">Pending</span>'}
+            <button class="btn btn-outline btn-small" onclick="togglePolicyAck(${i},${ci})">${c.ack?'Reset':'Mark ack.'}</button>
+          </span>
+        </li>`).join('')}
+      </ul>
+      <div class="drawer-actions">
+        <button class="btn btn-outline" onclick="closeDrawer()">Close</button>
+      </div>
+    </div>
+  </div>`;
+}
+function togglePolicyAck(pi, ci){
+  const p = state.policies[pi];
+  p.colleges[ci].ack = !p.colleges[ci].ack;
+  p.status = p.colleges.every(c=>c.ack) ? 'Fully acknowledged' : 'Distributing';
+  openPolicyDetail(pi);
+  if(state.active==='policies') renderContent();
+}
+
+/* ============================= SPECIAL VIEW: WHISTLEBLOWER CHANNEL ============================= */
+function nextWbId(){
+  const n = state.whistleblower.length + 1;
+  return 'WB-2026-' + String(300+n).padStart(4,'0');
+}
+function renderWhistleblower(){
+  const open = state.whistleblower.filter(r=>r.status!=='Resolved').length;
+  return `
+    <p class="lede">This channel does not collect or store the identity of the person submitting a report. Reports are logged with an anonymous case ID only, visible to QCAD investigators.</p>
+    <div class="kpi-row">
+      <div class="kpi"><div class="num">${state.whistleblower.length}</div><div class="label">Total reports on file</div></div>
+      <div class="kpi"><div class="num">${open}</div><div class="label">Open cases</div></div>
+      <div class="kpi"><div class="num">${state.whistleblower.filter(r=>r.status==='Resolved').length}</div><div class="label">Resolved</div></div>
+      <div class="kpi"><div class="num">${new Set(state.whistleblower.map(r=>r.college)).size}</div><div class="label">Colleges represented</div></div>
+    </div>
+    <div class="section-head"><h2>Submit an anonymous report</h2></div>
+    <div class="table-wrap" style="border:none;">
+      <form onsubmit="submitWhistleblower(event)" style="max-width:560px;">
+        <div class="two-col">
+          <div class="field"><label>College (optional)</label><select name="college"><option>Prefer not to say</option>${COLLEGES.map(c=>`<option>${c}</option>`).join('')}</select></div>
+          <div class="field"><label>Category</label><select name="category">${['Academic Integrity','Harassment','Financial Misconduct','Safety','Other'].map(c=>`<option>${c}</option>`).join('')}</select></div>
+        </div>
+        <div class="field"><label>Description</label><textarea name="description" required placeholder="Describe what you observed. Do not include your name."></textarea></div>
+        <button type="submit" class="btn btn-full">Submit anonymous report</button>
+      </form>
+    </div>
+    <div class="section-head"><h2>Reports on file</h2><span class="hint">${state.whistleblower.length} cases · click a row for detail</span></div>
+    ${state.whistleblower.length ? `<div class="table-wrap"><table class="ledger"><thead><tr>
+      <th>Case ID</th><th>College</th><th>Category</th><th>Date</th><th>Status</th>
+    </tr></thead><tbody>
+      ${state.whistleblower.map((r,i)=>`<tr onclick="openWbDetail(${i})">
+        <td>${r.id}</td><td>${r.college}</td><td>${r.category}</td><td>${r.date}</td>
+        <td>${r.status==='Resolved'?'<span class="tag dim">Resolved</span>':'<span class="tag">'+r.status+'</span>'}</td>
+      </tr>`).join('')}
+    </tbody></table></div>` : `<div class="empty">No reports on file.</div>`}
+  `;
+}
+function submitWhistleblower(e){
+  e.preventDefault();
+  const f = e.target;
+  state.whistleblower.unshift({
+    id:nextWbId(), college:f.college.value, category:f.category.value, date:'Sep 2026', status:'Received', description:f.description.value
+  });
+  f.reset();
+  renderContent();
+  toast('Report submitted anonymously. Case ID assigned.');
+}
+function openWbDetail(i){
+  const r = state.whistleblower[i];
+  const order = ['Received','Under investigation','Resolved'];
+  const next = order[order.indexOf(r.status)+1];
+  $('#drawer-root').innerHTML = `<div class="drawer-overlay" onclick="if(event.target===this)closeDrawer()">
+    <div class="drawer">
+      <div class="drawer-top"><div><div class="eyebrow">${r.category} · ${r.college}</div><h3>${r.id}</h3></div><button class="close-x" onclick="closeDrawer()">&times;</button></div>
+      <div class="kv"><span class="k">Date received</span><span class="v">${r.date}</span></div>
+      <div class="kv"><span class="k">Status</span><span class="v">${r.status}</span></div>
+      <div class="kv"><span class="k">Description</span><span class="v">${r.description}</span></div>
+      <div class="notice">Reporter identity is not collected or stored by this channel. Investigators can only see the case details shown here.</div>
+      <div class="drawer-actions">
+        ${next ? `<button class="btn" onclick="advanceWb(${i})">Advance to “${next}”</button>` : ''}
+        <button class="btn btn-outline" onclick="closeDrawer()">Close</button>
+      </div>
+    </div>
+  </div>`;
+}
+function advanceWb(i){
+  const order = ['Received','Under investigation','Resolved'];
+  const r = state.whistleblower[i];
+  const next = order[order.indexOf(r.status)+1];
+  if(next) r.status = next;
+  closeDrawer();
+  renderContent();
+  toast('Case status advanced.');
+}
+
+/* ============================= GENERIC RENDER ENGINE ============================= */
+function renderGenericFeature(id){
+  const cfg = FEATURES[id];
+  const rows = state[cfg.dataKey];
+  const kpis = cfg.kpis(rows);
+  const chart = cfg.chart ? cfg.chart(rows) : null;
+  return `
+    <div class="kpi-row">${kpis.map(k=>`<div class="kpi"><div class="num">${k.value}</div><div class="label">${k.label}</div>${k.delta?`<div class="delta">${k.delta}</div>`:''}</div>`).join('')}</div>
+    ${chart ? `
+      <div class="section-head"><h2>Trend</h2><span class="hint">Illustrative view across current entries</span></div>
+      <div class="chart-wrap">${barChart(id+'-chart', chart.labels, chart.series)}</div>
+      ${chart.series.length>1 ? chartLegend(chart.series) : ''}
+    ` : ''}
+    <div class="section-head"><h2>${cfg.tableTitle}</h2><span class="hint">${rows.length} ${rows.length===1?'record':'records'} · click a row for detail</span></div>
+    ${renderTable(cfg, rows)}
+  `;
+}
+function renderTable(cfg, rows){
+  if(!rows.length) return `<div class="empty">No records yet. Use the action button above to add one.</div>`;
+  const featureKey = Object.keys(FEATURES).find(k=>FEATURES[k]===cfg);
+  return `<div class="table-wrap"><table class="ledger"><thead><tr>
+    ${cfg.columns.map(c=>`<th class="${c.align==='num'?'num':''}">${c.label}</th>`).join('')}
+  </tr></thead><tbody>
+    ${rows.map((r,i)=>`<tr onclick="openDetail('${featureKey}',${i})">
+      ${cfg.columns.map(c=>`<td class="${c.align==='num'?'num':''}">${c.fmt ? c.fmt(r[c.key], r) : r[c.key]}</td>`).join('')}
+    </tr>`).join('')}
+  </tbody></table></div>`;
+}
+function openDetail(featureId, idx){
+  const cfg = FEATURES[featureId];
+  const row = state[cfg.dataKey][idx];
+  const titleKey = cfg.columns[0].key;
+  $('#drawer-root').innerHTML = `<div class="drawer-overlay" onclick="if(event.target===this)closeDrawer()">
+    <div class="drawer">
+      <div class="drawer-top"><div><div class="eyebrow">${TITLES[featureId].title}</div><h3>${row[titleKey]}</h3></div><button class="close-x" onclick="closeDrawer()">&times;</button></div>
+      ${cfg.columns.slice(1).map(c=>`<div class="kv"><span class="k">${c.label}</span><span class="v">${c.fmt ? c.fmt(row[c.key], row) : row[c.key]}</span></div>`).join('')}
+      <div class="drawer-actions">
+        ${cfg.rowAction ? `<button class="btn" onclick="applyRowAction('${featureId}',${idx})">${cfg.rowAction.label}</button>` : ''}
+        <button class="btn btn-outline" onclick="closeDrawer()">Close</button>
+      </div>
+    </div>
+  </div>`;
+}
+function applyRowAction(featureId, idx){
+  const cfg = FEATURES[featureId];
+  const row = state[cfg.dataKey][idx];
+  cfg.rowAction.apply(row, idx);
+  closeDrawer();
+  renderContent();
+}
+function openAddModal(featureId){
+  const cfg = FEATURES[featureId];
+  const form = cfg.form;
+  $('#modal-root').innerHTML = `<div class="overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <h3>${form.title}</h3>
+      <div class="sub">${form.sub}</div>
+      <form onsubmit="submitAdd(event,'${featureId}')">
+        ${form.fields.map(f=>{
+          if(f.type==='select'){
+            return `<div class="field"><label>${f.label}</label><select name="${f.key}">${f.options.map(o=>`<option>${o}</option>`).join('')}</select></div>`;
+          }
+          return `<div class="field"><label>${f.label}</label><input name="${f.key}" type="${f.type}" ${f.step?`step="${f.step}"`:''} placeholder="${f.placeholder||''}"></div>`;
+        }).join('')}
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
+          <button type="submit" class="btn">${form.actionLabel.replace('+ ','').replace(/^./,c=>c.toUpperCase())}</button>
+        </div>
+      </form>
+    </div>
+  </div>`;
+}
+function submitAdd(e, featureId){
+  e.preventDefault();
+  const cfg = FEATURES[featureId];
+  const f = e.target;
+  const values = {};
+  cfg.form.fields.forEach(fl => { values[fl.key] = f[fl.key] ? f[fl.key].value : ''; });
+  const row = cfg.form.build(values);
+  state[cfg.dataKey].unshift(row);
+  closeModal();
+  if(state.active===featureId) renderContent();
+  toast('Added successfully.');
+}
+
+/* ============================= TOP-LEVEL RENDER ============================= */
+function renderSidebar(){
+  $('#sidebar').innerHTML = `
+    <div class="brand">
+      <div class="brand-mark">ING Group Oversight</div>
+      <div class="brand-sub">QCAD Console — Cross-Tenant Quality Assurance</div>
+    </div>
+    <nav class="nav">
+      ${NAV.map(n=>`<button class="nav-item" data-id="${n.id}" onclick="navigate('${n.id}')"><span class="nav-mono">${n.mono}</span>${n.label}</button>`).join('')}
+    </nav>
+    <div class="sidebar-foot">
+      <div class="who">Signed in as QCAD</div>
+      Group Quality Assurance · All 6 colleges
+    </div>
+  `;
+}
+function renderTopbar(){
+  const t = TITLES[state.active];
+  let actionsHtml = '';
+  if(FEATURES[state.active] && FEATURES[state.active].form){
+    actionsHtml = `<button class="btn" onclick="openAddModal('${state.active}')">${FEATURES[state.active].form.actionLabel}</button>`;
+  } else if(state.active==='policies'){
+    actionsHtml = `<button class="btn" onclick="openPolicyModal()">+ Push new policy</button>`;
+  }
+  $('#topbar').innerHTML = `
+    <div>
+      <div class="title-row"><button class="menu-btn" onclick="toggleSidebar()">&#9776;</button><h1>${t.title}</h1></div>
+      <div class="desc">${t.desc}</div>
+    </div>
+    <div class="actions">${actionsHtml}</div>
+  `;
+}
+function renderContent(){
+  let html = '';
+  if(state.active==='dashboard') html = renderDashboard();
+  else if(state.active==='policies') html = renderPolicies();
+  else if(state.active==='whistleblower') html = renderWhistleblower();
+  else if(FEATURES[state.active]) html = renderGenericFeature(state.active);
+  $('#content').innerHTML = html;
+}
+function navigate(id){
+  state.active = id;
+  document.querySelectorAll('.nav-item').forEach(el=>{
+    el.classList.toggle('active', el.getAttribute('data-id')===id);
+  });
+  renderTopbar();
+  renderContent();
+  closeModal(); closeDrawer();
+  document.getElementById('sidebar').classList.remove('open');
+  window.scrollTo(0,0);
+}
+function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); }
+
+/* ============================= INIT ============================= */
+renderSidebar();
+navigate('dashboard');
+</script>
+</body>
+</html>

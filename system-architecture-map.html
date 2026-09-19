@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>System Architecture &amp; Organisational Hierarchy</title>
+<style>
+:root{
+  --bg:#f4f5f7; --panel:#ffffff; --ink:#111318; --muted:#5a6270;
+  --line:#111318; --box:#ffffff; --border:#111318; --accent:#1a4fd6;
+  --shared:#f7f2e4; --sharedborder:#8a6d1f;
+}
+:root:not([data-theme="light"]){}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#101215; --panel:#171a1f; --ink:#f2f4f7; --muted:#9aa4b2;
+    --line:#7d8899; --box:#1d2127; --border:#7d8899; --accent:#7aa2ff;
+    --shared:#241f14; --sharedborder:#c9a23a;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#101215; --panel:#171a1f; --ink:#f2f4f7; --muted:#9aa4b2;
+  --line:#7d8899; --box:#1d2127; --border:#7d8899; --accent:#7aa2ff;
+  --shared:#241f14; --sharedborder:#c9a23a;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:24px 16px 60px}
+header{max-width:1100px;margin:0 auto 26px;text-align:center}
+h1{font-size:1.5rem;margin:0 0 6px}
+header p{margin:0;color:var(--muted);font-size:.9rem}
+.canvas{background:var(--panel);border:1px solid var(--border);border-radius:10px;
+ padding:34px 20px;overflow-x:auto}
+.chart{min-width:1180px;display:flex;flex-direction:column;align-items:center}
+
+a.box,div.box{display:flex;flex-direction:column;align-items:center;justify-content:center;
+ background:var(--box);border:3px solid var(--border);color:var(--ink);
+ text-decoration:none;font-weight:700;text-align:center;padding:8px 6px;
+ min-height:52px;line-height:1.15;font-size:.84rem;transition:.15s}
+a.box:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-2px);
+ box-shadow:0 4px 12px rgba(0,0,0,.18)}
+.box small{display:block;font-weight:400;font-size:.63rem;color:var(--muted);margin-top:3px}
+a.box:hover small{color:var(--accent)}
+
+.v{width:3px;height:34px;background:var(--line);position:relative}
+.v::after{content:"";position:absolute;bottom:-1px;left:50%;transform:translateX(-50%);
+ border-left:7px solid transparent;border-right:7px solid transparent;border-top:10px solid var(--line)}
+
+.top a.box{width:180px}
+.top .wide{width:330px}
+
+/* generic fan-out group */
+.group{display:flex;justify-content:center;position:relative;padding-top:42px}
+.group::before{content:"";position:absolute;top:0;height:3px;background:var(--line)}
+.group>*{position:relative}
+.group>*::before{content:"";position:absolute;top:-42px;left:50%;transform:translateX(-50%);
+ width:3px;height:42px;background:var(--line)}
+.group>*::after{content:"";position:absolute;top:-10px;left:50%;transform:translateX(-50%);
+ border-left:7px solid transparent;border-right:7px solid transparent;border-top:10px solid var(--line)}
+
+.depts{gap:14px}
+.depts>*{width:120px}
+.depts::before{left:60px;right:60px}
+
+.row2{width:100%;display:flex;justify-content:space-between;align-items:flex-start;margin-top:0}
+.acad{gap:16px}
+.acad>*{width:150px}
+.acad::before{left:75px;right:75px}
+.bd{gap:16px}
+.bd>*{width:120px}
+.bd::before{left:60px;right:60px}
+.stub{width:3px;height:26px;background:var(--line);margin:0 auto}
+
+.shared{max-width:1100px;margin:34px auto 0;background:var(--panel);
+ border:1px solid var(--border);border-radius:10px;padding:22px}
+.shared h2{font-size:1rem;margin:0 0 4px;text-align:center}
+.shared p.sub{margin:0 0 18px;text-align:center;color:var(--muted);font-size:.82rem}
+.sgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.sgrid a.box{background:var(--shared);border-color:var(--sharedborder);min-height:74px;padding:12px}
+.legend{max-width:1100px;margin:22px auto 0;color:var(--muted);font-size:.8rem;text-align:center}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>System Architecture &amp; Organisational Hierarchy</h1>
+  <p>Authority flows top → bottom. Click any department or role to open its console.</p>
+</header>
+
+<div class="canvas">
+  <div class="chart">
+
+    <div class="top" style="display:flex;flex-direction:column;align-items:center">
+      <a class="box" href="ing-ceo-console.html">ING CEO<small>Group-level authority</small></a>
+      <div class="v"></div>
+      <a class="box" href="qcad-console.html">QCAD<small>Quality &amp; compliance</small></a>
+      <div class="v"></div>
+      <a class="box" href="college-ceo-console.html">College CEO<small>Institution head</small></a>
+      <div class="v"></div>
+      <a class="box wide" href="management-committee-governance.html">Management Committe &amp; COO<small>Governance &amp; daily operations</small></a>
+    </div>
+
+    <div class="group depts">
+      <a class="box" href="rd-wing-complete.html">R&amp;D Wing<small>Research</small></a>
+      <a class="box" href="academics-complete.html">Academics<small>Teaching</small></a>
+      <a class="box" href="finance-complete.html">Finance<small>Budget</small></a>
+      <a class="box" href="hr-complete.html">HR<small>People</small></a>
+      <a class="box" href="it-support-complete.html">IT Support<small>Systems</small></a>
+      <a class="box" href="operations-head-complete.html">Operations Head<small>Delivery</small></a>
+      <a class="box" href="resource-complete.html">Resource<small>Assets</small></a>
+      <a class="box" href="ssd-complete.html">SSD<small>Student support</small></a>
+      <div class="box">BD<small>Business dev.</small></div>
+    </div>
+
+    <div class="row2">
+      <div>
+        <div class="stub" style="margin-left:330px"></div>
+        <div class="group acad">
+          <a class="box" href="placement-complete.html">Placement<small>Industry links</small></a>
+          <a class="box" href="module-leader-complete.html">Module Leader<small>Module delivery</small></a>
+          <a class="box" href="pat-console.html">Personal Academic Tutor<small>Student mentoring</small></a>
+          <a class="box" href="fyp-complete.html">FYP Coordinator<small>Final year projects</small></a>
+        </div>
+      </div>
+      <div>
+        <div class="stub" style="margin-right:180px;margin-left:auto"></div>
+        <div class="group bd">
+          <a class="box" href="dmu-complete.html">DMU<small>Partner liaison</small></a>
+          <a class="box" href="sales-complete.html">Sales<small>Admissions</small></a>
+          <a class="box" href="branding-pr-complete.html">Branding &amp; PR<small>Marketing</small></a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<section class="shared">
+  <h2>Shared &amp; Cross-Cutting Systems</h2>
+  <p class="sub">Platforms used across every department — they sit outside the reporting line.</p>
+  <div class="sgrid">
+    <a class="box" href="collaborative-events-console.html">Collaborative Event System<small>Joint event planning &amp; execution across departments and colleges</small></a>
+    <a class="box" href="INNOVATION%20CREDITING%20%26%20DEPARTMENT%20TRANSPARENCY%20MODULE.html">Innovation Crediting &amp; Transparency<small>Credit attribution and open department records</small></a>
+    <a class="box" href="COLLEGE-TO-COLLEGE%20TRANSPARENCY%20%26%20BENEFIT%20HUB.html">College-to-College Benefit Hub<small>Inter-college resource sharing and benefit tracking</small></a>
+  </div>
+</section>
+
+<p class="legend">Place this file in the same folder as the console HTML files for the links to work.</p>
+
+</body>
+</html>

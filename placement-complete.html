@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ING ERP — Placement Management Unit</title>
+<style>
+  :root{
+    --surface-1:#fafafa;
+    --surface-2:#f2f2f2;
+    --border:#e6e6e6;
+    --border-strong:#cfcfcf;
+    --text-primary:#111111;
+    --text-secondary:#5a5a5e;
+    --text-muted:#9a9a9e;
+    --fill-primary:#000000;
+    --on-primary:#ffffff;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--surface-2);color:var(--text-primary);}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;background:#fff;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:10px;}
+  .topbar .who{font-size:12px;color:var(--text-secondary);}
+  .topbar .who strong{color:var(--text-primary);font-weight:600;}
+  .app{display:flex;min-height:100vh;}
+  .sidebar{width:220px;flex-shrink:0;background:var(--surface-1);border-right:1px solid var(--border);padding:20px 12px;}
+  .brand{display:flex;align-items:center;gap:10px;padding:0 8px 16px;}
+  .brand .mark{width:24px;height:24px;border-radius:6px;background:var(--fill-primary);flex-shrink:0;}
+  .brand .name{font-size:13px;font-weight:600;line-height:1.3;}
+  .brand .role{font-size:11px;color:var(--text-muted);line-height:1.3;}
+  .nav-item{display:block;padding:8px 10px;border-radius:7px;font-size:13px;color:var(--text-secondary);cursor:pointer;margin-bottom:2px;}
+  .nav-item:hover{background:var(--surface-2);}
+  .nav-item.active{background:var(--fill-primary);color:var(--on-primary);}
+  .nav-divider{border-top:1px solid var(--border);margin:12px 4px;}
+  .group{margin-bottom:16px;}
+  .group-label{font-size:11px;font-weight:600;color:var(--text-muted);margin:0 0 6px 10px;}
+  .main{flex:1;padding:32px 36px;min-width:0;}
+  .page{display:none;}
+  .page.active{display:block;}
+  .page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:12px;}
+  h1{font-size:22px;margin:0;font-weight:600;}
+  .subtitle{font-size:13px;color:var(--text-secondary);margin:5px 0 0;}
+  button.primary{background:var(--fill-primary);color:var(--on-primary);border:none;border-radius:8px;padding:10px 16px;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;}
+  button.secondary{background:#fff;color:var(--text-primary);border:1px solid var(--border-strong);border-radius:8px;padding:10px 16px;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;}
+  .link-btn{background:none;border:none;color:var(--text-primary);font-size:12px;font-weight:600;text-decoration:underline;cursor:pointer;padding:0;white-space:nowrap;}
+  .toolbar{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;align-items:center;}
+  input[type=text], input[type=number], input[type=date], select, textarea{border:1px solid var(--border-strong);border-radius:8px;padding:10px 12px;font-size:13px;background:#fff;color:var(--text-primary);font-family:inherit;}
+  input[type=text]{flex:1;min-width:160px;}
+  select{width:170px;}
+  .badge{font-size:11px;padding:2px 9px;border-radius:999px;white-space:nowrap;}
+  .badge.filled{background:var(--fill-primary);color:var(--on-primary);}
+  .badge.outline{border:1px solid var(--border-strong);color:var(--text-secondary);}
+  .badge.dashed{border:1px dashed var(--border-strong);color:var(--text-secondary);}
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+  .stat-card{border:1px solid var(--border);border-radius:var(--radius);background:#fff;padding:16px 18px;}
+  .stat-value{font-size:24px;font-weight:700;}
+  .stat-label{font-size:12px;color:var(--text-secondary);margin-top:4px;}
+  .list{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:#fff;}
+  .list-row{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;gap:14px;border-bottom:1px solid var(--border);}
+  .list-row:last-child{border-bottom:none;}
+  .list-row .primary-text{font-size:14px;font-weight:600;}
+  .list-row .secondary-text{font-size:12px;color:var(--text-secondary);margin-top:3px;}
+  .list-row .right{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+  .table-wrap{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:#fff;}
+  table{width:100%;border-collapse:collapse;}
+  th,td{padding:12px 14px;font-size:13px;text-align:left;border-bottom:1px solid var(--border);}
+  th{font-weight:600;color:var(--text-secondary);background:var(--surface-1);font-size:12px;}
+  tbody tr:last-child td{border-bottom:none;}
+  td.num{text-align:right;font-variant-numeric:tabular-nums;}
+  .bar-track{background:var(--surface-2);border-radius:6px;height:8px;width:120px;overflow:hidden;flex-shrink:0;}
+  .bar-fill{background:var(--fill-primary);height:100%;}
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:50;align-items:center;justify-content:center;padding:20px;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:#fff;border-radius:12px;max-width:440px;width:100%;max-height:86vh;overflow-y:auto;border:1px solid var(--border-strong);}
+  .modal-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);}
+  .modal-header h3{margin:0;font-size:16px;}
+  .modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-secondary);line-height:1;padding:4px;}
+  .modal-body{padding:18px 20px;}
+  .modal-footer{display:flex;justify-content:flex-end;gap:8px;padding:14px 20px;border-top:1px solid var(--border);}
+  .form-group{margin-bottom:14px;}
+  .form-group label{display:block;font-size:12px;color:var(--text-secondary);margin-bottom:5px;font-weight:600;}
+  .form-group input, .form-group select, .form-group textarea{width:100%;}
+  .form-group textarea{resize:vertical;min-height:70px;}
+  .form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px;}
+  .form-row-2 input, .form-row-2 select{width:100%;}
+  @media (max-width:640px){ .sidebar{display:none;} .main{padding:22px;} .stat-grid{grid-template-columns:1fr 1fr;} }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="who">Signed in as <strong>Mr. Sanjay Rai</strong> — Placement Officer</div>
+  <div class="who">BSc Computer Science, graduating cohort 2027</div>
+</div>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="mark"></div><div><div class="name">ING ERP</div><div class="role">Placement Unit</div></div></div>
+    <div class="nav-item active" data-page="dashboard" onclick="showPage('dashboard', this)">Dashboard</div>
+    <div class="nav-divider"></div>
+    <nav>
+      <div class="group"><p class="group-label">Corporate</p>
+        <div class="nav-item" data-page="corporate" onclick="showPage('corporate', this)">Corporate directory</div>
+      </div>
+      <div class="group"><p class="group-label">Opportunities</p>
+        <div class="nav-item" data-page="vacancies" onclick="showPage('vacancies', this)">Vacancies</div>
+        <div class="nav-item" data-page="interviews" onclick="showPage('interviews', this)">Interview schedule</div>
+      </div>
+      <div class="group"><p class="group-label">Students</p>
+        <div class="nav-item" data-page="resumes" onclick="showPage('resumes', this)">Resume archive</div>
+      </div>
+      <div class="group"><p class="group-label">Analytics</p>
+        <div class="nav-item" data-page="success" onclick="showPage('success', this)">Placement success</div>
+      </div>
+    </nav>
+  </aside>
+
+  <main class="main">
+
+    <section class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div><h1>Placement overview</h1><p class="subtitle">BSc Computer Science, graduating cohort 2027</p></div>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-value">24</div><div class="stat-label">Active companies</div></div>
+        <div class="stat-card"><div class="stat-value">8</div><div class="stat-label">Open vacancies</div></div>
+        <div class="stat-card"><div class="stat-value">5</div><div class="stat-label">Interviews this week</div></div>
+        <div class="stat-card"><div class="stat-value">87%</div><div class="stat-label">Placement rate</div></div>
+      </div>
+      <div class="list" style="margin-bottom:20px;">
+        <div class="list-row"><div><div class="primary-text">2 vacancies still in draft</div><div class="secondary-text">Cloud Support Engineer, Supply Chain Analyst</div></div><div class="right"><button class="link-btn" onclick="goTo('vacancies')">Review</button></div></div>
+        <div class="list-row"><div><div class="primary-text">5 interviews scheduled this week</div><div class="secondary-text">Sunita Gurung, Nisha Adhikari, Aisha Karki and 2 others</div></div><div class="right"><button class="link-btn" onclick="goTo('interviews')">View schedule</button></div></div>
+        <div class="list-row"><div><div class="primary-text">2 students have never uploaded a resume</div><div class="secondary-text">Manisha Shrestha, Kiran Magar</div></div><div class="right"><button class="link-btn" onclick="goTo('resumes')">Follow up</button></div></div>
+      </div>
+      <div class="toolbar">
+        <button class="secondary" onclick="openAddCompany()">+ Add company</button>
+        <button class="secondary" onclick="openPostVacancy()">+ Post vacancy</button>
+        <button class="secondary" onclick="openScheduleInterview()">+ Schedule interview</button>
+      </div>
+    </section>
+
+    <section class="page" id="page-corporate">
+      <div class="page-header">
+        <div><h1>Corporate Directory Ledger</h1><p class="subtitle">External partners, contacts, and hiring history</p></div>
+        <button class="primary" onclick="openAddCompany()">+ Add company</button>
+      </div>
+      <div class="toolbar"><input type="text" placeholder="Search companies" oninput="filterRows(this,'#corporate-list','.list-row')"></div>
+      <div class="list" id="corporate-list">
+        <div class="list-row"><div><div class="primary-text">TechNova Solutions</div><div class="secondary-text">Software — POC: Rita Sharma, HR Manager</div></div><div class="right"><span class="secondary-text">14 hires</span><span class="badge filled">Active partner</span><button class="link-btn" onclick="viewHistory(this)">History</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Himalayan Bank Ltd</div><div class="secondary-text">Banking &amp; Finance — POC: Bikash Rana, Talent Acquisition</div></div><div class="right"><span class="secondary-text">8 hires</span><span class="badge filled">Active partner</span><button class="link-btn" onclick="viewHistory(this)">History</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Everest Analytics</div><div class="secondary-text">Data &amp; AI — POC: Sneha Gurung, CTO</div></div><div class="right"><span class="secondary-text">5 hires</span><span class="badge filled">Active partner</span><button class="link-btn" onclick="viewHistory(this)">History</button></div></div>
+        <div class="list-row"><div><div class="primary-text">CloudPeak Systems</div><div class="secondary-text">Cloud Infrastructure — POC: Rohit Bista, Recruiter</div></div><div class="right"><span class="secondary-text">6 hires</span><span class="badge filled">Active partner</span><button class="link-btn" onclick="viewHistory(this)">History</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Sagarmatha Logistics</div><div class="secondary-text">Supply Chain — POC: Deepak Thapa, Ops Director</div></div><div class="right"><span class="secondary-text">2 hires</span><span class="badge filled">Active partner</span><button class="link-btn" onclick="viewHistory(this)">History</button></div></div>
+        <div class="list-row"><div><div class="primary-text">NextGen Retail Group</div><div class="secondary-text">Retail Tech — POC: Anjali Karki, HR Lead</div></div><div class="right"><span class="secondary-text">0 hires</span><span class="badge outline">Prospective</span><button class="link-btn" onclick="viewHistory(this)">History</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-vacancies">
+      <div class="page-header">
+        <div><h1>Vacancy Dispatch Engine</h1><p class="subtitle">Auto-matched against qualified student profiles</p></div>
+        <button class="primary" onclick="openPostVacancy()">+ Post vacancy</button>
+      </div>
+      <div class="list" id="vacancies-list">
+        <div class="list-row"><div><div class="primary-text">Software Engineer Intern</div><div class="secondary-text">TechNova Solutions — matched to 12 students</div></div><div class="right"><span class="badge filled">Dispatched</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Data Analyst</div><div class="secondary-text">Everest Analytics — matched to 8 students</div></div><div class="right"><span class="badge filled">Dispatched</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Graduate Trainee — Banking</div><div class="secondary-text">Himalayan Bank Ltd — matched to 15 students</div></div><div class="right"><span class="badge filled">Dispatched</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Cloud Support Engineer</div><div class="secondary-text">CloudPeak Systems — matched to 6 students</div></div><div class="right"><span class="badge dashed">Draft</span><button class="link-btn" onclick="dispatchVacancy(this)">Verify &amp; dispatch</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Supply Chain Analyst</div><div class="secondary-text">Sagarmatha Logistics — matched to 4 students</div></div><div class="right"><span class="badge dashed">Draft</span><button class="link-btn" onclick="dispatchVacancy(this)">Verify &amp; dispatch</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-interviews">
+      <div class="page-header">
+        <div><h1>Interview Scheduling Matrix</h1><p class="subtitle">Coordinating corporate hiring teams and student cohorts</p></div>
+        <button class="primary" onclick="openScheduleInterview()">+ Schedule interview</button>
+      </div>
+      <div class="table-wrap">
+        <table id="interviews-table">
+          <thead><tr><th>Student</th><th>Company</th><th>Position</th><th>Date &amp; time</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>Sunita Gurung</td><td>Everest Analytics</td><td>Data Analyst</td><td>Sep 12, 10:00</td><td><span class="badge dashed">Scheduled</span> <button class="link-btn" onclick="markOutcome(this)">Mark outcome</button></td></tr>
+            <tr><td>Nisha Adhikari</td><td>TechNova Solutions</td><td>Software Engineer Intern</td><td>Sep 12, 14:00</td><td><span class="badge dashed">Scheduled</span> <button class="link-btn" onclick="markOutcome(this)">Mark outcome</button></td></tr>
+            <tr><td>Aisha Karki</td><td>Himalayan Bank Ltd</td><td>Graduate Trainee</td><td>Sep 13, 11:00</td><td><span class="badge dashed">Scheduled</span> <button class="link-btn" onclick="markOutcome(this)">Mark outcome</button></td></tr>
+            <tr><td>Rajesh Karki</td><td>TechNova Solutions</td><td>Software Engineer Intern</td><td>Sep 10, 9:00</td><td><span class="badge filled">Selected</span></td></tr>
+            <tr><td>Anita Poudel</td><td>Everest Analytics</td><td>Data Analyst</td><td>Sep 9, 15:00</td><td><span class="badge outline">Not selected</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="page" id="page-resumes">
+      <div class="page-header">
+        <div><h1>Student Resume Archive</h1><p class="subtitle">Profiles, portfolios, and certification links</p></div>
+      </div>
+      <div class="toolbar"><input type="text" placeholder="Search students" oninput="filterRows(this,'#resumes-list','.list-row')"></div>
+      <div class="list" id="resumes-list">
+        <div class="list-row"><div><div class="primary-text">Sunita Gurung</div><div class="secondary-text">3 certifications — updated 2 days ago</div></div><div class="right"><span class="badge filled">Verified</span><button class="link-btn" onclick="viewResume(this)">View</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Nisha Adhikari</div><div class="secondary-text">2 certifications — updated 5 days ago</div></div><div class="right"><span class="badge filled">Verified</span><button class="link-btn" onclick="viewResume(this)">View</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Aisha Karki</div><div class="secondary-text">1 certification — updated 1 week ago</div></div><div class="right"><span class="badge filled">Verified</span><button class="link-btn" onclick="viewResume(this)">View</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Rajesh Karki</div><div class="secondary-text">2 certifications — updated 3 days ago</div></div><div class="right"><span class="badge filled">Verified</span><button class="link-btn" onclick="viewResume(this)">View</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Anita Poudel</div><div class="secondary-text">1 certification — updated 1 week ago</div></div><div class="right"><span class="badge filled">Verified</span><button class="link-btn" onclick="viewResume(this)">View</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Bibek Rai</div><div class="secondary-text">0 certifications — updated 2 months ago</div></div><div class="right"><span class="badge dashed">Needs update</span><button class="link-btn" onclick="requestUpdate(this)">Request update</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Prakash Thapa</div><div class="secondary-text">1 certification — updated 2 weeks ago</div></div><div class="right"><span class="badge filled">Verified</span><button class="link-btn" onclick="viewResume(this)">View</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Manisha Shrestha</div><div class="secondary-text">0 certifications — never uploaded</div></div><div class="right"><span class="badge outline">Missing</span><button class="link-btn" onclick="requestUpdate(this)">Request update</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Suman Basnet</div><div class="secondary-text">0 certifications — updated 3 months ago</div></div><div class="right"><span class="badge dashed">Needs update</span><button class="link-btn" onclick="requestUpdate(this)">Request update</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Kiran Magar</div><div class="secondary-text">0 certifications — never uploaded</div></div><div class="right"><span class="badge outline">Missing</span><button class="link-btn" onclick="requestUpdate(this)">Request update</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-success">
+      <div class="page-header">
+        <div><h1>Placement Success Dashboard</h1><p class="subtitle">BSc Computer Science, graduating cohort 2027</p></div>
+        <button class="secondary" onclick="exportReport()">Export report</button>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-value">36</div><div class="stat-label">Students placed</div></div>
+        <div class="stat-card"><div class="stat-value">87%</div><div class="stat-label">Placement rate</div></div>
+        <div class="stat-card"><div class="stat-value">NPR 55,000</div><div class="stat-label">Avg entry salary / month</div></div>
+        <div class="stat-card"><div class="stat-value">18</div><div class="stat-label">Companies hiring</div></div>
+      </div>
+      <p style="font-size:12px;font-weight:600;color:var(--text-muted);margin:0 0 8px;">Entry salary distribution</p>
+      <div class="list" style="margin-bottom:20px;">
+        <div class="list-row"><div class="primary-text">Below NPR 30,000</div><div class="right"><div class="bar-track"><div class="bar-fill" style="width:20%"></div></div><span class="secondary-text">4 students</span></div></div>
+        <div class="list-row"><div class="primary-text">NPR 30,000–50,000</div><div class="right"><div class="bar-track"><div class="bar-fill" style="width:55%"></div></div><span class="secondary-text">11 students</span></div></div>
+        <div class="list-row"><div class="primary-text">NPR 50,000–70,000</div><div class="right"><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div><span class="secondary-text">15 students</span></div></div>
+        <div class="list-row"><div class="primary-text">Above NPR 70,000</div><div class="right"><div class="bar-track"><div class="bar-fill" style="width:30%"></div></div><span class="secondary-text">6 students</span></div></div>
+      </div>
+      <p style="font-size:12px;font-weight:600;color:var(--text-muted);margin:0 0 8px;">Top hiring companies</p>
+      <div class="list">
+        <div class="list-row"><div class="primary-text">TechNova Solutions</div><div class="right"><span class="secondary-text">14 hires</span></div></div>
+        <div class="list-row"><div class="primary-text">Himalayan Bank Ltd</div><div class="right"><span class="secondary-text">8 hires</span></div></div>
+        <div class="list-row"><div class="primary-text">CloudPeak Systems</div><div class="right"><span class="secondary-text">6 hires</span></div></div>
+        <div class="list-row"><div class="primary-text">Everest Analytics</div><div class="right"><span class="secondary-text">5 hires</span></div></div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this) closeModal()">
+  <div class="modal">
+    <div class="modal-header"><h3 id="modal-title"></h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer" id="modal-footer"></div>
+  </div>
+</div>
+
+<script>
+var modalContext = null;
+var STUDENTS = ['Sunita Gurung','Nisha Adhikari','Aisha Karki','Rajesh Karki','Anita Poudel','Bibek Rai','Prakash Thapa','Manisha Shrestha','Suman Basnet','Kiran Magar'];
+var COMPANIES = ['TechNova Solutions','Himalayan Bank Ltd','Everest Analytics','CloudPeak Systems','Sagarmatha Logistics','NextGen Retail Group'];
+
+function showPage(id, el){
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
+  if(el) el.classList.add('active');
+}
+function goTo(id){
+  showPage(id, document.querySelector('.nav-item[data-page="' + id + '"]'));
+}
+function filterRows(inputEl, containerSelector, rowSelector){
+  var q = inputEl.value.toLowerCase();
+  document.querySelectorAll(containerSelector + ' ' + rowSelector).forEach(function(row){
+    row.style.display = row.textContent.toLowerCase().indexOf(q) > -1 ? '' : 'none';
+  });
+}
+
+/* ---------- modal shell ---------- */
+function openModal(title, bodyHtml, footerHtml){
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = bodyHtml;
+  document.getElementById('modal-footer').innerHTML = footerHtml || '<button class="secondary" onclick="closeModal()">Close</button>';
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal(){
+  document.getElementById('modal-overlay').classList.remove('open');
+  modalContext = null;
+}
+function formInput(label,id,val,type){
+  type = type || 'text';
+  return '<div class="form-group"><label>' + label + '</label><input type="' + type + '" id="' + id + '" value="' + (val===undefined?'':val) + '"></div>';
+}
+function formTextarea(label,id){
+  return '<div class="form-group"><label>' + label + '</label><textarea id="' + id + '"></textarea></div>';
+}
+function formSelect(label,id,opts){
+  var o = opts.map(function(x){ return '<option>' + x + '</option>'; }).join('');
+  return '<div class="form-group"><label>' + label + '</label><select id="' + id + '">' + o + '</select></div>';
+}
+
+/* ---------- corporate directory ---------- */
+function openAddCompany(){
+  openModal('Add company',
+    formInput('Company name','ac-name','') +
+    formInput('Industry','ac-industry','') +
+    '<div class="form-row-2">' + formInput('Point of contact','ac-poc','') + formInput('Contact email','ac-email','','text') + '</div>' +
+    formTextarea('Notes','ac-notes'),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveCompany()">Save</button>'
+  );
+}
+function saveCompany(){
+  var name = document.getElementById('ac-name').value || 'Untitled company';
+  var industry = document.getElementById('ac-industry').value || 'Unspecified industry';
+  var poc = document.getElementById('ac-poc').value || 'Unassigned contact';
+  var list = document.getElementById('corporate-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + name + '</div><div class="secondary-text">' + industry + ' — POC: ' + poc + '</div></div><div class="right"><span class="secondary-text">0 hires</span><span class="badge outline">Prospective</span><button class="link-btn" onclick="viewHistory(this)">History</button></div>';
+  list.appendChild(row);
+  closeModal();
+  COMPANIES.push(name);
+}
+function viewHistory(btn){
+  var row = btn.closest('.list-row');
+  var name = row.querySelector('.primary-text').textContent;
+  openModal('Hiring history — ' + name,
+    '<div class="list-row" style="border:none;padding:6px 0;"><span>Rajesh Karki — Software Engineer Intern</span><span class="secondary-text">2026</span></div>' +
+    '<div class="list-row" style="border:none;padding:6px 0;"><span>Prior cohort candidate — Backend Developer</span><span class="secondary-text">2025</span></div>',
+    '<button class="primary" onclick="closeModal()">Close</button>'
+  );
+}
+
+/* ---------- vacancies ---------- */
+function openPostVacancy(){
+  openModal('Post vacancy',
+    formInput('Job title','pv-title','') +
+    '<div class="form-row-2">' + formSelect('Company','pv-company', COMPANIES) + formInput('Positions open','pv-positions','1','number') + '</div>' +
+    '<div class="form-row-2">' + formInput('Minimum GPA','pv-gpa','3.0') + formInput('Application deadline','pv-deadline','','date') + '</div>',
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveVacancy()">Save as draft</button>'
+  );
+}
+function saveVacancy(){
+  var title = document.getElementById('pv-title').value || 'Untitled vacancy';
+  var company = document.getElementById('pv-company').value;
+  var matched = Math.floor(Math.random() * 10) + 3;
+  var list = document.getElementById('vacancies-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + title + '</div><div class="secondary-text">' + company + ' — matched to ' + matched + ' students</div></div><div class="right"><span class="badge dashed">Draft</span><button class="link-btn" onclick="dispatchVacancy(this)">Verify &amp; dispatch</button></div>';
+  list.appendChild(row);
+  closeModal();
+}
+function dispatchVacancy(btn){
+  var row = btn.closest('.list-row');
+  var badge = row.querySelector('.badge');
+  badge.textContent = 'Dispatched';
+  badge.className = 'badge filled';
+  btn.remove();
+}
+
+/* ---------- interviews ---------- */
+function openScheduleInterview(){
+  openModal('Schedule interview',
+    formSelect('Student','si-student', STUDENTS) +
+    formSelect('Company','si-company', COMPANIES) +
+    '<div class="form-row-2">' + formInput('Position','si-position','') + formInput('Date &amp; time','si-datetime','e.g. Sep 15, 10:00') + '</div>',
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveInterview()">Schedule</button>'
+  );
+}
+function saveInterview(){
+  var student = document.getElementById('si-student').value;
+  var company = document.getElementById('si-company').value;
+  var position = document.getElementById('si-position').value || 'Unspecified role';
+  var when = document.getElementById('si-datetime').value || 'TBC';
+  var tbody = document.querySelector('#interviews-table tbody');
+  var tr = document.createElement('tr');
+  tr.innerHTML = '<td>' + student + '</td><td>' + company + '</td><td>' + position + '</td><td>' + when + '</td><td><span class="badge dashed">Scheduled</span> <button class="link-btn" onclick="markOutcome(this)">Mark outcome</button></td>';
+  tbody.appendChild(tr);
+  closeModal();
+}
+function markOutcome(btn){
+  var tr = btn.closest('tr');
+  modalContext = { tr: tr };
+  openModal('Mark interview outcome',
+    formSelect('Outcome','mo-outcome',['Selected','Not selected','Reschedule']),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveOutcome()">Save</button>'
+  );
+}
+function saveOutcome(){
+  var outcome = document.getElementById('mo-outcome').value;
+  var tr = modalContext.tr;
+  var cell = tr.children[4];
+  if(outcome === 'Reschedule'){
+    cell.innerHTML = '<span class="badge dashed">Scheduled</span> <button class="link-btn" onclick="markOutcome(this)">Mark outcome</button>';
+  } else {
+    cell.innerHTML = '<span class="badge ' + (outcome === 'Selected' ? 'filled' : 'outline') + '">' + outcome + '</span>';
+  }
+  closeModal();
+}
+
+/* ---------- resumes ---------- */
+function viewResume(btn){
+  var row = btn.closest('.list-row');
+  var name = row.querySelector('.primary-text').textContent;
+  openModal('Resume — ' + name,
+    '<p style="font-size:13px;color:var(--text-secondary);margin:0 0 12px;">Portfolio link, CV, and certification files would preview here.</p>' +
+    '<div class="list-row" style="border:none;padding:6px 0;"><span>Portfolio</span><span class="badge filled">Linked</span></div>' +
+    '<div class="list-row" style="border:none;padding:6px 0;"><span>CV (PDF)</span><span class="badge filled">Uploaded</span></div>',
+    '<button class="primary" onclick="closeModal()">Close</button>'
+  );
+}
+function requestUpdate(btn){
+  var row = btn.closest('.list-row');
+  var name = row.querySelector('.primary-text').textContent;
+  openModal('Reminder sent', '<p style="font-size:13px;">A resume update reminder has been sent to ' + name + '.</p>', '<button class="primary" onclick="closeModal()">Done</button>');
+}
+
+/* ---------- success dashboard ---------- */
+function exportReport(){
+  openModal('Export', '<p style="font-size:13px;">Preparing the placement success report as a PDF file.</p>', '<button class="primary" onclick="closeModal()">Close</button>');
+}
+</script>
+</body>
+</html>

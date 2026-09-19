@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PAT Console — Personal Academic Tutor</title>
+<style>
+:root{
+  --bg:#ffffff;
+  --ink:#111111;
+  --ink-soft:#5b5b5b;
+  --ink-faint:#9a9a9a;
+  --line:#dcdcdc;
+  --line-strong:#b7b7b7;
+  --fill:#f4f4f4;
+  --sidebar:#070707;
+  --sidebar-line:#242424;
+  --sidebar-ink:#cfcfcf;
+  --sidebar-ink-dim:#7a7a7a;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{font-family:var(--sans);color:var(--ink);background:var(--bg);font-size:14.5px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+button,input,select,textarea{font-family:inherit;}
+.app{display:flex;min-height:100vh;}
+
+.sidebar{width:264px;flex-shrink:0;background:var(--sidebar);color:var(--sidebar-ink);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.brand{padding:24px 22px 16px;border-bottom:1px solid var(--sidebar-line);}
+.brand-mark{font-family:var(--serif);font-size:18px;color:#fff;letter-spacing:.01em;}
+.brand-sub{font-size:10.7px;color:var(--sidebar-ink-dim);margin-top:5px;}
+.nav{flex:1;padding:10px 8px;overflow-y:auto;}
+.nav-item{display:flex;align-items:center;gap:10px;width:100%;padding:8px 11px;background:none;border:none;color:var(--sidebar-ink);font-size:12.6px;text-align:left;cursor:pointer;border-left:2px solid transparent;font-family:var(--sans);}
+.nav-item:hover{color:#fff;}
+.nav-item.active{color:#fff;border-left-color:#fff;background:rgba(255,255,255,.06);}
+.nav-mono{width:28px;height:19px;border:1px solid var(--sidebar-line);display:flex;align-items:center;justify-content:center;font-size:9px;letter-spacing:.02em;color:var(--sidebar-ink-dim);flex-shrink:0;}
+.nav-item.active .nav-mono{border-color:#fff;color:#fff;}
+.sidebar-foot{padding:14px 22px;border-top:1px solid var(--sidebar-line);font-size:11px;color:var(--sidebar-ink-dim);}
+.sidebar-foot .who{color:#e6e6e6;font-size:12px;margin-bottom:2px;}
+
+.main{flex:1;min-width:0;}
+.topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;padding:28px 40px 20px;border-bottom:1px solid var(--line);flex-wrap:wrap;}
+.topbar h1{font-family:var(--serif);font-weight:400;font-size:25px;margin:0;}
+.topbar .desc{font-size:13px;color:var(--ink-soft);margin-top:6px;max-width:660px;}
+.topbar .actions{display:flex;gap:10px;flex-shrink:0;padding-top:2px;flex-wrap:wrap;}
+.content{padding:32px 40px 90px;max-width:1180px;}
+
+.btn{font-family:var(--sans);font-size:13px;padding:9px 16px;border:1px solid var(--ink);background:var(--ink);color:#fff;cursor:pointer;white-space:nowrap;}
+.btn:hover{background:#000;}
+.btn-outline{background:transparent;color:var(--ink);border:1px solid var(--line-strong);}
+.btn-outline:hover{border-color:var(--ink);}
+.btn-small{padding:5px 11px;font-size:12px;}
+.btn-urgent{border-width:2px;font-weight:600;}
+.btn-full{width:100%;}
+
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-bottom:38px;}
+.kpi{padding:20px 22px;border-left:1px solid var(--line);}
+.kpi:first-child{border-left:none;}
+.kpi .num{font-family:var(--serif);font-size:28px;font-variant-numeric:tabular-nums;}
+.kpi .label{font-size:11.6px;color:var(--ink-soft);margin-top:5px;}
+.kpi .delta{font-size:11px;margin-top:7px;color:var(--ink-faint);}
+
+.section-head{display:flex;justify-content:space-between;align-items:baseline;margin:44px 0 14px;flex-wrap:wrap;gap:6px;}
+.section-head h2{font-family:var(--serif);font-weight:400;font-size:18px;margin:0;}
+.section-head .hint{font-size:11.8px;color:var(--ink-faint);}
+
+.chart-wrap{border:1px solid var(--line);padding:22px 24px 16px;}
+.legend{display:flex;gap:20px;font-size:12px;color:var(--ink-soft);margin-top:12px;flex-wrap:wrap;}
+.legend span{display:inline-flex;align-items:center;gap:6px;}
+.swatch{width:10px;height:10px;display:inline-block;border:1px solid var(--ink);}
+
+.table-wrap{overflow-x:auto;border-bottom:1px solid var(--line);}
+table.ledger{width:100%;border-collapse:collapse;font-size:13px;min-width:560px;}
+table.ledger th{text-align:left;font-weight:500;color:var(--ink-soft);font-size:11.2px;padding:0 14px 10px;border-bottom:1px solid var(--ink);white-space:nowrap;}
+table.ledger td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top;}
+table.ledger tbody tr{cursor:pointer;}
+table.ledger tbody tr:hover{background:var(--fill);}
+table.ledger td.num, table.ledger th.num{text-align:right;font-variant-numeric:tabular-nums;}
+.tag{display:inline-block;font-size:10.6px;padding:2.5px 8px;border:1px solid var(--ink);white-space:nowrap;}
+.tag.dim{border-color:var(--line-strong);color:var(--ink-soft);}
+
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);}
+.dash-card{background:#fff;padding:20px;cursor:pointer;}
+.dash-card:hover{background:var(--fill);}
+.dash-card .mono{width:32px;height:22px;border:1px solid var(--ink);display:flex;align-items:center;justify-content:center;font-size:9.5px;margin-bottom:14px;}
+.dash-card h4{font-family:var(--serif);font-weight:400;font-size:15px;margin:0 0 6px;}
+.dash-card p{font-size:11.8px;color:var(--ink-soft);margin:0 0 12px;min-height:44px;}
+.dash-card .metric{font-family:var(--serif);font-size:19px;}
+.dash-card .metric-label{font-size:10.8px;color:var(--ink-faint);}
+
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.32);display:flex;align-items:center;justify-content:center;z-index:80;padding:20px;}
+.modal{background:#fff;width:500px;max-width:100%;max-height:92vh;overflow-y:auto;padding:30px 32px;border:1px solid var(--ink);}
+.modal.urgent{border-width:2px;}
+.modal h3{font-family:var(--serif);font-weight:400;font-size:21px;margin:0 0 4px;}
+.modal .sub{font-size:12.5px;color:var(--ink-soft);margin-bottom:22px;}
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:11.8px;color:var(--ink-soft);margin-bottom:6px;}
+.field input, .field select, .field textarea{width:100%;padding:9px 10px;border:1px solid var(--line-strong);font-family:var(--sans);font-size:13.5px;background:#fff;color:var(--ink);}
+.field input:focus, .field select:focus, .field textarea:focus{outline:2px solid var(--ink);outline-offset:1px;}
+.field textarea{min-height:70px;resize:vertical;}
+.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:24px;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+
+.drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.25);z-index:70;display:flex;justify-content:flex-end;}
+.drawer{width:440px;max-width:94vw;background:#fff;height:100%;overflow-y:auto;padding:32px 34px;border-left:1px solid var(--ink);}
+.drawer .eyebrow{font-size:11.5px;color:var(--ink-faint);margin-bottom:6px;}
+.drawer h3{font-family:var(--serif);font-size:21px;font-weight:400;margin:0 0 18px;}
+.kv{display:flex;justify-content:space-between;gap:16px;padding:11px 0;border-bottom:1px solid var(--line);font-size:13px;}
+.kv .k{color:var(--ink-soft);flex-shrink:0;}
+.kv .v{text-align:right;}
+.drawer-actions{display:flex;gap:10px;margin-top:26px;flex-wrap:wrap;}
+.close-x{background:none;border:none;font-size:20px;color:var(--ink-soft);cursor:pointer;line-height:1;padding:0;}
+.drawer-top{display:flex;justify-content:space-between;align-items:flex-start;}
+.notice{border:1px solid var(--line-strong);padding:14px 16px;font-size:12.5px;color:var(--ink-soft);margin-top:18px;}
+.notice.strong{border-color:var(--ink);color:var(--ink);}
+.mini-list{list-style:none;padding:0;margin:16px 0 0;}
+.mini-list li{padding:11px 0;border-bottom:1px solid var(--line);font-size:12.8px;display:flex;justify-content:space-between;align-items:center;gap:10px;}
+
+.toast{position:fixed;bottom:26px;right:26px;background:#111;color:#fff;padding:13px 20px;font-size:13px;z-index:100;border:1px solid #000;}
+.empty{padding:40px 0;text-align:center;color:var(--ink-faint);font-size:13px;border:1px dashed var(--line-strong);}
+.menu-btn{display:none;border:1px solid var(--line-strong);background:#fff;padding:8px 10px;cursor:pointer;margin-right:12px;}
+.title-row{display:flex;align-items:center;}
+.lede{font-size:13px;color:var(--ink-soft);margin:-8px 0 26px;max-width:680px;}
+
+@media (max-width:820px){
+  .sidebar{position:fixed;z-index:60;transform:translateX(-100%);transition:transform .2s;}
+  .sidebar.open{transform:translateX(0);}
+  .topbar,.content{padding-left:20px;padding-right:20px;}
+  .menu-btn{display:inline-flex !important;}
+  .two-col{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <main class="main">
+    <div class="topbar" id="topbar"></div>
+    <div class="content" id="content"></div>
+  </main>
+</div>
+<div id="modal-root"></div>
+<div id="drawer-root"></div>
+<div id="toast-root"></div>
+
+<script>
+/* ============================= UTILITIES ============================= */
+const $ = sel => document.querySelector(sel);
+const num = n => Math.round(n).toLocaleString('en-US');
+const pct = n => (Math.round(n*10)/10) + '%';
+function toast(msg){
+  const root = $('#toast-root');
+  root.innerHTML = `<div class="toast">${msg}</div>`;
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(()=>{ root.innerHTML=''; }, 2800);
+}
+function closeModal(){ $('#modal-root').innerHTML=''; }
+function closeDrawer(){ $('#drawer-root').innerHTML=''; }
+
+/* ============================= CHART ============================= */
+function barChart(id, labels, series){
+  const w = Math.max(600, labels.length*Math.max(78, series.length*44));
+  const h = 205, padL=8, padB=30, padT=16, padR=8;
+  const max = Math.max(1, ...series.flatMap(s=>s.values)) * 1.18;
+  const groupW = (w-padL-padR)/labels.length;
+  const barW = Math.min(28, (groupW-16)/series.length);
+  let bars='';
+  labels.forEach((lab,li)=>{
+    const gx = padL + li*groupW + (groupW - (barW*series.length+(series.length-1)*6))/2;
+    series.forEach((s,si)=>{
+      const val = s.values[li];
+      const bh = (val/max)*(h-padT-padB);
+      const bx = gx + si*(barW+6);
+      const by = h-padB-bh;
+      const fillId = si===0? `url(#${id}-f0)` : si===1? `url(#${id}-f1)` : `url(#${id}-f2)`;
+      bars += `<rect x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(bh,0).toFixed(1)}" fill="${fillId}" stroke="#111" stroke-width="0.6"/>`;
+      bars += `<text x="${(bx+barW/2).toFixed(1)}" y="${(by-5).toFixed(1)}" font-size="9" text-anchor="middle" fill="#5b5b5b" font-family="sans-serif">${s.fmt?s.fmt(val):val}</text>`;
+    });
+    bars += `<text x="${(gx + (barW*series.length+(series.length-1)*6)/2).toFixed(1)}" y="${h-10}" font-size="9.4" text-anchor="middle" fill="#5b5b5b" font-family="sans-serif">${lab}</text>`;
+  });
+  bars += `<line x1="${padL}" y1="${h-padB}" x2="${w-padR}" y2="${h-padB}" stroke="#111" stroke-width="1"/>`;
+  return `<svg viewBox="0 0 ${w} ${h}" style="width:100%;height:${h}px;display:block;">
+    <defs>
+      <pattern id="${id}-f1" width="6" height="6" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"><rect width="6" height="6" fill="#fff"/><line x1="0" y1="0" x2="0" y2="6" stroke="#111" stroke-width="2.6"/></pattern>
+      <pattern id="${id}-f0" width="2" height="2" patternUnits="userSpaceOnUse"><rect width="2" height="2" fill="#111"/></pattern>
+      <pattern id="${id}-f2" width="2" height="2" patternUnits="userSpaceOnUse"><rect width="2" height="2" fill="#c7c7c7"/></pattern>
+    </defs>
+    ${bars}
+  </svg>`;
+}
+function chartLegend(series){
+  return `<div class="legend">${series.map((s,i)=>`<span><span class="swatch" style="background:${i===0?'#111':i===1?'repeating-linear-gradient(45deg,#111,#111 2px,#fff 2px,#fff 4px)':'#c7c7c7'}"></span>${s.name}</span>`).join('')}</div>`;
+}
+
+/* ============================= CONSTANTS ============================= */
+const STUDENTS = ['Maya Chen','Jordan Blake','Aaliyah Osei','Ryan Patel','Sofia Martins','Liam Connor','Naledi Dube','Theo Nakamura'];
+
+/* ============================= STATE / MOCK DATA ============================= */
+const state = {
+  active:'dashboard',
+  queries:[
+    {student:'Jordan Blake', subject:'Confused about assignment 2 rubric', category:'Academic', priority:'Medium', status:'Open', opened:'10 Sep 2026'},
+    {student:'Aaliyah Osei', subject:'Feeling overwhelmed with clinical placement hours', category:'Pastoral', priority:'High', status:'In progress', opened:'08 Sep 2026'},
+    {student:'Ryan Patel', subject:'Cannot access online portal for grades', category:'Administrative', priority:'Low', status:'Resolved', opened:'02 Sep 2026'},
+    {student:'Sofia Martins', subject:'Requesting extension on practicum report', category:'Academic', priority:'Medium', status:'Open', opened:'12 Sep 2026'},
+    {student:'Naledi Dube', subject:'Struggling to balance part-time job and coursework', category:'Pastoral', priority:'Medium', status:'In progress', opened:'09 Sep 2026'},
+  ],
+  pastoral:[
+    {student:'Aaliyah Osei', date:'08 Sep 2026', entryType:'Wellness check-in', summary:'Reports high stress from clinical rotation hours; sleep disrupted.', wellnessScore:2},
+    {student:'Jordan Blake', date:'01 Sep 2026', entryType:'Special adjustment', summary:'Approved extended lab access due to part-time work schedule conflict.', wellnessScore:4},
+    {student:'Naledi Dube', date:'09 Sep 2026', entryType:'Personal challenge', summary:'Discussed financial pressure affecting attendance; referred to bursary office.', wellnessScore:3},
+    {student:'Maya Chen', date:'28 Aug 2026', entryType:'Wellness check-in', summary:'Doing well; positive outlook on second-year course load.', wellnessScore:5},
+  ],
+  meetings:[
+    {student:'Jordan Blake', purpose:'Assignment 2 rubric walkthrough', date:'18 Sep 2026', time:'10:00', mode:'In-person', status:'Confirmed'},
+    {student:'Aaliyah Osei', purpose:'Wellness follow-up', date:'19 Sep 2026', time:'14:30', mode:'Video call', status:'Requested'},
+    {student:'Sofia Martins', purpose:'Practicum extension discussion', date:'20 Sep 2026', time:'11:00', mode:'In-person', status:'Requested'},
+    {student:'Naledi Dube', purpose:'Check-in on action plan progress', date:'12 Sep 2026', time:'09:30', mode:'Video call', status:'Completed'},
+  ],
+  warnings:[
+    {student:'Ryan Patel', academicScore:58, attendance:64, engagement:60, riskLevel:'High', flaggedDate:'11 Sep 2026'},
+    {student:'Naledi Dube', academicScore:66, attendance:71, engagement:68, riskLevel:'Medium', flaggedDate:'09 Sep 2026'},
+    {student:'Theo Nakamura', academicScore:74, attendance:88, engagement:80, riskLevel:'Low', flaggedDate:'05 Sep 2026'},
+    {student:'Liam Connor', academicScore:61, attendance:69, engagement:63, riskLevel:'Medium', flaggedDate:'10 Sep 2026'},
+  ],
+  actionPlans:[
+    {student:'Ryan Patel', goal:'Raise Culinary Theory grade above 65%', nextCheckIn:'22 Sep 2026', progress:35, status:'Active'},
+    {student:'Naledi Dube', goal:'Improve attendance to 85%+ over 6 weeks', nextCheckIn:'25 Sep 2026', progress:50, status:'On track'},
+    {student:'Liam Connor', goal:'Complete missed trades practicals', nextCheckIn:'21 Sep 2026', progress:20, status:'Active'},
+  ],
+  referrals:[
+    {student:'Aaliyah Osei', reason:'Escalating stress and sleep disruption from clinical hours', routedTo:'SSD', date:'08 Sep 2026', status:'In progress'},
+    {student:'Naledi Dube', reason:'Financial hardship affecting attendance', routedTo:'Registry', date:'09 Sep 2026', status:'Accepted'},
+    {student:'Ryan Patel', reason:'Repeated missed practicals, possible learning support need', routedTo:'SSD', date:'11 Sep 2026', status:'Submitted'},
+  ],
+  parental:[
+    {student:'Ryan Patel', parentName:'Mr. D. Patel', date:'05 Sep 2026', mode:'Phone', summary:'Discussed missed practicals and part-time work hours affecting attendance.', agreedOutcome:'Parent will help adjust work schedule around practical sessions.'},
+    {student:'Sofia Martins', parentName:'Mrs. L. Martins', date:'30 Aug 2026', mode:'In-person', summary:'Discussed practicum placement stress.', agreedOutcome:'Agreed to weekly check-ins with PAT for one month.'},
+  ],
+  skillDeficits:[
+    {student:'Ryan Patel', skill:'Written report structuring', level:'Beginner', remediationPlan:'Weekly writing lab sessions with SSD writing tutor', status:'Open'},
+    {student:'Jordan Blake', skill:'Time management', level:'Developing', remediationPlan:'Assigned weekly planner check-ins', status:'In progress'},
+    {student:'Liam Connor', skill:'Technical measurement accuracy', level:'Developing', remediationPlan:'Extra practical lab hours booked', status:'Open'},
+  ],
+  personas:[
+    {student:'Maya Chen', learningStyle:'Visual', careerGoal:'Corporate finance analyst', languages:'English, Mandarin', accommodations:'None on file'},
+    {student:'Jordan Blake', learningStyle:'Kinesthetic', careerGoal:'Network security specialist', languages:'English', accommodations:'Extended time on written exams (25%)'},
+    {student:'Aaliyah Osei', learningStyle:'Auditory', careerGoal:'Registered Nurse, pediatrics', languages:'English, Twi', accommodations:'None on file'},
+    {student:'Ryan Patel', learningStyle:'Kinesthetic', careerGoal:'Executive chef, own restaurant', languages:'English, Gujarati', accommodations:'Reader support for written assessments'},
+    {student:'Sofia Martins', learningStyle:'Visual', careerGoal:'Primary school teacher', languages:'English, Portuguese', accommodations:'None on file'},
+    {student:'Liam Connor', learningStyle:'Kinesthetic', careerGoal:'Licensed electrician', languages:'English', accommodations:'Dyslexia support — extra time + audio materials'},
+    {student:'Naledi Dube', learningStyle:'Reading/Writing', careerGoal:'HR business partner', languages:'English, Zulu', accommodations:'None on file'},
+    {student:'Theo Nakamura', learningStyle:'Visual', careerGoal:'Software engineer', languages:'English, Japanese', accommodations:'None on file'},
+  ],
+  escalations:[
+    {student:'Aaliyah Osei', emergencyType:'Mental Health Crisis', notes:'Student disclosed acute anxiety and difficulty coping; immediate support requested.', routedTo:'Campus Crisis Response Team', timestamp:'08 Sep 2026, 15:40', status:'Resolved'},
+  ],
+  studyGroups:[
+    {groupName:'Culinary Theory Support Circle', subject:'Culinary Theory', mentor:'Elena Cruz (peer mentor)', members:'Ryan Patel, 2 others', cadence:'Weekly, Thursdays', status:'Active'},
+    {groupName:'IT Fundamentals Study Pod', subject:'IT & Computing core modules', mentor:'Theo Nakamura (peer mentor)', members:'Jordan Blake, 3 others', cadence:'Biweekly', status:'Active'},
+  ],
+  kb:[
+    {question:'How do I request an assignment extension?', category:'Academic', views:412, lastUpdated:'Jul 2026', status:'Published'},
+    {question:'Who do I contact about financial hardship support?', category:'Pastoral', views:298, lastUpdated:'Jun 2026', status:'Published'},
+    {question:'How do I book a meeting with my PAT?', category:'Administrative', views:520, lastUpdated:'Aug 2026', status:'Published'},
+    {question:'What accommodations are available for exams?', category:'Academic', views:184, lastUpdated:'—', status:'Draft'},
+  ],
+  feedback:[
+    {student:'Ryan Patel', ticketSubject:'Portal access issue', sentiment:'Positive', comment:'Quick and clear resolution, thank you.', date:'03 Sep 2026'},
+    {student:'Jordan Blake', ticketSubject:'Rubric clarification', sentiment:'Neutral', comment:'Got an answer but took a few days.', date:'11 Sep 2026'},
+    {student:'Naledi Dube', ticketSubject:'Attendance policy question', sentiment:'Negative', comment:'Felt like my situation wasn’t fully understood at first.', date:'10 Sep 2026'},
+  ],
+  impact:[
+    {student:'Ryan Patel', intervention:'Weekly writing lab + action plan', preGrade:52, postGrade:64, verifiedBy:'PAT + Culinary Faculty'},
+    {student:'Naledi Dube', intervention:'Attendance action plan + bursary referral', preGrade:61, postGrade:70, verifiedBy:'PAT'},
+    {student:'Liam Connor', intervention:'Extra practical lab hours', preGrade:58, postGrade:58, verifiedBy:'PAT + Trades Faculty'},
+  ],
+  archive:[
+    {student:'Aaliyah Osei', academicYear:'2024–2025', summary:'First-year adjustment challenges, resolved with weekly check-ins.', priorTutor:'M. Alvarez (former PAT)', keyOutcomes:'Completed year with improved wellness score (2 → 4).'},
+    {student:'Jordan Blake', academicYear:'2024–2025', summary:'Time-management concerns flagged early; accommodations agreed.', priorTutor:'M. Alvarez (former PAT)', keyOutcomes:'Passed all modules; accommodation remains active.'},
+  ],
+  disciplinary:[
+    {student:'Ryan Patel', itFlags:1, ssdFlags:1, escalationRaised:false},
+    {student:'Liam Connor', itFlags:2, ssdFlags:2, escalationRaised:true},
+  ],
+};
+// compute initial disciplinary status
+state.disciplinary.forEach(r=>{ r.status = (r.itFlags>=2 && r.ssdFlags>=2 && r.escalationRaised) ? 'Disciplinary Meeting Triggered' : 'Monitoring'; r.meetingDate = r.status==='Disciplinary Meeting Triggered' ? 'To be scheduled' : '—'; });
+
+/* ============================= NAV / TITLES ============================= */
+const NAV = [
+  {id:'dashboard', label:'Overview', mono:'OV'},
+  {id:'queries', label:'Query Management', mono:'QM'},
+  {id:'pastoral', label:'Pastoral Care Logs', mono:'PC'},
+  {id:'meetings', label:'Meeting Scheduler', mono:'MS'},
+  {id:'warnings', label:'Early Warning Flags', mono:'EW'},
+  {id:'actionPlans', label:'Action Plan Builder', mono:'AP'},
+  {id:'referrals', label:'Cross-Dept. Referrals', mono:'CR'},
+  {id:'parental', label:'Parental Advisory Logs', mono:'PA'},
+  {id:'skillDeficits', label:'Skill Deficit Checklists', mono:'SD'},
+  {id:'personas', label:'Student Persona Records', mono:'SP'},
+  {id:'escalations', label:'Escalation Dispatcher', mono:'ED'},
+  {id:'studyGroups', label:'Study Group Organizer', mono:'SG'},
+  {id:'kb', label:'Self-Service Knowledgebase', mono:'KB'},
+  {id:'feedback', label:'Feedback Analysis', mono:'FA'},
+  {id:'impact', label:'Intervention Impact', mono:'II'},
+  {id:'archive', label:'Archived Pastoral Histories', mono:'AH'},
+  {id:'disciplinary', label:'Unified Disciplinary Escalation', mono:'DE'},
+];
+const TITLES = {
+  dashboard:{title:'PAT caseload overview', desc:'Pastoral care, personal tutoring and query resolution across your assigned student caseload.'},
+  queries:{title:'Query Management Console', desc:'Ticket-based tracking for intake, prioritization, assignment and closure of student pastoral and academic inquiries.'},
+  pastoral:{title:'Pastoral Care Logs', desc:'Secure journals documenting personal student challenges, emotional wellness metrics and special adjustments.'},
+  meetings:{title:'Meeting Scheduler Engine', desc:'Book meetings that sync your calendar availability with the student’s calendar display.'},
+  warnings:{title:'Early Warning Flags', desc:'Combined academic performance, attendance and engagement signals that surface at-risk students automatically.'},
+  actionPlans:{title:'Action Plan Builder', desc:'Goal-oriented recovery plans with milestones and scheduled check-ins.'},
+  referrals:{title:'Cross-Departmental Referrals', desc:'Standardized routing to forward distressed or high-need students to SSD or the Registry.'},
+  parental:{title:'Parental Advisory Logs', desc:'Logs, minutes and agreed outcomes from direct parent-tutor communications.'},
+  skillDeficits:{title:'Skill Deficit Checklists', desc:'Core learning competencies mapped against each student, with targeted remediation plans.'},
+  personas:{title:'Student Persona Records', desc:'Complete profiles: learning styles, career aspirations, language proficiencies and disability accommodations.'},
+  escalations:{title:'Escalation Dispatcher', desc:'Panic-routing controls that immediately transition critical mental health or behavioral emergencies to specialized external support.'},
+  studyGroups:{title:'Study Group Organizer', desc:'Pair struggling students with high-achieving peer mentors in a coordinated workspace.'},
+  kb:{title:'Self-Service Knowledgebase', desc:'Student-facing answers to frequent questions, reducing redundant low-complexity queries.'},
+  feedback:{title:'Feedback Analysis Engine', desc:'Sentiment tracking on closed tickets to gauge support quality and locate operational gaps.'},
+  impact:{title:'Intervention Impact Analytics', desc:'Pre- and post-intervention grade comparisons to evaluate the effectiveness of academic support.'},
+  archive:{title:'Archived Pastoral Histories', desc:'Cross-year record persistence so an incoming tutor has full context on a student’s prior support journey.'},
+  disciplinary:{title:'Unified Disciplinary Escalation', desc:'Cross-module trigger: a student is flagged for a multi-departmental Disciplinary Meeting once IT and SSD misbehavior flags both accumulate and a department raises for escalation.'},
+};
+
+/* ============================= GENERIC FEATURE CONFIGS ============================= */
+const FEATURES = {
+  queries:{
+    dataKey:'queries', tableTitle:'All tickets',
+    kpis: rows => [
+      {value:rows.filter(r=>r.status!=='Resolved').length, label:'Open tickets'},
+      {value:rows.filter(r=>r.priority==='High'&&r.status!=='Resolved').length, label:'High priority, open'},
+      {value:'1.8 days', label:'Avg. resolution time'},
+      {value:rows.filter(r=>r.status==='Resolved').length, label:'Resolved this month'},
+    ],
+    chart: rows => ({labels:['Academic','Pastoral','Administrative'], series:[
+      {name:'Tickets', values:['Academic','Pastoral','Administrative'].map(c=>rows.filter(r=>r.category===c).length)},
+    ]}),
+    columns:[
+      {key:'student', label:'Student'},
+      {key:'subject', label:'Subject'},
+      {key:'category', label:'Category'},
+      {key:'priority', label:'Priority', fmt:v=>`<span class="tag ${v==='High'?'':'dim'}">${v}</span>`},
+      {key:'status', label:'Status', fmt:v=>`<span class="tag ${v==='Resolved'?'dim':''}">${v}</span>`},
+    ],
+    form:{ actionLabel:'+ Log new query', title:'Log new query', sub:'Open a new ticket for a student pastoral or academic inquiry.',
+      fields:[
+        {key:'student', label:'Student', type:'select', options:STUDENTS},
+        {key:'subject', label:'Subject', type:'text', placeholder:'e.g. Question about resit policy'},
+        {key:'category', label:'Category', type:'select', options:['Academic','Pastoral','Administrative']},
+        {key:'priority', label:'Priority', type:'select', options:['High','Medium','Low']},
+      ],
+      build: v => ({student:v.student, subject:v.subject||'Untitled query', category:v.category||'Academic', priority:v.priority||'Medium', status:'Open', opened:'Sep 2026'})
+    },
+    rowAction:{ label:'Advance status', apply:(row)=>{ const order=['Open','In progress','Resolved']; const i=order.indexOf(row.status); row.status = i>-1 && i<2 ? order[i+1] : 'Resolved'; toast('Ticket status advanced.'); } },
+  },
+  pastoral:{
+    dataKey:'pastoral', tableTitle:'Pastoral log entries',
+    kpis: rows => [
+      {value:rows.length, label:'Entries this term'},
+      {value:(rows.reduce((a,r)=>a+r.wellnessScore,0)/rows.length).toFixed(1)+' / 5', label:'Avg. wellness score'},
+      {value:new Set(rows.filter(r=>r.entryType==='Special adjustment').map(r=>r.student)).size, label:'Students with adjustments'},
+      {value:rows.filter(r=>r.wellnessScore<=2).length, label:'Entries flagged low wellness'},
+    ],
+    chart: rows => ({labels:['Wellness','Challenge','Adjustment'], series:[
+      {name:'Entries', values:['Wellness check-in','Personal challenge','Special adjustment'].map(t=>rows.filter(r=>r.entryType===t).length)},
+    ]}),
+    columns:[
+      {key:'student', label:'Student'},
+      {key:'entryType', label:'Entry type'},
+      {key:'wellnessScore', label:'Wellness', align:'num', fmt:v=>v+' / 5'},
+      {key:'date', label:'Date'},
+      {key:'summary', label:'Summary'},
+    ],
+    form:{ actionLabel:'+ Log pastoral entry', title:'Log pastoral entry', sub:'This entry is encrypted and visible only to the assigned PAT and safeguarding staff.',
+      fields:[
+        {key:'student', label:'Student', type:'select', options:STUDENTS},
+        {key:'entryType', label:'Entry type', type:'select', options:['Wellness check-in','Personal challenge','Special adjustment']},
+        {key:'wellnessScore', label:'Wellness score (1–5)', type:'number'},
+        {key:'summary', label:'Summary', type:'text', placeholder:'Confidential summary of the conversation'},
+      ],
+      build: v => ({student:v.student, entryType:v.entryType, wellnessScore:+v.wellnessScore||3, date:'Sep 2026', summary:v.summary||'—'})
+    },
+    rowAction:{ label:'Flag for safeguarding review', apply:(row)=>{ state.escalations.unshift({student:row.student, emergencyType:'Safety Concern', notes:'Escalated from a pastoral log entry: '+row.summary, routedTo:'Safeguarding Team', timestamp:'Sep 2026', status:'Dispatched'}); toast('Flagged and routed to the Escalation Dispatcher.'); } },
+  },
+  meetings:{
+    dataKey:'meetings', tableTitle:'Scheduled meetings',
+    kpis: rows => [
+      {value:rows.filter(r=>r.status==='Confirmed').length, label:'Upcoming confirmed'},
+      {value:rows.filter(r=>r.status==='Requested').length, label:'Pending requests'},
+      {value:rows.filter(r=>r.status==='Completed').length, label:'Completed this month'},
+      {value:'0', label:'No-shows this month'},
+    ],
+    columns:[
+      {key:'student', label:'Student'},
+      {key:'purpose', label:'Purpose'},
+      {key:'date', label:'Date'},
+      {key:'time', label:'Time'},
+      {key:'mode', label:'Mode'},
+      {key:'status', label:'Status', fmt:v=>`<span class="tag ${v==='Completed'?'dim':''}">${v}</span>`},
+    ],
+    form:{ actionLabel:'+ Schedule meeting', title:'Schedule meeting', sub:'Send a meeting request that syncs with the student’s calendar display.',
+      fields:[
+        {key:'student', label:'Student', type:'select', options:STUDENTS},
+        {key:'purpose', label:'Purpose', type:'text', placeholder:'e.g. Mid-term progress review'},
+        {key:'date', label:'Date', type:'text', placeholder:'e.g. 25 Sep 2026'},
+        {key:'time', label:'Time', type:'text', placeholder:'e.g. 13:00'},
+        {key:'mode', label:'Mode', type:'select', options:['In-person','Video call']},
+      ],
+      build: v => ({student:v.student, purpose:v.purpose||'Meeting', date:v.date||'—', time:v.time||'—', mode:v.mode||'In-person', status:'Requested'})
+    },
+    rowAction:{ label:'Advance status', apply:(row)=>{ const order=['Requested','Confirmed','Completed']; const i=order.indexOf(row.status); row.status = i>-1 && i<2 ? order[i+1] : 'Completed'; toast('Meeting status advanced.'); } },
+  },
+  warnings:{
+    dataKey:'warnings', tableTitle:'Flagged students',
+    kpis: rows => [
+      {value:rows.filter(r=>r.riskLevel==='High').length, label:'High risk'},
+      {value:rows.filter(r=>r.riskLevel==='Medium').length, label:'Medium risk'},
+      {value:rows.length, label:'Students monitored'},
+      {value:rows.filter(r=>r.flaggedDate==='11 Sep 2026'||r.flaggedDate==='10 Sep 2026').length, label:'New flags this week'},
+    ],
+    chart: rows => ({labels: rows.map(r=>r.student.split(' ')[0]), series:[
+      {name:'Academic', values:rows.map(r=>r.academicScore)},
+      {name:'Attendance', values:rows.map(r=>r.attendance)},
+      {name:'Engagement', values:rows.map(r=>r.engagement)},
+    ]}),
+    columns:[
+      {key:'student', label:'Student'},
+      {key:'academicScore', label:'Academic', align:'num', fmt:pct},
+      {key:'attendance', label:'Attendance', align:'num', fmt:pct},
+      {key:'engagement', label:'Engagement', align:'num', fmt:pct},
+      {key:'riskLevel', label:'Risk', fmt:v=>`<span class="tag ${v==='High'?'':'dim'}">${v}</span>`},
+    ],
+    form:{ actionLabel:'+ Log risk reading', title:'Log risk reading', sub:'Add a refreshed academic, attendance and engagement reading for a student.',
+      fields:[
+        {key:'student', label:'Student', type:'select', options:STUDENTS},
+        {key:'academicScore', label:'Academic score (%)', type:'number'},
+        {key:'attendance', label:'Attendance (%)', type:'number'},
+        {key:'engagement', label:'Engagement (%)', type:'number'},
+      ],
+      build: v => { const a=+v.academicScore||0, at=+v.attendance||0, e=+v.engagement||0; const avg=(a+at+e)/3; return {student:v.student, academicScore:a, attendance:at, engagement:e, riskLevel: avg<65?'High':avg<75?'Medium':'Low', flaggedDate:'Sep 2026'}; }
+    },
+    rowAction:{ label:'Create action plan', apply:(row)=>{ state.actionPlans.unshift({student:row.student, goal:'Address risk flag: academic/attendance/engagement recovery', nextCheckIn:'2 weeks', progress:0, status:'Active'}); toast('Action plan created for ' + row.student + '.'); } },
+  },
+  actionPlans:{
+    dataKey:'actionPlans', tableTitle:'Active plans',
+    kpis: rows => [
+      {value:rows.filter(r=>r.status!=='Complete').length, label:'Active plans'},
+      {value:rows.filter(r=>r.status==='On track').length, label:'On track'},
+      {value:Math.round(rows.reduce((a,r)=>a+r.progress,0)/rows.length)+'%', label:'Avg. progress'},
+      {value:rows.filter(r=>r.status==='Complete').length, label:'Completed this term'},
+    ],
+    columns:[
+      {key:'student', label:'Student'},
+      {key:'goal', label:'Goal'},
+      {key:'nextCheckIn', label:'Next check-in'},
+      {key:'progress', label:'Progress', align:'num', fmt:pct},
+      {key:'status', label:'Status', fmt:v=>`<span class="tag ${v==='Complete'?'dim':''}">${v}</span>`},
+    ],
+    form:{ actionLabel:'+ Build action plan', title:'Build action plan', sub:'Define a goal-oriented recovery plan with a scheduled check-in.',
+      fields:[
+        {key:'student', label:'Student', type:'select', options:STUDENTS},
+        {key:'goal', label:'Goal', type:'text', placeholder:'e.g. Raise attendance above 85%'},
+        {key:'nextCheckIn', label:'Next check-in', type:'text', placeholder:'e.g. 30 Sep 2026'},
+      ],
+      build: v => ({student:v.student, goal:v.goal||'Untitled goal', nextCheckIn:v.nextCheckIn||'—', progress:0, status:'Active'})
+    },
+    rowAction:{ label:'Log check-in (+25% progress)', apply:(row)=>{ row.progress = Math.min(100, row.progress+25); row.status = row.progress>=100?'Complete':'On track'; toast('Check-in logged.'); } },
+  },
+  referrals:{
+    dataKey:'referrals', tableTitle:'Referral pipeline',
+    kpis: rows => [
+      {value:rows.filter(r=>r.status!=='Resolved').length, label:'Open referrals'},
+      {value:rows.filter(r=>r.routedTo==='SSD').length, label:'Routed to SSD'},
+      {value:rows.filter(r=>r.routedTo==='Registry').length, label:'Routed to Registry'},
+      {value:rows.filter(r=>r.status==='Resolved').length, label:'Resolved this term'},
+    ],
+    columns:[
+      {key:'student', label:'Student'},
+      {key:'reason', label:'Reason'},
+      {key:'routedTo', label:'Routed to'},
+      {key:'date', label:'Date'},
+      {key:'status', label:'Status', fmt:v=>`<span class="tag ${v==='Resolved'?'dim':''}">${v}</span>`},
+    ],
+    form:{ actionLabel:'+ Submit referral', title:'Submit referral', sub:'Route a distressed or high-need student directly to SSD or the Registry.',
+      fields:[
+        {key:'student', label:'Student', type:'select', options:STUDENTS},
+        {key:'reason', label:'Reason', type:'text', placeholder:'Why is this student being referred?'},
+        {key:'routedTo', label:'Route to', type:'select', options:['SSD','Registry']},
+      ],
+      build: v => ({student:v.student, reason:v.reason||'—', routedTo:v.routedTo||'SSD', date:'Sep 2026', status:'Submitted'})
+    },
+    rowAction:{ label:'Advance status', apply:(row)=>{ const order=['Submitted','Accepted','In progress','Resolved']; const i=order.indexOf(row.status); row.status = i>-1 && i<3 ? order[i+1] : 'Resolved'; toast('Referral status advanced.'); } },
+  },
+  parental:{
+    dataKey:'parental', tableTitle:'Communication log',
+    kpis: rows => [
+      {value:rows.length, label:'Logs this term'},
+      {value:new Set(rows.map(r=>r.student)).size, label:'Students with parent contact'},
+      {value:'2', label:'Upcoming follow-ups'},
+      {value:(rows.length/new Set(rows.map(r=>r.student)).size).toFixed(1), label:'Avg. contacts per student'},
+    ],
+    columns:[
+      {key:'student', label:'Student'},
+      {key:'parentName', label:'Parent / guardian'},
+      {key:'mode', label:'Mode'},
+      {key:'date', label:'Date'},
+      {key:'agreedOutcome', label:'Agreed outcome'},
+    ],
+    form:{ actionLabel:'+ Log parent communication', title:'Log parent communication', sub:'Record minutes and agreed outcomes from a parent-tutor conversation.',
+      fields:[
+        {key:'student', label:'Student', type:'select', options:STUDENTS},
+        {key:'parentName', label:'Parent / guardian name', type:'text', placeholder:'e.g. Mrs. J. Smith'},
+        {key:'mode', label:'Mode', type:'select', options:['Phone','In-person','Video']},
+        {key:'summary', label:'Summary', type:'text', placeholder:'What was discussed?'},
+        {key:'agreedOutcome', label:'Agreed outcome', type:'text', placeholder:'What was agreed?'},
+      ],
+      build: v => ({student:v.student, parentName:v.parentName||'—', mode:v.mode||'Phone', date:'Sep 2026', summary:v.summary||'—', agreedOutcome:v.agreedOutcome||'—'})
+    },
+    rowAction:{ label:'Schedule follow-up meeting', apply:(row)=>{ state.meetings.unshift({student:row.student, purpose:'Parent follow-up: '+row.agreedOutcome, date:'To be scheduled', time:'—', mode:'Video call', status:'Requested'}); toast('Follow-up added to the Meeting Scheduler.'); } },
+  },
+  skillDeficits:{
+    dataKey:'skillDeficits', tableTitle:'Deficit log',
+    kpis: rows => [
+      {value:rows.filter(r=>r.status!=='Closed').length, label:'Open deficits'},
+      {value:new Set(rows.map(r=>r.student)).size, label:'Students affected'},
+      {value:rows.filter(r=>r.status==='Closed').length, label:'Closed this term'},
+      {value:rows[0]?rows[0].skill:'—', label:'Most recent gap logged'},
+    ],
+    columns:[
+      {key:'student', label:'Student'},
+      {key:'skill', label:'Skill'},
+      {key:'level', label:'Level'},
+      {key:'remediationPlan', label:'Remediation plan'},
+      {key:'status', label:'Status', fmt:v=>`<span class="tag ${v==='Closed'?'dim':''}">${v}</span>`},
+    ],
+    form:{ actionLabel:'+ Log skill deficit', title:'Log skill deficit', sub:'Map a core learning competency gap and its remediation plan.',
+      fields:[
+        {key:'student', label:'Student', type:'select', options:STUDENTS},
+        {key:'skill', label:'Skill', type:'text', placeholder:'e.g. Academic referencing'},
+        {key:'level', label:'Level', type:'select', options:['Beginner','Developing','Proficient']},
+        {key:'remediationPlan', label:'Remediation plan', type:'text', placeholder:'e.g. Weekly writing lab sessions'},
+      ],
+      build: v => ({student:v.student, skill:v.skill||'Untitled skill', level:v.level||'Developing', remediationPlan:v.remediationPlan||'—', status:'Open'})
+    },
+    rowAction:{ label:'Advance status', apply:(row)=>{ const order=['Open','In progress','Closed']; const i=order.indexOf(row.status); row.status = i>-1 && i<2 ? order[i+1] : 'Closed'; toast('Deficit status advanced.'); } },
+  },
+  personas:{
+    dataKey:'personas', tableTitle:'Student profiles',
+    kpis: rows => [
+      {value:rows.length, label:'Profiles on file'},
+      {value:rows.filter(r=>r.accommodations!=='None on file').length, label:'Students with accommodations'},
+      {value:new Set(rows.map(r=>r.learningStyle)).size, label:'Learning styles represented'},
+      {value:new Set(rows.flatMap(r=>r.languages.split(', '))).size, label:'Languages spoken'},
+    ],
+    columns:[
+      {key:'student', label:'Student'},
+      {key:'learningStyle', label:'Learning style'},
+      {key:'careerGoal', label:'Career aspiration'},
+      {key:'languages', label:'Languages'},
+      {key:'accommodations', label:'Accommodations'},
+    ],
+    form:{ actionLabel:'+ Add persona record', title:'Add persona record', sub:'Build a complete profile for a student on your caseload.',
+      fields:[
+        {key:'student', label:'Student', type:'select', options:STUDENTS},
+        {key:'learningStyle', label:'Learning style', type:'select', options:['Visual','Auditory','Kinesthetic','Reading/Writing']},
+        {key:'careerGoal', label:'Career aspiration', type:'text', placeholder:'e.g. Marine engineer'},
+        {key:'languages', label:'Languages (comma separated)', type:'text', placeholder:'e.g. English, Spanish'},
+        {key:'accommodations', label:'Accommodations', type:'text', placeholder:'e.g. None on file'},
+      ],
+      build: v => ({student:v.student, learningStyle:v.learningStyle||'Visual', careerGoal:v.careerGoal||'—', languages:v.languages||'English', accommodations:v.accommodations||'None on file'})
+    },
+    rowAction:{ label:'View archived history', apply:(row)=>{ navigate('archive'); toast('Showing archived pastoral history for ' + row.student + '.'); } },
+  },
+  studyGroups:{
+    dataKey:'studyGroups', tableTitle:'Active groups',
+    kpis: rows => [
+      {value:rows.filter(r=>r.status==='Active').length, label:'Active groups'},
+      {value:rows.length*3, label:'Students paired (approx.)'},
+      {value:new Set(rows.map(r=>r.mentor)).size, label:'Peer mentors active'},
+      {value:'3–4', label:'Avg. group size'},
+    ],
+    columns:[
+      {key:'groupName', label:'Group'},
+      {key:'subject', label:'Subject'},
+      {key:'mentor', label:'Peer mentor'},
+      {key:'members', label:'Members'},
+      {key:'cadence', label:'Cadence'},
+      {key:'status', label:'Status', fmt:v=>`<span class="tag ${v==='Active'?'':'dim'}">${v}</span>`},
+    ],
+    form:{ actionLabel:'+ Create study group', title:'Create study group', sub:'Pair struggling students with a high-achieving peer mentor.',
+      fields:[
+        {key:'groupName', label:'Group name', type:'text', placeholder:'e.g. Nursing Fundamentals Circle'},
+        {key:'subject', label:'Subject', type:'text', placeholder:'e.g. Nursing Fundamentals'},
+        {key:'mentor', label:'Peer mentor', type:'text', placeholder:'e.g. Aaliyah Osei (peer mentor)'},
+        {key:'members', label:'Members', type:'text', placeholder:'e.g. Ryan Patel, 2 others'},
+        {key:'cadence', label:'Meeting cadence', type:'text', placeholder:'e.g. Weekly, Tuesdays'},
+      ],
+      build: v => ({groupName:v.groupName||'Untitled group', subject:v.subject||'—', mentor:v.mentor||'—', members:v.members||'—', cadence:v.cadence||'—', status:'Active'})
+    },
+    rowAction:{ label:'Mark completed', apply:(row)=>{ row.status='Completed'; toast('Study group marked completed.'); } },
+  },
+  kb:{
+    dataKey:'kb', tableTitle:'Knowledgebase articles',
+    kpis: rows => [
+      {value:rows.filter(r=>r.status==='Published').length, label:'Published articles'},
+      {value:num(rows.reduce((a,r)=>a+r.views,0)), label:'Total views'},
+      {value:rows.filter(r=>r.status==='Draft').length, label:'Drafts pending'},
+      {value:'Administrative', label:'Most-viewed category'},
+    ],
+    columns:[
+      {key:'question', label:'Question'},
+      {key:'category', label:'Category'},
+      {key:'views', label:'Views', align:'num'},
+      {key:'lastUpdated', label:'Last updated'},
+      {key:'status', label:'Status', fmt:v=>`<span class="tag ${v==='Published'?'':'dim'}">${v}</span>`},
+    ],
+    form:{ actionLabel:'+ Add article', title:'Add knowledgebase article', sub:'Publish an answer to a frequently asked question to reduce redundant tickets.',
+      fields:[
+        {key:'question', label:'Question', type:'text', placeholder:'e.g. How do I appeal a grade?'},
+        {key:'category', label:'Category', type:'select', options:['Academic','Pastoral','Administrative']},
+        {key:'answer', label:'Answer', type:'text', placeholder:'Write the answer here'},
+      ],
+      build: v => ({question:v.question||'Untitled question', category:v.category||'Academic', views:0, lastUpdated:'Sep 2026', status:'Draft'})
+    },
+    rowAction:{ label:'Publish', apply:(row)=>{ row.status='Published'; toast('Article published.'); } },
+  },
+  feedback:{
+    dataKey:'feedback', tableTitle:'Ticket feedback',
+    kpis: rows => {
+      const pos = rows.filter(r=>r.sentiment==='Positive').length;
+      return [
+        {value:pct((pos/rows.length)*100), label:'Positive sentiment share'},
+        {value:rows.filter(r=>r.sentiment==='Negative').length, label:'Negative feedback'},
+        {value:rows.length, label:'Tickets reviewed'},
+        {value:'78%', label:'Feedback response rate'},
+      ];
+    },
+    chart: rows => ({labels:['Positive','Neutral','Negative'], series:[
+      {name:'Tickets', values:['Positive','Neutral','Negative'].map(s=>rows.filter(r=>r.sentiment===s).length)},
+    ]}),
+    columns:[
+      {key:'student', label:'Student'},
+      {key:'ticketSubject', label:'Ticket'},
+      {key:'sentiment', label:'Sentiment', fmt:v=>`<span class="tag ${v==='Negative'?'':'dim'}">${v}</span>`},
+      {key:'comment', label:'Comment'},
+      {key:'date', label:'Date'},
+    ],
+    form:{ actionLabel:'+ Log feedback', title:'Log feedback', sub:'Record sentiment on a closed ticket to track support quality.',
+      fields:[
+        {key:'student', label:'Student', type:'select', options:STUDENTS},
+        {key:'ticketSubject', label:'Ticket subject', type:'text', placeholder:'e.g. Extension request'},
+        {key:'sentiment', label:'Sentiment', type:'select', options:['Positive','Neutral','Negative']},
+        {key:'comment', label:'Comment', type:'text', placeholder:'What did the student say?'},
+      ],
+      build: v => ({student:v.student, ticketSubject:v.ticketSubject||'—', sentiment:v.sentiment||'Neutral', comment:v.comment||'—', date:'Sep 2026'})
+    },
+  },
+  impact:{
+    dataKey:'impact', tableTitle:'Outcomes log',
+    kpis: rows => {
+      const avgDelta = rows.reduce((a,r)=>a+(r.postGrade-r.preGrade),0)/rows.length;
+      return [
+        {value:(avgDelta>=0?'+':'')+avgDelta.toFixed(1)+' pts', label:'Avg. grade improvement'},
+        {value:rows.length, label:'Interventions tracked'},
+        {value:rows.filter(r=>r.postGrade>r.preGrade).length, label:'Improved'},
+        {value:rows.filter(r=>r.postGrade<=r.preGrade).length, label:'No improvement'},
+      ];
+    },
+    chart: rows => ({labels: rows.map(r=>r.student.split(' ')[0]), series:[
+      {name:'Pre-grade', values:rows.map(r=>r.preGrade)},
+      {name:'Post-grade', values:rows.map(r=>r.postGrade)},
+    ]}),
+    columns:[
+      {key:'student', label:'Student'},
+      {key:'intervention', label:'Intervention'},
+      {key:'preGrade', label:'Pre-grade', align:'num'},
+      {key:'postGrade', label:'Post-grade', align:'num'},
+      {key:'verifiedBy', label:'Verified by'},
+    ],
+    form:{ actionLabel:'+ Log intervention outcome', title:'Log intervention outcome', sub:'Compare grades before and after an academic support intervention.',
+      fields:[
+        {key:'student', label:'Student', type:'select', options:STUDENTS},
+        {key:'intervention', label:'Intervention', type:'text', placeholder:'e.g. Weekly tutoring + action plan'},
+        {key:'preGrade', label:'Pre-grade (%)', type:'number'},
+        {key:'postGrade', label:'Post-grade (%)', type:'number'},
+        {key:'verifiedBy', label:'Verified by', type:'text', placeholder:'e.g. PAT + Faculty'},
+      ],
+      build: v => ({student:v.student, intervention:v.intervention||'—', preGrade:+v.preGrade||0, postGrade:+v.postGrade||0, verifiedBy:v.verifiedBy||'PAT'})
+    },
+  },
+  archive:{
+    dataKey:'archive', tableTitle:'Cross-year records',
+    kpis: rows => [
+      {value:new Set(rows.map(r=>r.student)).size, label:'Students with archived history'},
+      {value:new Set(rows.map(r=>r.academicYear)).size, label:'Academic years covered'},
+      {value:(rows.length/new Set(rows.map(r=>r.student)).size).toFixed(1), label:'Avg. entries per student'},
+      {value:'Aug 2026', label:'Most recent handover'},
+    ],
+    columns:[
+      {key:'student', label:'Student'},
+      {key:'academicYear', label:'Academic year'},
+      {key:'priorTutor', label:'Prior tutor'},
+      {key:'summary', label:'Summary'},
+      {key:'keyOutcomes', label:'Key outcomes'},
+    ],
+    form:{ actionLabel:'+ Log archived entry', title:'Log archived history entry', sub:'Preserve context from a prior academic year for the next incoming tutor.',
+      fields:[
+        {key:'student', label:'Student', type:'select', options:STUDENTS},
+        {key:'academicYear', label:'Academic year', type:'text', placeholder:'e.g. 2025–2026'},
+        {key:'priorTutor', label:'Prior tutor', type:'text', placeholder:'e.g. J. Rivera (former PAT)'},
+        {key:'summary', label:'Summary', type:'text', placeholder:'What happened this year?'},
+        {key:'keyOutcomes', label:'Key outcomes', type:'text', placeholder:'How did it resolve?'},
+      ],
+      build: v => ({student:v.student, academicYear:v.academicYear||'—', priorTutor:v.priorTutor||'—', summary:v.summary||'—', keyOutcomes:v.keyOutcomes||'—'})
+    },
+  },
+  escalations:{
+    dataKey:'escalations', tableTitle:'Escalation log',
+    kpis: rows => [
+      {value:rows.filter(r=>r.status!=='Resolved').length, label:'Active escalations'},
+      {value:rows.filter(r=>r.status==='Resolved').length, label:'Resolved this term'},
+      {value:'6 min', label:'Avg. dispatch response time'},
+      {value:rows.filter(r=>r.timestamp && r.timestamp.includes('Sep 2026')).length, label:'Dispatched this month'},
+    ],
+    columns:[
+      {key:'student', label:'Student'},
+      {key:'emergencyType', label:'Type'},
+      {key:'routedTo', label:'Routed to'},
+      {key:'timestamp', label:'Timestamp'},
+      {key:'status', label:'Status', fmt:v=>`<span class="tag ${v==='Resolved'?'dim':''}">${v}</span>`},
+    ],
+    form:{ actionLabel:'🚨 Escalate now', title:'Dispatch emergency escalation', sub:'This immediately routes a critical mental health or behavioral concern to specialized external support.',
+      fields:[
+        {key:'student', label:'Student', type:'select', options:STUDENTS},
+        {key:'emergencyType', label:'Emergency type', type:'select', options:['Mental Health Crisis','Behavioral Emergency','Safety Concern']},
+        {key:'notes', label:'Notes', type:'text', placeholder:'Brief factual description for responders'},
+      ],
+      build: v => {
+        const routeMap = {'Mental Health Crisis':'Campus Crisis Response Team','Behavioral Emergency':'Campus Security','Safety Concern':'Safeguarding Team'};
+        return {student:v.student, emergencyType:v.emergencyType, notes:v.notes||'—', routedTo:routeMap[v.emergencyType]||'Safeguarding Team', timestamp:'Sep 2026, just now', status:'Dispatched'};
+      }
+    },
+    rowAction:{ label:'Advance status', apply:(row)=>{ const order=['Dispatched','Acknowledged','Resolved']; const i=order.indexOf(row.status); row.status = i>-1 && i<2 ? order[i+1] : 'Resolved'; toast('Escalation status advanced.'); } },
+  },
+};
+
+/* ============================= DASHBOARD ============================= */
+function renderDashboard(){
+  const openTickets = state.queries.filter(r=>r.status!=='Resolved').length;
+  const highRisk = state.warnings.filter(r=>r.riskLevel==='High').length;
+  const activeEsc = state.escalations.filter(r=>r.status!=='Resolved').length;
+  const discTriggered = state.disciplinary.filter(r=>r.status==='Disciplinary Meeting Triggered').length;
+
+  const cards = [
+    {id:'queries', metric:openTickets, label:'Open tickets'},
+    {id:'pastoral', metric:state.pastoral.length, label:'Entries logged'},
+    {id:'meetings', metric:state.meetings.filter(r=>r.status!=='Completed').length, label:'Upcoming meetings'},
+    {id:'warnings', metric:highRisk, label:'High-risk students'},
+    {id:'actionPlans', metric:state.actionPlans.filter(r=>r.status!=='Complete').length, label:'Active plans'},
+    {id:'referrals', metric:state.referrals.filter(r=>r.status!=='Resolved').length, label:'Open referrals'},
+    {id:'parental', metric:state.parental.length, label:'Parent logs'},
+    {id:'skillDeficits', metric:state.skillDeficits.filter(r=>r.status!=='Closed').length, label:'Open deficits'},
+    {id:'personas', metric:state.personas.length, label:'Profiles on file'},
+    {id:'escalations', metric:activeEsc, label:'Active escalations'},
+    {id:'studyGroups', metric:state.studyGroups.filter(r=>r.status==='Active').length, label:'Active study groups'},
+    {id:'kb', metric:state.kb.filter(r=>r.status==='Published').length, label:'Published articles'},
+    {id:'feedback', metric:state.feedback.filter(r=>r.sentiment==='Negative').length, label:'Negative feedback'},
+    {id:'impact', metric:state.impact.length, label:'Interventions tracked'},
+    {id:'archive', metric:new Set(state.archive.map(r=>r.student)).size, label:'Students with archived history'},
+    {id:'disciplinary', metric:discTriggered, label:'Meetings triggered'},
+  ];
+
+  return `
+    <div class="kpi-row">
+      <div class="kpi"><div class="num">${STUDENTS.length}</div><div class="label">Students on caseload</div></div>
+      <div class="kpi"><div class="num">${openTickets}</div><div class="label">Open query tickets</div></div>
+      <div class="kpi"><div class="num">${highRisk}</div><div class="label">High-risk students flagged</div></div>
+      <div class="kpi"><div class="num">${activeEsc}</div><div class="label">Active emergency escalations</div></div>
+    </div>
+    <div class="section-head"><h2>All modules</h2><span class="hint">16 areas of pastoral and academic support · click any card to open</span></div>
+    <div class="dash-grid">
+      ${cards.map(c=>{
+        const t = TITLES[c.id];
+        const nav = NAV.find(n=>n.id===c.id);
+        return `<div class="dash-card" onclick="navigate('${c.id}')">
+          <div class="mono">${nav.mono}</div>
+          <h4>${t.title}</h4>
+          <p>${t.desc}</p>
+          <div class="metric">${c.metric}</div>
+          <div class="metric-label">${c.label}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+}
+
+/* ============================= SPECIAL VIEW: UNIFIED DISCIPLINARY ESCALATION ============================= */
+function recomputeDisciplinary(row){
+  row.status = (row.itFlags>=2 && row.ssdFlags>=2 && row.escalationRaised) ? 'Disciplinary Meeting Triggered' : 'Monitoring';
+  row.meetingDate = row.status==='Disciplinary Meeting Triggered' ? (row.meetingDate==='—'?'To be scheduled':row.meetingDate) : '—';
+}
+function renderDisciplinary(){
+  const triggered = state.disciplinary.filter(r=>r.status==='Disciplinary Meeting Triggered').length;
+  return `
+    <p class="lede">A student is automatically flagged for a multi-departmental Disciplinary Meeting once both the IT and SSD misbehavior trackers show accumulated flags <strong>and</strong> a department has raised the case for escalation.</p>
+    <div class="kpi-row">
+      <div class="kpi"><div class="num">${state.disciplinary.length}</div><div class="label">Students monitored</div></div>
+      <div class="kpi"><div class="num">${triggered}</div><div class="label">Meetings triggered</div></div>
+      <div class="kpi"><div class="num">${state.disciplinary.filter(r=>r.escalationRaised).length}</div><div class="label">Escalations raised</div></div>
+      <div class="kpi"><div class="num">${(state.disciplinary.reduce((a,r)=>a+r.itFlags+r.ssdFlags,0)/(state.disciplinary.length||1)).toFixed(1)}</div><div class="label">Avg. combined flags</div></div>
+    </div>
+    <div class="section-head"><h2>Log a misbehavior flag</h2></div>
+    <div class="table-wrap" style="border:none;">
+      <form onsubmit="logMisbehavior(event)" style="max-width:560px;">
+        <div class="two-col">
+          <div class="field"><label>Student</label><select name="student">${STUDENTS.map(s=>`<option>${s}</option>`).join('')}</select></div>
+          <div class="field"><label>Department</label><select name="dept"><option>IT</option><option>SSD</option></select></div>
+        </div>
+        <div class="field"><label>Note</label><input name="note" placeholder="e.g. Repeated lab equipment misuse"></div>
+        <button type="submit" class="btn btn-full">Log flag</button>
+      </form>
+    </div>
+    <div class="section-head"><h2>Monitored students</h2><span class="hint">${state.disciplinary.length} on record · click a row for detail</span></div>
+    ${state.disciplinary.length ? `<div class="table-wrap"><table class="ledger"><thead><tr>
+      <th>Student</th><th>IT flags</th><th>SSD flags</th><th>Escalation raised</th><th>Status</th>
+    </tr></thead><tbody>
+      ${state.disciplinary.map((r,i)=>`<tr onclick="openDisciplinaryDetail(${i})">
+        <td>${r.student}</td><td class="num">${r.itFlags}</td><td class="num">${r.ssdFlags}</td>
+        <td>${r.escalationRaised?'<span class="tag">Yes</span>':'<span class="tag dim">No</span>'}</td>
+        <td>${r.status==='Disciplinary Meeting Triggered'?'<span class="tag">Meeting triggered</span>':'<span class="tag dim">Monitoring</span>'}</td>
+      </tr>`).join('')}
+    </tbody></table></div>` : `<div class="empty">No students currently monitored.</div>`}
+  `;
+}
+function findOrCreateDisciplinary(student){
+  let row = state.disciplinary.find(r=>r.student===student);
+  if(!row){ row = {student, itFlags:0, ssdFlags:0, escalationRaised:false, status:'Monitoring', meetingDate:'—'}; state.disciplinary.push(row); }
+  return row;
+}
+function logMisbehavior(e){
+  e.preventDefault();
+  const f = e.target;
+  const row = findOrCreateDisciplinary(f.student.value);
+  if(f.dept.value==='IT') row.itFlags += 1; else row.ssdFlags += 1;
+  recomputeDisciplinary(row);
+  renderContent();
+  toast(`${f.dept.value} flag logged for ${f.student.value}.` + (row.status==='Disciplinary Meeting Triggered' ? ' Disciplinary Meeting triggered.' : ''));
+}
+function openDisciplinaryDetail(i){
+  const r = state.disciplinary[i];
+  $('#drawer-root').innerHTML = `<div class="drawer-overlay" onclick="if(event.target===this)closeDrawer()">
+    <div class="drawer">
+      <div class="drawer-top"><div><div class="eyebrow">Disciplinary monitoring</div><h3>${r.student}</h3></div><button class="close-x" onclick="closeDrawer()">&times;</button></div>
+      <div class="kv"><span class="k">IT misbehavior flags</span><span class="v">${r.itFlags}</span></div>
+      <div class="kv"><span class="k">SSD misbehavior flags</span><span class="v">${r.ssdFlags}</span></div>
+      <div class="kv"><span class="k">Escalation raised</span><span class="v">${r.escalationRaised?'Yes':'No'}</span></div>
+      <div class="kv"><span class="k">Status</span><span class="v">${r.status}</span></div>
+      ${r.status==='Disciplinary Meeting Triggered' ? `<div class="notice strong">Threshold met: both trackers show 2+ flags and a department has raised this case. A multi-departmental Disciplinary Meeting is required.</div>` : `<div class="notice">Threshold not yet met — requires 2+ flags in both IT and SSD trackers, plus a department escalation.</div>`}
+      <div class="drawer-actions">
+        ${!r.escalationRaised ? `<button class="btn" onclick="raiseEscalation(${i})">Raise for escalation</button>` : ''}
+        ${r.status==='Disciplinary Meeting Triggered' ? `<button class="btn btn-outline" onclick="scheduleDisciplinaryMeeting(${i})">Schedule meeting</button>` : ''}
+        <button class="btn btn-outline" onclick="closeDrawer()">Close</button>
+      </div>
+    </div>
+  </div>`;
+}
+function raiseEscalation(i){
+  const row = state.disciplinary[i];
+  row.escalationRaised = true;
+  recomputeDisciplinary(row);
+  openDisciplinaryDetail(i);
+  renderContent();
+  toast(row.status==='Disciplinary Meeting Triggered' ? 'Escalation raised — Disciplinary Meeting triggered.' : 'Escalation raised.');
+}
+function scheduleDisciplinaryMeeting(i){
+  const row = state.disciplinary[i];
+  state.meetings.unshift({student:row.student, purpose:'Multi-departmental Disciplinary Meeting', date:'To be scheduled', time:'—', mode:'In-person', status:'Requested'});
+  row.meetingDate = 'Pending scheduling — see Meeting Scheduler';
+  closeDrawer();
+  renderContent();
+  toast('Disciplinary Meeting added to the Meeting Scheduler.');
+}
+
+/* ============================= GENERIC RENDER ENGINE ============================= */
+function renderGenericFeature(id){
+  const cfg = FEATURES[id];
+  const rows = state[cfg.dataKey];
+  const kpis = cfg.kpis(rows);
+  const chart = cfg.chart ? cfg.chart(rows) : null;
+  return `
+    <div class="kpi-row">${kpis.map(k=>`<div class="kpi"><div class="num">${k.value}</div><div class="label">${k.label}</div>${k.delta?`<div class="delta">${k.delta}</div>`:''}</div>`).join('')}</div>
+    ${chart ? `
+      <div class="section-head"><h2>Trend</h2><span class="hint">Illustrative view across current entries</span></div>
+      <div class="chart-wrap">${barChart(id+'-chart', chart.labels, chart.series)}</div>
+      ${chart.series.length>1 ? chartLegend(chart.series) : ''}
+    ` : ''}
+    <div class="section-head"><h2>${cfg.tableTitle}</h2><span class="hint">${rows.length} ${rows.length===1?'record':'records'} · click a row for detail</span></div>
+    ${renderTable(cfg, rows)}
+  `;
+}
+function renderTable(cfg, rows){
+  if(!rows.length) return `<div class="empty">No records yet. Use the action button above to add one.</div>`;
+  const featureKey = Object.keys(FEATURES).find(k=>FEATURES[k]===cfg);
+  return `<div class="table-wrap"><table class="ledger"><thead><tr>
+    ${cfg.columns.map(c=>`<th class="${c.align==='num'?'num':''}">${c.label}</th>`).join('')}
+  </tr></thead><tbody>
+    ${rows.map((r,i)=>`<tr onclick="openDetail('${featureKey}',${i})">
+      ${cfg.columns.map(c=>`<td class="${c.align==='num'?'num':''}">${c.fmt ? c.fmt(r[c.key], r) : r[c.key]}</td>`).join('')}
+    </tr>`).join('')}
+  </tbody></table></div>`;
+}
+function openDetail(featureId, idx){
+  const cfg = FEATURES[featureId];
+  const row = state[cfg.dataKey][idx];
+  const titleKey = cfg.columns[0].key;
+  $('#drawer-root').innerHTML = `<div class="drawer-overlay" onclick="if(event.target===this)closeDrawer()">
+    <div class="drawer">
+      <div class="drawer-top"><div><div class="eyebrow">${TITLES[featureId].title}</div><h3>${row[titleKey]}</h3></div><button class="close-x" onclick="closeDrawer()">&times;</button></div>
+      ${cfg.columns.slice(1).map(c=>`<div class="kv"><span class="k">${c.label}</span><span class="v">${c.fmt ? c.fmt(row[c.key], row) : row[c.key]}</span></div>`).join('')}
+      <div class="drawer-actions">
+        ${cfg.rowAction ? `<button class="btn" onclick="applyRowAction('${featureId}',${idx})">${cfg.rowAction.label}</button>` : ''}
+        <button class="btn btn-outline" onclick="closeDrawer()">Close</button>
+      </div>
+    </div>
+  </div>`;
+}
+function applyRowAction(featureId, idx){
+  const cfg = FEATURES[featureId];
+  const row = state[cfg.dataKey][idx];
+  cfg.rowAction.apply(row, idx);
+  closeDrawer();
+  renderContent();
+}
+function openAddModal(featureId){
+  const cfg = FEATURES[featureId];
+  const form = cfg.form;
+  const urgent = featureId==='escalations';
+  $('#modal-root').innerHTML = `<div class="overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal ${urgent?'urgent':''}">
+      <h3>${form.title}</h3>
+      <div class="sub">${form.sub}</div>
+      <form onsubmit="submitAdd(event,'${featureId}')">
+        ${form.fields.map(f=>{
+          if(f.type==='select'){
+            return `<div class="field"><label>${f.label}</label><select name="${f.key}">${f.options.map(o=>`<option>${o}</option>`).join('')}</select></div>`;
+          }
+          return `<div class="field"><label>${f.label}</label><input name="${f.key}" type="${f.type}" ${f.step?`step="${f.step}"`:''} placeholder="${f.placeholder||''}"></div>`;
+        }).join('')}
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
+          <button type="submit" class="btn ${urgent?'btn-urgent':''}">${urgent?'Dispatch now':form.actionLabel.replace('+ ','').replace(/^./,c=>c.toUpperCase())}</button>
+        </div>
+      </form>
+    </div>
+  </div>`;
+}
+function submitAdd(e, featureId){
+  e.preventDefault();
+  const cfg = FEATURES[featureId];
+  const f = e.target;
+  const values = {};
+  cfg.form.fields.forEach(fl => { values[fl.key] = f[fl.key] ? f[fl.key].value : ''; });
+  const row = cfg.form.build(values);
+  state[cfg.dataKey].unshift(row);
+  closeModal();
+  if(state.active===featureId) renderContent();
+  toast(featureId==='escalations' ? 'Escalation dispatched to ' + row.routedTo + '.' : 'Added successfully.');
+}
+
+/* ============================= TOP-LEVEL RENDER ============================= */
+function renderSidebar(){
+  $('#sidebar').innerHTML = `
+    <div class="brand">
+      <div class="brand-mark">ING Student Support</div>
+      <div class="brand-sub">PAT Console — Personal Academic Tutor</div>
+    </div>
+    <nav class="nav">
+      ${NAV.map(n=>`<button class="nav-item" data-id="${n.id}" onclick="navigate('${n.id}')"><span class="nav-mono">${n.mono}</span>${n.label}</button>`).join('')}
+    </nav>
+    <div class="sidebar-foot">
+      <div class="who">Signed in as PAT</div>
+      Northgate College · 8 students on caseload
+    </div>
+  `;
+}
+function renderTopbar(){
+  const t = TITLES[state.active];
+  let actionsHtml = '';
+  if(state.active==='disciplinary'){
+    actionsHtml = '';
+  } else if(FEATURES[state.active] && FEATURES[state.active].form){
+    const urgent = state.active==='escalations';
+    actionsHtml = `<button class="btn ${urgent?'btn-urgent':''}" onclick="openAddModal('${state.active}')">${FEATURES[state.active].form.actionLabel}</button>`;
+  }
+  $('#topbar').innerHTML = `
+    <div>
+      <div class="title-row"><button class="menu-btn" onclick="toggleSidebar()">&#9776;</button><h1>${t.title}</h1></div>
+      <div class="desc">${t.desc}</div>
+    </div>
+    <div class="actions">${actionsHtml}</div>
+  `;
+}
+function renderContent(){
+  let html = '';
+  if(state.active==='dashboard') html = renderDashboard();
+  else if(state.active==='disciplinary') html = renderDisciplinary();
+  else if(FEATURES[state.active]) html = renderGenericFeature(state.active);
+  $('#content').innerHTML = html;
+}
+function navigate(id){
+  state.active = id;
+  document.querySelectorAll('.nav-item').forEach(el=>{
+    el.classList.toggle('active', el.getAttribute('data-id')===id);
+  });
+  renderTopbar();
+  renderContent();
+  closeModal(); closeDrawer();
+  document.getElementById('sidebar').classList.remove('open');
+  window.scrollTo(0,0);
+}
+function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); }
+
+/* ============================= INIT ============================= */
+renderSidebar();
+navigate('dashboard');
+</script>
+</body>
+</html>

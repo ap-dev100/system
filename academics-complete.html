@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ING ERP — Academics</title>
+<style>
+  :root{
+    --surface-1:#fafafa;
+    --surface-2:#f2f2f2;
+    --border:#e6e6e6;
+    --border-strong:#cfcfcf;
+    --text-primary:#111111;
+    --text-secondary:#5a5a5e;
+    --text-muted:#9a9a9e;
+    --fill-primary:#000000;
+    --on-primary:#ffffff;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--surface-2);color:var(--text-primary);}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;background:#fff;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:10px;}
+  .topbar .who{font-size:12px;color:var(--text-secondary);}
+  .topbar .who strong{color:var(--text-primary);font-weight:600;}
+  .topbar .right-group{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .app{display:flex;min-height:100vh;}
+  .sidebar{width:220px;flex-shrink:0;background:var(--surface-1);border-right:1px solid var(--border);padding:20px 12px;}
+  .brand{display:flex;align-items:center;gap:10px;padding:0 8px 16px;}
+  .brand .mark{width:24px;height:24px;border-radius:6px;background:var(--fill-primary);flex-shrink:0;}
+  .brand .name{font-size:13px;font-weight:600;line-height:1.3;}
+  .brand .role{font-size:11px;color:var(--text-muted);line-height:1.3;}
+  .nav-item{display:block;padding:8px 10px;border-radius:7px;font-size:13px;color:var(--text-secondary);cursor:pointer;margin-bottom:2px;}
+  .nav-item:hover{background:var(--surface-2);}
+  .nav-item.active{background:var(--fill-primary);color:var(--on-primary);}
+  .nav-divider{border-top:1px solid var(--border);margin:12px 4px;}
+  .group{margin-bottom:18px;}
+  .group-label{font-size:11px;font-weight:600;color:var(--text-muted);margin:0 0 6px 10px;}
+  .main{flex:1;padding:32px 36px;min-width:0;}
+  .page{display:none;}
+  .page.active{display:block;}
+  .page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:12px;}
+  h1{font-size:22px;margin:0;font-weight:600;}
+  .subtitle{font-size:13px;color:var(--text-secondary);margin:5px 0 0;}
+  button.primary{background:var(--fill-primary);color:var(--on-primary);border:none;border-radius:8px;padding:10px 16px;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;}
+  button.secondary{background:#fff;color:var(--text-primary);border:1px solid var(--border-strong);border-radius:8px;padding:10px 16px;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;}
+  .link-btn{background:none;border:none;color:var(--text-primary);font-size:12px;font-weight:600;text-decoration:underline;cursor:pointer;padding:0;white-space:nowrap;}
+  .toolbar{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;}
+  input[type=text], input[type=number], input[type=date], select, textarea{border:1px solid var(--border-strong);border-radius:8px;padding:10px 12px;font-size:13px;background:#fff;color:var(--text-primary);font-family:inherit;}
+  input[type=text]{flex:1;min-width:160px;}
+  select{width:170px;}
+  .card{border:1px solid var(--border);border-radius:var(--radius);margin-bottom:12px;overflow:hidden;background:#fff;}
+  .card-header{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;cursor:pointer;gap:12px;}
+  .badge{font-size:11px;padding:2px 9px;border-radius:999px;white-space:nowrap;cursor:default;}
+  .badge.filled{background:var(--fill-primary);color:var(--on-primary);}
+  .badge.outline{border:1px solid var(--border-strong);color:var(--text-secondary);}
+  .badge.dashed{border:1px dashed var(--border-strong);color:var(--text-secondary);}
+  .badge.clickable{cursor:pointer;}
+  .meta{font-size:12px;color:var(--text-secondary);margin:5px 0 0;}
+  .title-row{display:flex;align-items:center;flex-wrap:wrap;gap:8px;}
+  .course-title{font-size:14px;font-weight:600;}
+  .chev{color:var(--text-muted);font-size:14px;flex-shrink:0;}
+  .detail{border-top:1px solid var(--border);padding:16px 18px;background:var(--surface-1);display:none;}
+  .detail.open{display:block;}
+  .detail-label{font-size:12px;font-weight:600;color:var(--text-muted);margin:0 0 6px;}
+  .detail p{font-size:13px;margin:0 0 10px;line-height:1.5;}
+  .outcomes{margin:0;padding-left:18px;font-size:13px;line-height:1.6;}
+  .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+  .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
+  .stat-grid.cols-4{grid-template-columns:repeat(4,1fr);}
+  .stat-card{border:1px solid var(--border);border-radius:var(--radius);background:#fff;padding:16px 18px;}
+  .stat-value{font-size:24px;font-weight:700;}
+  .stat-label{font-size:12px;color:var(--text-secondary);margin-top:4px;}
+  .list{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:#fff;}
+  .list-row{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;gap:14px;border-bottom:1px solid var(--border);}
+  .list-row:last-child{border-bottom:none;}
+  .list-row.clickable{cursor:pointer;}
+  .list-row.clickable:hover{background:var(--surface-1);}
+  .list-row .primary-text{font-size:14px;font-weight:600;}
+  .list-row .secondary-text{font-size:12px;color:var(--text-secondary);margin-top:3px;}
+  .list-row .right{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+  .table-wrap{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:#fff;}
+  table{width:100%;border-collapse:collapse;}
+  th,td{padding:12px 14px;font-size:13px;text-align:left;border-bottom:1px solid var(--border);}
+  th{font-weight:600;color:var(--text-secondary);background:var(--surface-1);font-size:12px;}
+  tbody tr:last-child td{border-bottom:none;}
+  td.num{text-align:right;font-variant-numeric:tabular-nums;}
+  td.avg{font-weight:700;text-align:right;}
+  .notice{border:1px solid var(--border-strong);border-radius:var(--radius);padding:14px 16px;font-size:13px;margin-bottom:16px;background:var(--surface-1);}
+  .bar-track{background:var(--surface-2);border-radius:6px;height:8px;width:100px;overflow:hidden;flex-shrink:0;}
+  .bar-fill{background:var(--fill-primary);height:100%;}
+  .switch-row{display:flex;align-items:center;gap:8px;font-size:13px;margin-top:14px;}
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:50;align-items:center;justify-content:center;padding:20px;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:#fff;border-radius:12px;max-width:440px;width:100%;max-height:86vh;overflow-y:auto;border:1px solid var(--border-strong);}
+  .modal-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);}
+  .modal-header h3{margin:0;font-size:16px;}
+  .modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-secondary);line-height:1;padding:4px;}
+  .modal-body{padding:18px 20px;}
+  .modal-footer{display:flex;justify-content:flex-end;gap:8px;padding:14px 20px;border-top:1px solid var(--border);}
+  .form-group{margin-bottom:14px;}
+  .form-group label{display:block;font-size:12px;color:var(--text-secondary);margin-bottom:5px;font-weight:600;}
+  .form-group input, .form-group select, .form-group textarea{width:100%;}
+  .form-group textarea{resize:vertical;min-height:70px;}
+  .form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px;}
+  .form-row-2 input{width:100%;}
+  .msg-bubble{background:var(--surface-1);border-radius:10px;padding:10px 14px;font-size:13px;margin-bottom:10px;}
+  .msg-bubble .who{font-size:11px;color:var(--text-muted);margin-bottom:4px;font-weight:600;}
+  .rubric-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;}
+  .rubric-row:last-child{border-bottom:none;}
+  @media (max-width:640px){ .sidebar{display:none;} .detail-grid{grid-template-columns:1fr;} .main{padding:22px;} .stat-grid{grid-template-columns:1fr 1fr;} }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="who">Signed in as <strong>Dr. Meera Joshi</strong> — Faculty</div>
+  <div class="right-group">
+    <span class="who">Course setup &amp; staffing is managed by your Course Leader</span>
+    <select id="course-switch">
+      <option>CS204 — Database Management Systems</option>
+      <option>CS210 — Software Engineering Principles</option>
+      <option>CS230 — Machine Learning Foundations</option>
+    </select>
+  </div>
+</div>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="mark"></div><div><div class="name">ING ERP</div><div class="role">Faculty</div></div></div>
+    <div class="nav-item active" data-page="dashboard" onclick="showPage('dashboard', this)">Dashboard</div>
+    <div class="nav-divider"></div>
+    <nav>
+      <div class="group"><p class="group-label">Teaching</p>
+        <div class="nav-item" data-page="curriculum" onclick="showPage('curriculum', this)">Curriculum</div>
+        <div class="nav-item" data-page="lessonplans" onclick="showPage('lessonplans', this)">Lesson plans</div>
+        <div class="nav-item" data-page="vle" onclick="showPage('vle', this)">VLE content</div>
+        <div class="nav-item" data-page="schedule" onclick="showPage('schedule', this)">My schedule</div>
+      </div>
+      <div class="group"><p class="group-label">Classroom</p>
+        <div class="nav-item" data-page="attendance" onclick="showPage('attendance', this)">Attendance</div>
+        <div class="nav-item" data-page="engagement" onclick="showPage('engagement', this)">Engagement</div>
+        <div class="nav-item" data-page="assignments" onclick="showPage('assignments', this)">Assignments</div>
+      </div>
+      <div class="group"><p class="group-label">Assessment</p>
+        <div class="nav-item" data-page="grading" onclick="showPage('grading', this)">Gradebook</div>
+        <div class="nav-item" data-page="probation" onclick="showPage('probation', this)">Probation</div>
+      </div>
+      <div class="group"><p class="group-label">Students</p>
+        <div class="nav-item" data-page="progress" onclick="showPage('progress', this)">Progress</div>
+        <div class="nav-item" data-page="awards" onclick="showPage('awards', this)">Awards</div>
+        <div class="nav-item" data-page="alumni" onclick="showPage('alumni', this)">Alumni</div>
+      </div>
+      <div class="group"><p class="group-label">Communication</p>
+        <div class="nav-item" data-page="parentmsg" onclick="showPage('parentmsg', this)">Parent messages</div>
+      </div>
+      <div class="group"><p class="group-label">Professional</p>
+        <div class="nav-item" data-page="peerreview" onclick="showPage('peerreview', this)">Peer review</div>
+        <div class="nav-item" data-page="research" onclick="showPage('research', this)">Research</div>
+      </div>
+    </nav>
+  </aside>
+
+  <main class="main">
+
+    <section class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div><h1>Good morning, Dr. Meera Joshi</h1><p class="subtitle">Here's what's happening across your courses today.</p></div>
+      </div>
+      <div class="stat-grid cols-4">
+        <div class="stat-card"><div class="stat-value">2</div><div class="stat-label">Classes today</div></div>
+        <div class="stat-card"><div class="stat-value">7</div><div class="stat-label">Submissions to grade</div></div>
+        <div class="stat-card"><div class="stat-value">3</div><div class="stat-label">Attendance alerts</div></div>
+        <div class="stat-card"><div class="stat-value">2</div><div class="stat-label">Unread parent messages</div></div>
+      </div>
+      <div class="list" style="margin-bottom:20px;">
+        <div class="list-row"><div><div class="primary-text">CS204 — Database Management Systems</div><div class="secondary-text">10:00–11:30, Room B204</div></div><div class="right"><button class="link-btn" onclick="goTo('attendance')">Take attendance</button></div></div>
+        <div class="list-row"><div><div class="primary-text">CS210 — Software Engineering Principles</div><div class="secondary-text">14:00–15:30, Room A110</div></div><div class="right"><button class="link-btn" onclick="goTo('schedule')">View schedule</button></div></div>
+      </div>
+      <div class="notice"><strong>3 students need attention.</strong> 2 are below the attendance threshold and 1 is flagged for academic probation. <button class="link-btn" onclick="goTo('probation')" style="margin-left:6px;">Review</button></div>
+      <div class="toolbar">
+        <button class="secondary" onclick="openNewCourse()">+ New course</button>
+        <button class="secondary" onclick="openUploadContent()">+ Upload content</button>
+        <button class="secondary" onclick="openSubmitLessonPlan()">+ Submit lesson plan</button>
+      </div>
+    </section>
+
+    <section class="page" id="page-curriculum">
+      <div class="page-header">
+        <div><h1>Curriculum Management</h1><p class="subtitle">BSc Computer Science, Semester 1</p></div>
+        <button class="primary" onclick="openNewCourse()">+ New course</button>
+      </div>
+      <div class="toolbar">
+        <input type="text" placeholder="Search courses or modules" oninput="filterRows(this,'#curriculum-list','.card')">
+        <select><option>All programs</option></select>
+      </div>
+      <div id="curriculum-list">
+        <div class="card">
+          <div class="card-header" onclick="toggleCard(this)">
+            <div>
+              <div class="title-row"><span class="course-title">CS204 — Database Management Systems</span><span class="badge filled">Published</span></div>
+              <p class="meta">6 credits, 8 modules, 12 outcomes mapped, 42 students enrolled — updated 3 days ago</p>
+            </div>
+            <span class="chev">▾</span>
+          </div>
+          <div class="detail open">
+            <p class="detail-label">Module descriptor</p>
+            <p>Relational theory, normalization, SQL, and transaction management across 12 weeks.</p>
+            <div class="detail-grid">
+              <div><p class="detail-label">Learning outcomes</p>
+                <ul class="outcomes"><li>Design normalized schemas</li><li>Write complex SQL queries</li><li>Explain ACID properties</li></ul>
+              </div>
+              <div><p class="detail-label">Lecture schedule</p><p>Mon &amp; Wed, 10:00–11:30, Room B204</p></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header" onclick="toggleCard(this)">
+            <div>
+              <div class="title-row"><span class="course-title">CS210 — Software Engineering Principles</span><span class="badge filled">Published</span></div>
+              <p class="meta">5 credits, 6 modules, 9 outcomes mapped, 38 students enrolled — updated 1 week ago</p>
+            </div>
+            <span class="chev">▸</span>
+          </div>
+          <div class="detail"><p class="detail-label">Module descriptor</p><p>Requirements, design patterns, testing, and agile delivery across 10 weeks. Tue &amp; Thu, 2:00–3:30, Room A110.</p></div>
+        </div>
+        <div class="card">
+          <div class="card-header" onclick="toggleCard(this)">
+            <div>
+              <div class="title-row"><span class="course-title">CS230 — Machine Learning Foundations</span><span class="badge outline">Draft</span></div>
+              <p class="meta">6 credits, 7 modules, 4 outcomes mapped — not yet published</p>
+            </div>
+            <span class="chev">▸</span>
+          </div>
+          <div class="detail"><p class="detail-label">Module descriptor</p><p>Supervised and unsupervised learning fundamentals. Schedule pending curriculum committee review.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="page-lessonplans">
+      <div class="page-header">
+        <div><h1>Lesson Plan Repository</h1><p class="subtitle">CS204 — Database Management Systems</p></div>
+        <button class="primary" onclick="openSubmitLessonPlan()">+ Submit lesson plan</button>
+      </div>
+      <div class="list" id="lessonplans-list">
+        <div class="list-row"><div><div class="primary-text">Week 6 — Normalization</div><div class="secondary-text">Version 3 — submitted 3 days ago</div></div><div class="right"><span class="badge filled">Approved</span><button class="link-btn" onclick="viewRowDetail(this,'Lesson plan')">View</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Week 7 — SQL Joins</div><div class="secondary-text">Version 1 — submitted yesterday</div></div><div class="right"><span class="badge dashed">Pending review</span><button class="link-btn" onclick="viewRowDetail(this,'Lesson plan')">View</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Week 5 — ER Modeling</div><div class="secondary-text">Version 2 — feedback: add more worked examples</div></div><div class="right"><span class="badge outline">Needs revision</span><button class="link-btn" onclick="viewRowDetail(this,'Lesson plan')">View</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Week 4 — Relational Algebra</div><div class="secondary-text">Version 2 — submitted 2 weeks ago</div></div><div class="right"><span class="badge filled">Approved</span><button class="link-btn" onclick="viewRowDetail(this,'Lesson plan')">View</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-vle">
+      <div class="page-header">
+        <div><h1>Virtual Learning Environment</h1><p class="subtitle">Content distributed to CS204 and CS210</p></div>
+        <button class="primary" onclick="openUploadContent()">+ Upload content</button>
+      </div>
+      <div class="toolbar"><input type="text" placeholder="Search content" oninput="filterRows(this,'#vle-list','.list-row')"><select><option>All types</option></select></div>
+      <div class="list" id="vle-list">
+        <div class="list-row"><div><div class="primary-text">Week 6 Lecture Slides</div><div class="secondary-text">Document, CS204 — uploaded 2 days ago, 45 views</div></div><div class="right"><span class="badge outline">PDF</span><button class="link-btn" onclick="viewRowDetail(this,'Content preview')">Open</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Normalization Walkthrough</div><div class="secondary-text">Video, CS204 — uploaded 5 days ago, 112 views</div></div><div class="right"><span class="badge outline">MP4</span><button class="link-btn" onclick="viewRowDetail(this,'Content preview')">Open</button></div></div>
+        <div class="list-row"><div><div class="primary-text">SQL Practice Notes</div><div class="secondary-text">Interactive notes, CS210 — uploaded 1 week ago, 78 views</div></div><div class="right"><span class="badge outline">TXT</span><button class="link-btn" onclick="viewRowDetail(this,'Content preview')">Open</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Transaction Management Demo</div><div class="secondary-text">Video, CS204 — uploaded 2 weeks ago, 96 views</div></div><div class="right"><span class="badge outline">MP4</span><button class="link-btn" onclick="viewRowDetail(this,'Content preview')">Open</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-schedule">
+      <div class="page-header">
+        <div><h1>Faculty Allocation Scheduler</h1><p class="subtitle">Weekly teaching load — week of Sep 7</p></div>
+        <button class="secondary" onclick="openScheduleChange()">Request schedule change</button>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-value">14</div><div class="stat-label">Hours this week</div></div>
+        <div class="stat-card"><div class="stat-value">3</div><div class="stat-label">Modules taught</div></div>
+        <div class="stat-card"><div class="stat-value">2</div><div class="stat-label">Specialization areas</div></div>
+      </div>
+      <div class="list">
+        <div class="list-row"><div><div class="primary-text">Mon, 10:00–11:30</div><div class="secondary-text">CS204 Database Management Systems, Room B204</div></div></div>
+        <div class="list-row"><div><div class="primary-text">Tue, 2:00–3:30</div><div class="secondary-text">CS210 Software Engineering Principles, Room A110</div></div></div>
+        <div class="list-row"><div><div class="primary-text">Wed, 10:00–11:30</div><div class="secondary-text">CS204 Database Management Systems, Room B204</div></div></div>
+        <div class="list-row"><div><div class="primary-text">Thu, 2:00–3:30</div><div class="secondary-text">CS210 Software Engineering Principles, Room A110</div></div></div>
+      </div>
+      <div class="switch-row"><input type="checkbox" id="sub-toggle" checked><label for="sub-toggle">Available for substitute teaching on Fridays</label></div>
+    </section>
+
+    <section class="page" id="page-attendance">
+      <div class="page-header">
+        <div><h1>Attendance Logging Matrix</h1><p class="subtitle">CS204 — Database Management Systems, Mon 10:00 session — 42 enrolled</p></div>
+        <button class="primary" onclick="markAllPresent()">Mark all present</button>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-value" id="stat-present">5</div><div class="stat-label">Present</div></div>
+        <div class="stat-card"><div class="stat-value" id="stat-absent">3</div><div class="stat-label">Absent</div></div>
+        <div class="stat-card"><div class="stat-value" id="stat-rate">70%</div><div class="stat-label">Term attendance rate</div></div>
+      </div>
+      <div class="notice" id="attendance-notice"><strong>3 students below 75% attendance.</strong> Notifications sent to Bibek Rai, Manisha Shrestha, and Kiran Magar.</div>
+      <div class="toolbar"><input type="text" placeholder="Search students" oninput="filterRows(this,'#attendance-roster','.list-row')"></div>
+      <div class="list" id="attendance-roster">
+        <div class="list-row"><div><div class="primary-text">Aisha Karki</div><div class="secondary-text">ST1042</div></div><div class="right"><span class="badge filled clickable" onclick="cycleStatus(this)">Present</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Bibek Rai</div><div class="secondary-text">ST1043</div></div><div class="right"><span class="badge outline clickable" onclick="cycleStatus(this)">Absent</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Sunita Gurung</div><div class="secondary-text">ST1044</div></div><div class="right"><span class="badge dashed clickable" onclick="cycleStatus(this)">Late</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Prakash Thapa</div><div class="secondary-text">ST1045</div></div><div class="right"><span class="badge filled clickable" onclick="cycleStatus(this)">Present</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Manisha Shrestha</div><div class="secondary-text">ST1046</div></div><div class="right"><span class="badge outline clickable" onclick="cycleStatus(this)">Absent</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Rajesh Karki</div><div class="secondary-text">ST1047</div></div><div class="right"><span class="badge filled clickable" onclick="cycleStatus(this)">Present</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Nisha Adhikari</div><div class="secondary-text">ST1048</div></div><div class="right"><span class="badge filled clickable" onclick="cycleStatus(this)">Present</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Suman Basnet</div><div class="secondary-text">ST1049</div></div><div class="right"><span class="badge dashed clickable" onclick="cycleStatus(this)">Late</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Anita Poudel</div><div class="secondary-text">ST1050</div></div><div class="right"><span class="badge filled clickable" onclick="cycleStatus(this)">Present</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Kiran Magar</div><div class="secondary-text">ST1051</div></div><div class="right"><span class="badge outline clickable" onclick="cycleStatus(this)">Absent</span></div></div>
+      </div>
+      <p class="secondary-text" style="margin-top:10px;">Showing 10 of 42 students. Tap any status to correct it.</p>
+    </section>
+
+    <section class="page" id="page-engagement">
+      <div class="page-header">
+        <div><h1>Classroom Interactivity Logs</h1><p class="subtitle">CS204 — Mon 10:00 session</p></div>
+        <button class="primary" onclick="openAddEngagement()">+ Add entry</button>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-value">18</div><div class="stat-label">Participation tokens used</div></div>
+        <div class="stat-card"><div class="stat-value">78%</div><div class="stat-label">In-class quiz average</div></div>
+        <div class="stat-card"><div class="stat-value">6</div><div class="stat-label">Questions asked</div></div>
+      </div>
+      <div class="list" id="engagement-list">
+        <div class="list-row"><div><div class="primary-text">Aisha Karki</div><div class="secondary-text">10:05 — participation token used</div></div><div class="right"><span class="badge filled">+2 pts</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Bibek Rai</div><div class="secondary-text">10:12 — quiz answer submitted</div></div><div class="right"><span class="badge filled">Correct</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Sunita Gurung</div><div class="secondary-text">10:15 — asked "clarify normal forms"</div></div><div class="right"><span class="badge outline">Question</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Prakash Thapa</div><div class="secondary-text">10:20 — quiz answer submitted</div></div><div class="right"><span class="badge outline">Incorrect</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-assignments">
+      <div class="page-header">
+        <div><h1>Assignment Submission Portals</h1><p class="subtitle">Assignment 2 — ER Diagram Design, due Sep 10</p></div>
+        <select><option>Assignment 2 — ER Diagram Design</option></select>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-value">4</div><div class="stat-label">On time</div></div>
+        <div class="stat-card"><div class="stat-value">2</div><div class="stat-label">Late</div></div>
+        <div class="stat-card"><div class="stat-value">1</div><div class="stat-label">Missing</div></div>
+      </div>
+      <div class="toolbar"><input type="text" placeholder="Search students" oninput="filterRows(this,'#assignments-list','.list-row')"></div>
+      <div class="list" id="assignments-list">
+        <div class="list-row"><div><div class="primary-text">Aisha Karki</div><div class="secondary-text">Submitted Sep 8, 4:32 PM</div></div><div class="right"><span class="badge outline">6% similarity</span><span class="badge filled">On time</span><button class="link-btn" onclick="openReview(this)">Review</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Bibek Rai</div><div class="secondary-text">Submitted Sep 11, 9:10 AM</div></div><div class="right"><span class="badge outline">3% similarity</span><span class="badge dashed">Late</span><button class="link-btn" onclick="openReview(this)">Review</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Sunita Gurung</div><div class="secondary-text">Submitted Sep 9, 11:02 PM</div></div><div class="right"><span class="badge outline">22% similarity — flagged</span><span class="badge filled">On time</span><button class="link-btn" onclick="openReview(this)">Review</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Prakash Thapa</div><div class="secondary-text">No submission received</div></div><div class="right"><span class="badge outline">Missing</span><button class="link-btn" onclick="sendReminder()">Remind</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Manisha Shrestha</div><div class="secondary-text">Submitted Sep 8, 6:15 PM</div></div><div class="right"><span class="badge outline">9% similarity</span><span class="badge filled">On time</span><button class="link-btn" onclick="openReview(this)">Review</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Rajesh Karki</div><div class="secondary-text">Submitted Sep 11, 8:45 AM</div></div><div class="right"><span class="badge outline">4% similarity</span><span class="badge dashed">Late</span><button class="link-btn" onclick="openReview(this)">Review</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Nisha Adhikari</div><div class="secondary-text">Submitted Sep 8, 2:20 PM</div></div><div class="right"><span class="badge outline">5% similarity</span><span class="badge filled">On time</span><button class="link-btn" onclick="openReview(this)">Review</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-grading">
+      <div class="page-header">
+        <div><h1>Continuous Assessment Grading</h1><p class="subtitle">CS204 — Database Management Systems</p></div>
+        <button class="secondary" onclick="openRubricConfig()">Configure rubric</button>
+      </div>
+      <div class="toolbar"><input type="text" placeholder="Search students" oninput="filterRows(this,'#gradebook-table','tbody tr')"></div>
+      <div class="table-wrap">
+        <table id="gradebook-table">
+          <thead><tr><th>Student</th><th>Quiz 1 (10%)</th><th>Assignment 1 (20%)</th><th>Midterm (30%)</th><th>Project (40%)</th><th>Weighted average</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr><td>Aisha Karki</td><td class="num">8/10</td><td class="num">17/20</td><td class="num">26/30</td><td class="num">35/40</td><td class="avg">86%</td><td><button class="link-btn" onclick="editGrade(this)">Edit</button></td></tr>
+            <tr><td>Bibek Rai</td><td class="num">6/10</td><td class="num">14/20</td><td class="num">21/30</td><td class="num">30/40</td><td class="avg">71%</td><td><button class="link-btn" onclick="editGrade(this)">Edit</button></td></tr>
+            <tr><td>Sunita Gurung</td><td class="num">9/10</td><td class="num">19/20</td><td class="num">28/30</td><td class="num">38/40</td><td class="avg">94%</td><td><button class="link-btn" onclick="editGrade(this)">Edit</button></td></tr>
+            <tr><td>Prakash Thapa</td><td class="num">7/10</td><td class="num">15/20</td><td class="num">22/30</td><td class="num">31/40</td><td class="avg">75%</td><td><button class="link-btn" onclick="editGrade(this)">Edit</button></td></tr>
+            <tr><td>Manisha Shrestha</td><td class="num">5/10</td><td class="num">12/20</td><td class="num">18/30</td><td class="num">25/40</td><td class="avg">60%</td><td><button class="link-btn" onclick="editGrade(this)">Edit</button></td></tr>
+            <tr><td>Rajesh Karki</td><td class="num">8/10</td><td class="num">16/20</td><td class="num">24/30</td><td class="num">33/40</td><td class="avg">81%</td><td><button class="link-btn" onclick="editGrade(this)">Edit</button></td></tr>
+            <tr><td>Nisha Adhikari</td><td class="num">9/10</td><td class="num">18/20</td><td class="num">27/30</td><td class="num">37/40</td><td class="avg">91%</td><td><button class="link-btn" onclick="editGrade(this)">Edit</button></td></tr>
+            <tr><td>Suman Basnet</td><td class="num">6/10</td><td class="num">13/20</td><td class="num">20/30</td><td class="num">28/40</td><td class="avg">67%</td><td><button class="link-btn" onclick="editGrade(this)">Edit</button></td></tr>
+            <tr><td>Anita Poudel</td><td class="num">8/10</td><td class="num">17/20</td><td class="num">25/30</td><td class="num">34/40</td><td class="avg">84%</td><td><button class="link-btn" onclick="editGrade(this)">Edit</button></td></tr>
+            <tr><td>Kiran Magar</td><td class="num">4/10</td><td class="num">10/20</td><td class="num">15/30</td><td class="num">20/40</td><td class="avg">49%</td><td><button class="link-btn" onclick="editGrade(this)">Edit</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="secondary-text" style="margin-top:10px;">Showing 10 of 42 students.</p>
+    </section>
+
+    <section class="page" id="page-probation">
+      <div class="page-header">
+        <div><h1>Academic Probation Workflow</h1><p class="subtitle">Students flagged below minimum performance thresholds</p></div>
+        <button class="secondary" onclick="showExportConfirm('probation report')">Export report</button>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-value">2</div><div class="stat-label">Active warnings</div></div>
+        <div class="stat-card"><div class="stat-value">1</div><div class="stat-label">Under review</div></div>
+        <div class="stat-card"><div class="stat-value">1</div><div class="stat-label">Cleared this term</div></div>
+      </div>
+      <div class="list">
+        <div class="list-row"><div><div class="primary-text">Manisha Shrestha</div><div class="secondary-text">GPA below 2.0 threshold</div></div><div class="right"><span class="badge dashed">Warning sent</span><button class="link-btn" onclick="viewCase(this)">View</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Kiran Magar</div><div class="secondary-text">Attendance below 75%</div></div><div class="right"><span class="badge outline">Under review</span><button class="link-btn" onclick="viewCase(this)">View</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Rajesh Karki</div><div class="secondary-text">GPA below 2.0 threshold, previous term</div></div><div class="right"><span class="badge filled">Cleared</span><button class="link-btn" onclick="viewCase(this)">View</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-progress">
+      <div class="page-header">
+        <div><h1>Student Progress Tracking</h1><p class="subtitle">CS204 — Database Management Systems</p></div>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-value">82%</div><div class="stat-label">Class average</div></div>
+        <div class="stat-card"><div class="stat-value">2</div><div class="stat-label">At-risk students</div></div>
+        <div class="stat-card"><div class="stat-value">91%</div><div class="stat-label">Attendance rate</div></div>
+      </div>
+      <div class="toolbar"><input type="text" placeholder="Search students" oninput="filterRows(this,'#progress-list','.list-row')"></div>
+      <div class="list" id="progress-list">
+        <div class="list-row"><div><div class="primary-text">Sunita Gurung</div><div class="secondary-text">+3% vs midterm</div></div><div class="right"><div class="bar-track"><div class="bar-fill" style="width:94%"></div></div><span class="secondary-text">94%</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Nisha Adhikari</div><div class="secondary-text">+2% vs midterm</div></div><div class="right"><div class="bar-track"><div class="bar-fill" style="width:91%"></div></div><span class="secondary-text">91%</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Aisha Karki</div><div class="secondary-text">+1% vs midterm</div></div><div class="right"><div class="bar-track"><div class="bar-fill" style="width:86%"></div></div><span class="secondary-text">86%</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Anita Poudel</div><div class="secondary-text">+4% vs midterm</div></div><div class="right"><div class="bar-track"><div class="bar-fill" style="width:84%"></div></div><span class="secondary-text">84%</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Rajesh Karki</div><div class="secondary-text">-1% vs midterm</div></div><div class="right"><div class="bar-track"><div class="bar-fill" style="width:81%"></div></div><span class="secondary-text">81%</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Prakash Thapa</div><div class="secondary-text">-2% vs midterm</div></div><div class="right"><div class="bar-track"><div class="bar-fill" style="width:75%"></div></div><span class="secondary-text">75%</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Bibek Rai</div><div class="secondary-text">-5% vs midterm</div></div><div class="right"><div class="bar-track"><div class="bar-fill" style="width:71%"></div></div><span class="secondary-text">71%</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Suman Basnet</div><div class="secondary-text">-3% vs midterm</div></div><div class="right"><div class="bar-track"><div class="bar-fill" style="width:67%"></div></div><span class="secondary-text">67%</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Manisha Shrestha</div><div class="secondary-text">-6% vs midterm</div></div><div class="right"><div class="bar-track"><div class="bar-fill" style="width:60%"></div></div><span class="secondary-text">60%</span><span class="badge outline">At risk</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Kiran Magar</div><div class="secondary-text">-9% vs midterm</div></div><div class="right"><div class="bar-track"><div class="bar-fill" style="width:49%"></div></div><span class="secondary-text">49%</span><span class="badge outline">At risk</span></div></div>
+      </div>
+      <p class="secondary-text" style="margin-top:10px;">Showing 10 of 42 students.</p>
+    </section>
+
+    <section class="page" id="page-awards">
+      <div class="page-header">
+        <div><h1>Excellence Awards Dashboard</h1><p class="subtitle">BSc Computer Science, Semester 1 leaderboard</p></div>
+        <button class="secondary" onclick="showExportConfirm('awards list')">Export list</button>
+      </div>
+      <div class="list">
+        <div class="list-row clickable" onclick="viewStudentAward(this)"><div><div class="primary-text">1. Sunita Gurung</div><div class="secondary-text">GPA 3.95</div></div><div class="right"><span class="badge filled">Dean's List</span></div></div>
+        <div class="list-row clickable" onclick="viewStudentAward(this)"><div><div class="primary-text">2. Nisha Adhikari</div><div class="secondary-text">GPA 3.90</div></div><div class="right"><span class="badge filled">Merit scholarship</span></div></div>
+        <div class="list-row clickable" onclick="viewStudentAward(this)"><div><div class="primary-text">3. Aisha Karki</div><div class="secondary-text">GPA 3.70</div></div><div class="right"><span class="badge outline">Honor roll</span></div></div>
+        <div class="list-row clickable" onclick="viewStudentAward(this)"><div><div class="primary-text">4. Anita Poudel</div><div class="secondary-text">GPA 3.62</div></div><div class="right"><span class="badge outline">Honor roll</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-alumni">
+      <div class="page-header">
+        <div><h1>Alumni Academic Records</h1><p class="subtitle">BSc Computer Science, past cohorts</p></div>
+      </div>
+      <div class="toolbar"><input type="text" placeholder="Search alumni by name" oninput="filterRows(this,'#alumni-list','.list-row')"><select><option>All graduation years</option></select></div>
+      <div class="list" id="alumni-list">
+        <div class="list-row"><div><div class="primary-text">Sabina Thapa</div><div class="secondary-text">Class of 2022, First Class Honors — 360/360 credits</div></div><div class="right"><button class="link-btn" onclick="viewTranscript(this)">View transcript</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Nabin Koirala</div><div class="secondary-text">Class of 2021, Second Class Upper — 360/360 credits</div></div><div class="right"><button class="link-btn" onclick="viewTranscript(this)">View transcript</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Kritika Basnet</div><div class="secondary-text">Class of 2023, First Class with Distinction — 360/360 credits</div></div><div class="right"><button class="link-btn" onclick="viewTranscript(this)">View transcript</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-parentmsg">
+      <div class="page-header">
+        <div><h1>Parent-Teacher Communication</h1><p class="subtitle">Verified guardian accounts, CS204</p></div>
+        <button class="primary" onclick="openNewMessage()">+ New message</button>
+      </div>
+      <div class="toolbar"><input type="text" placeholder="Search messages" oninput="filterRows(this,'#parentmsg-list','.list-row')"></div>
+      <div class="list" id="parentmsg-list">
+        <div class="list-row clickable" onclick="openThread(this)"><div><div class="primary-text">Bibek Rai's parent — Mr. Rai</div><div class="secondary-text">Following up on attendance concerns raised last week.</div></div><div class="right"><span class="badge dashed">Unread</span><span class="secondary-text">2d ago</span></div></div>
+        <div class="list-row clickable" onclick="openThread(this)"><div><div class="primary-text">Sunita Gurung's parent — Mrs. Gurung</div><div class="secondary-text">Thank you for the update on her project grade.</div></div><div class="right"><span class="secondary-text">5d ago</span></div></div>
+        <div class="list-row clickable" onclick="openThread(this)"><div><div class="primary-text">Manisha Shrestha's parent — Mr. Shrestha</div><div class="secondary-text">Requesting a meeting regarding academic probation.</div></div><div class="right"><span class="badge dashed">Unread</span><span class="secondary-text">1w ago</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-peerreview">
+      <div class="page-header">
+        <div><h1>Peer Review Modules</h1><p class="subtitle">Session observations and rubric scores</p></div>
+        <button class="primary" onclick="openScheduleObservation()">+ Schedule observation</button>
+      </div>
+      <div class="list" id="peerreview-list">
+        <div class="list-row"><div><div class="primary-text">Dr. Meera Joshi → Prakash Thapa</div><div class="secondary-text">CS204, Mon 10:00 session</div></div><div class="right"><span class="badge dashed">Scheduled</span><button class="link-btn" onclick="cancelObservation(this)">Cancel</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Prakash Thapa → Dr. Meera Joshi</div><div class="secondary-text">CS210, Tue 2:00 session</div></div><div class="right"><span class="secondary-text">4.5 / 5</span><span class="badge filled">Completed</span><button class="link-btn" onclick="viewRubric(this)">View rubric</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Dr. Anil Sharma → Sunita Rai</div><div class="secondary-text">CS230, Wed 1:00 session</div></div><div class="right"><span class="secondary-text">4.2 / 5</span><span class="badge filled">Completed</span><button class="link-btn" onclick="viewRubric(this)">View rubric</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-research">
+      <div class="page-header">
+        <div><h1>Research Trackers</h1><p class="subtitle">Publications, grants, and presentations</p></div>
+        <button class="primary" onclick="openLogResearch()">+ Log contribution</button>
+      </div>
+      <div class="list" id="research-list">
+        <div class="list-row"><div><div class="primary-text">Query Optimization in Multi-Tenant Databases</div><div class="secondary-text">Publication, Journal of Data Systems, 2025 — 12 citations</div></div><div class="right"><span class="badge outline">Published</span></div></div>
+        <div class="list-row"><div><div class="primary-text">AI-Assisted Curriculum Mapping</div><div class="secondary-text">Grant, NPR 800,000 funded, 2026</div></div><div class="right"><span class="badge filled">Active</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Teaching Databases at Scale</div><div class="secondary-text">Conference presentation, ICER 2025</div></div><div class="right"><span class="badge filled">Presented</span></div></div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this) closeModal()">
+  <div class="modal">
+    <div class="modal-header"><h3 id="modal-title"></h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer" id="modal-footer"></div>
+  </div>
+</div>
+
+<script>
+var modalContext = null;
+
+function showPage(id, el){
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
+  if(el) el.classList.add('active');
+}
+function goTo(id){
+  var target = document.querySelector('.nav-item[data-page="' + id + '"]');
+  showPage(id, target);
+}
+function toggleCard(header){
+  var card = header.parentElement;
+  var detail = card.querySelector('.detail');
+  var chev = header.querySelector('.chev');
+  var open = detail.classList.contains('open');
+  detail.classList.toggle('open', !open);
+  chev.textContent = open ? '▸' : '▾';
+}
+function filterRows(inputEl, containerSelector, rowSelector){
+  var q = inputEl.value.toLowerCase();
+  document.querySelectorAll(containerSelector + ' ' + rowSelector).forEach(function(row){
+    row.style.display = row.textContent.toLowerCase().indexOf(q) > -1 ? '' : 'none';
+  });
+}
+
+/* ---------- modal shell ---------- */
+function openModal(title, bodyHtml, footerHtml){
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = bodyHtml;
+  document.getElementById('modal-footer').innerHTML = footerHtml || '<button class="secondary" onclick="closeModal()">Close</button>';
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal(){
+  document.getElementById('modal-overlay').classList.remove('open');
+  modalContext = null;
+}
+function formInput(label,id,placeholder,type){
+  type = type || 'text';
+  return '<div class="form-group"><label>' + label + '</label><input type="' + type + '" id="' + id + '" placeholder="' + (placeholder||'') + '"></div>';
+}
+function formTextarea(label,id){
+  return '<div class="form-group"><label>' + label + '</label><textarea id="' + id + '"></textarea></div>';
+}
+function formSelect(label,id,opts){
+  var o = opts.map(function(x){ return '<option>' + x + '</option>'; }).join('');
+  return '<div class="form-group"><label>' + label + '</label><select id="' + id + '">' + o + '</select></div>';
+}
+function viewRowDetail(btn, title){
+  var row = btn.closest('.list-row');
+  var primary = row.querySelector('.primary-text').textContent;
+  var secondary = row.querySelector('.secondary-text').textContent;
+  openModal(title, '<p style="font-size:13px;color:var(--text-secondary);margin:0 0 12px;">' + primary + ' — ' + secondary + '</p><p style="font-size:13px;">Full preview would render here in the finished product.</p>', '<button class="primary" onclick="closeModal()">Close</button>');
+}
+
+/* ---------- curriculum ---------- */
+function openNewCourse(){
+  openModal('New course',
+    formInput('Course code','nc-code','e.g. CS240') +
+    formInput('Course name','nc-name','e.g. Cloud Computing') +
+    '<div class="form-row-2">' + formSelect('Program','nc-program',['BSc Computer Science','BA Business']) + formInput('Credits','nc-credits','6','number') + '</div>' +
+    formTextarea('Description','nc-desc'),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveNewCourse()">Save course</button>'
+  );
+}
+function saveNewCourse(){
+  var code = document.getElementById('nc-code').value || 'NEW101';
+  var name = document.getElementById('nc-name').value || 'Untitled course';
+  var credits = document.getElementById('nc-credits').value || '0';
+  var list = document.getElementById('curriculum-list');
+  var div = document.createElement('div');
+  div.className = 'card';
+  div.innerHTML = '<div class="card-header" onclick="toggleCard(this)"><div><div class="title-row"><span class="course-title">' + code + ' — ' + name + '</span><span class="badge outline">Draft</span></div><p class="meta">' + credits + ' credits, 0 modules, 0 outcomes mapped — just created</p></div><span class="chev">▸</span></div><div class="detail"><p class="detail-label">Module descriptor</p><p>No syllabus mapped yet.</p></div>';
+  list.appendChild(div);
+  closeModal();
+}
+
+/* ---------- lesson plans ---------- */
+function openSubmitLessonPlan(){
+  openModal('Submit lesson plan',
+    formSelect('Week','lp-week',['Week 8','Week 9','Week 10']) +
+    formInput('Title','lp-title','e.g. Indexing strategies') +
+    formTextarea('Notes for reviewer','lp-notes'),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveLessonPlan()">Submit</button>'
+  );
+}
+function saveLessonPlan(){
+  var week = document.getElementById('lp-week').value;
+  var title = document.getElementById('lp-title').value || 'Untitled lesson';
+  var list = document.getElementById('lessonplans-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + week + ' — ' + title + '</div><div class="secondary-text">Version 1 — submitted just now</div></div><div class="right"><span class="badge dashed">Pending review</span><button class="link-btn" onclick="viewRowDetail(this,\'Lesson plan\')">View</button></div>';
+  list.appendChild(row);
+  closeModal();
+}
+
+/* ---------- VLE ---------- */
+function openUploadContent(){
+  openModal('Upload content',
+    formInput('Title','vc-title','e.g. Week 8 slides') +
+    '<div class="form-row-2">' + formSelect('Type','vc-type',['Document','Video','Interactive notes']) + formSelect('Course','vc-course',['CS204','CS210']) + '</div>' +
+    formInput('File','vc-file','','file'),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveContent()">Upload</button>'
+  );
+}
+function saveContent(){
+  var title = document.getElementById('vc-title').value || 'Untitled content';
+  var type = document.getElementById('vc-type').value;
+  var course = document.getElementById('vc-course').value;
+  var ext = type === 'Video' ? 'MP4' : (type === 'Document' ? 'PDF' : 'TXT');
+  var list = document.getElementById('vle-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + title + '</div><div class="secondary-text">' + type + ', ' + course + ' — uploaded just now, 0 views</div></div><div class="right"><span class="badge outline">' + ext + '</span><button class="link-btn" onclick="viewRowDetail(this,\'Content preview\')">Open</button></div>';
+  list.appendChild(row);
+  closeModal();
+}
+
+/* ---------- schedule ---------- */
+function openScheduleChange(){
+  openModal('Request schedule change',
+    formSelect('Session','sc-session',['Mon 10:00 — CS204','Tue 2:00 — CS210','Wed 10:00 — CS204','Thu 2:00 — CS210']) +
+    formTextarea('Reason for change','sc-reason'),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="submitScheduleChange()">Submit request</button>'
+  );
+}
+function submitScheduleChange(){
+  openModal('Request submitted', '<p style="font-size:13px;">Your schedule change request has been sent to the Operations Head for review.</p>', '<button class="primary" onclick="closeModal()">Done</button>');
+}
+
+/* ---------- attendance ---------- */
+function cycleStatus(badge){
+  var states = ['Present','Late','Absent'];
+  var classes = {Present:'filled', Late:'dashed', Absent:'outline'};
+  var cur = badge.textContent.trim();
+  var next = states[(states.indexOf(cur) + 1) % states.length];
+  badge.textContent = next;
+  badge.className = 'badge clickable ' + classes[next];
+  updateAttendanceStats();
+}
+function updateAttendanceStats(){
+  var present = 0, late = 0, absent = 0;
+  document.querySelectorAll('#attendance-roster .badge').forEach(function(b){
+    var t = b.textContent.trim();
+    if(t === 'Present') present++; else if(t === 'Late') late++; else if(t === 'Absent') absent++;
+  });
+  document.getElementById('stat-present').textContent = present;
+  document.getElementById('stat-absent').textContent = absent;
+  var total = present + late + absent;
+  document.getElementById('stat-rate').textContent = (total ? Math.round((present + late) / total * 100) : 0) + '%';
+}
+function markAllPresent(){
+  document.querySelectorAll('#attendance-roster .badge').forEach(function(b){
+    b.textContent = 'Present';
+    b.className = 'badge clickable filled';
+  });
+  updateAttendanceStats();
+  document.getElementById('attendance-notice').style.display = 'none';
+}
+
+/* ---------- engagement ---------- */
+function openAddEngagement(){
+  openModal('Add engagement entry',
+    formSelect('Student','eg-student',['Aisha Karki','Bibek Rai','Sunita Gurung','Prakash Thapa','Manisha Shrestha']) +
+    formSelect('Activity','eg-activity',['Participation token used','Quiz answer submitted','Question asked']) +
+    formInput('Result / points','eg-result','e.g. +2 pts or Correct'),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveEngagement()">Add</button>'
+  );
+}
+function saveEngagement(){
+  var student = document.getElementById('eg-student').value;
+  var activity = document.getElementById('eg-activity').value;
+  var result = document.getElementById('eg-result').value || 'Logged';
+  var now = new Date();
+  var time = now.getHours() + ':' + String(now.getMinutes()).padStart(2,'0');
+  var list = document.getElementById('engagement-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + student + '</div><div class="secondary-text">' + time + ' — ' + activity.toLowerCase() + '</div></div><div class="right"><span class="badge outline">' + result + '</span></div>';
+  list.appendChild(row);
+  closeModal();
+}
+
+/* ---------- assignments ---------- */
+function openReview(btn){
+  var row = btn.closest('.list-row');
+  modalContext = { row: row };
+  var name = row.querySelector('.primary-text').textContent;
+  openModal('Review submission — ' + name,
+    '<p style="font-size:13px;color:var(--text-secondary);margin:0 0 12px;">Submitted file: er-diagram-final.pdf</p>' +
+    formInput('Grade (out of 100)','rv-grade','e.g. 88','number') +
+    formTextarea('Feedback','rv-feedback'),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveReview()">Save grade</button>'
+  );
+}
+function saveReview(){
+  var grade = document.getElementById('rv-grade').value || '—';
+  var badge = document.createElement('span');
+  badge.className = 'badge filled';
+  badge.textContent = 'Graded: ' + grade + '%';
+  modalContext.row.querySelector('.right').appendChild(badge);
+  closeModal();
+}
+function sendReminder(){
+  openModal('Reminder sent', '<p style="font-size:13px;">A reminder email has been sent to the student about the missing submission.</p>', '<button class="primary" onclick="closeModal()">Done</button>');
+}
+
+/* ---------- gradebook ---------- */
+function openRubricConfig(){
+  openModal('Configure rubric',
+    '<div id="rubric-rows">' + rubricInputRow('Quiz 1',10) + rubricInputRow('Assignment 1',20) + rubricInputRow('Midterm',30) + rubricInputRow('Project',40) + '</div>' +
+    '<button class="link-btn" onclick="addRubricRow()">+ Add criterion</button>',
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="closeModal()">Save rubric</button>'
+  );
+}
+function rubricInputRow(name, weight){
+  return '<div class="form-row-2"><input type="text" value="' + name + '"><input type="number" value="' + weight + '"></div>';
+}
+function addRubricRow(){
+  var wrap = document.getElementById('rubric-rows');
+  var div = document.createElement('div');
+  div.className = 'form-row-2';
+  div.innerHTML = '<input type="text" placeholder="Criterion name"><input type="number" placeholder="Weight">';
+  wrap.appendChild(div);
+}
+function editGrade(btn){
+  var tr = btn.closest('tr');
+  var cells = tr.querySelectorAll('td.num');
+  var vals = [];
+  cells.forEach(function(c){ vals.push(parseInt(c.textContent)); });
+  modalContext = { tr: tr, cells: cells };
+  openModal('Edit grades — ' + tr.children[0].textContent,
+    formInput('Quiz 1 (out of 10)','g0',vals[0],'number') +
+    formInput('Assignment 1 (out of 20)','g1',vals[1],'number') +
+    formInput('Midterm (out of 30)','g2',vals[2],'number') +
+    formInput('Project (out of 40)','g3',vals[3],'number'),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveGradeEdit()">Save</button>'
+  );
+  document.getElementById('g0').value = vals[0];
+  document.getElementById('g1').value = vals[1];
+  document.getElementById('g2').value = vals[2];
+  document.getElementById('g3').value = vals[3];
+}
+function saveGradeEdit(){
+  var maxes = [10,20,30,40];
+  var cells = modalContext.cells;
+  var total = 0;
+  for(var i=0;i<4;i++){
+    var v = parseInt(document.getElementById('g'+i).value) || 0;
+    cells[i].textContent = v + '/' + maxes[i];
+    total += v;
+  }
+  modalContext.tr.querySelector('td.avg').textContent = total + '%';
+  closeModal();
+}
+
+/* ---------- probation ---------- */
+function viewCase(btn){
+  var row = btn.closest('.list-row');
+  var name = row.querySelector('.primary-text').textContent;
+  var reason = row.querySelector('.secondary-text').textContent;
+  openModal('Case — ' + name,
+    '<p style="font-size:13px;color:var(--text-secondary);margin:0 0 12px;">' + reason + '</p>' +
+    '<p class="detail-label">Timeline</p>' +
+    '<ul class="outcomes"><li>Sep 1 — Flagged automatically by threshold monitor</li><li>Sep 3 — Warning letter generated and emailed to student</li><li>Sep 5 — PAT notified for pastoral follow-up</li></ul>',
+    '<button class="secondary" onclick="closeModal()">Close</button><button class="primary" onclick="closeModal()">Generate letter</button>'
+  );
+}
+function showExportConfirm(name){
+  openModal('Export', '<p style="font-size:13px;">Preparing the ' + name + ' as a CSV file.</p>', '<button class="primary" onclick="closeModal()">Close</button>');
+}
+
+/* ---------- awards ---------- */
+function viewStudentAward(row){
+  var name = row.querySelector('.primary-text').textContent;
+  var gpa = row.querySelector('.secondary-text').textContent;
+  openModal(name,
+    '<p style="font-size:13px;color:var(--text-secondary);margin:0 0 12px;">' + gpa + '</p>' +
+    '<p class="detail-label">Eligible recognitions</p>' +
+    '<ul class="outcomes"><li>Dean\'s List, Semester 1</li><li>Merit-based tuition scholarship (pending approval)</li></ul>',
+    '<button class="primary" onclick="closeModal()">Close</button>'
+  );
+}
+
+/* ---------- alumni ---------- */
+function viewTranscript(btn){
+  var row = btn.closest('.list-row');
+  var name = row.querySelector('.primary-text').textContent;
+  openModal('Transcript — ' + name,
+    '<div class="table-wrap"><table><thead><tr><th>Module</th><th>Grade</th></tr></thead><tbody>' +
+    '<tr><td>Database Management Systems</td><td class="num">A</td></tr>' +
+    '<tr><td>Software Engineering Principles</td><td class="num">A-</td></tr>' +
+    '<tr><td>Operating Systems</td><td class="num">B+</td></tr>' +
+    '<tr><td>Final Year Project</td><td class="num">A</td></tr>' +
+    '</tbody></table></div>',
+    '<button class="primary" onclick="closeModal()">Close</button>'
+  );
+}
+
+/* ---------- parent messages ---------- */
+function openNewMessage(){
+  openModal('New message',
+    formSelect('To','pm-to',["Bibek Rai's parent — Mr. Rai","Sunita Gurung's parent — Mrs. Gurung","Manisha Shrestha's parent — Mr. Shrestha"]) +
+    formInput('Subject','pm-subject') +
+    formTextarea('Message','pm-body'),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="sendNewMessage()">Send</button>'
+  );
+}
+function sendNewMessage(){
+  var to = document.getElementById('pm-to').value;
+  var body = document.getElementById('pm-body').value || '';
+  var list = document.getElementById('parentmsg-list');
+  var row = document.createElement('div');
+  row.className = 'list-row clickable';
+  row.setAttribute('onclick','openThread(this)');
+  row.innerHTML = '<div><div class="primary-text">' + to + '</div><div class="secondary-text">' + body.slice(0,60) + '</div></div><div class="right"><span class="secondary-text">Just now</span></div>';
+  list.appendChild(row);
+  closeModal();
+}
+function openThread(row){
+  var name = row.querySelector('.primary-text').textContent;
+  var msg = row.querySelector('.secondary-text').textContent;
+  modalContext = { row: row };
+  openModal(name,
+    '<div id="thread-body"><div class="msg-bubble"><div class="who">' + name + '</div>' + msg + '</div></div>' +
+    formTextarea('Reply','th-reply'),
+    '<button class="secondary" onclick="closeModal()">Close</button><button class="primary" onclick="sendReply()">Send reply</button>'
+  );
+}
+function sendReply(){
+  var body = document.getElementById('th-reply').value;
+  if(body){
+    var thread = document.getElementById('thread-body');
+    var bubble = document.createElement('div');
+    bubble.className = 'msg-bubble';
+    bubble.innerHTML = '<div class="who">You</div>' + body;
+    thread.appendChild(bubble);
+    document.getElementById('th-reply').value = '';
+  }
+}
+
+/* ---------- peer review ---------- */
+function openScheduleObservation(){
+  openModal('Schedule observation',
+    formSelect('Reviewer','po-reviewer',['Dr. Meera Joshi','Dr. Anil Sharma','Prakash Thapa']) +
+    formSelect('Reviewee','po-reviewee',['Prakash Thapa','Sunita Rai','Dr. Meera Joshi']) +
+    '<div class="form-row-2">' + formSelect('Session','po-session',['CS204, Mon 10:00','CS210, Tue 2:00','CS230, Wed 1:00']) + formInput('Date','po-date','','date') + '</div>',
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveObservation()">Schedule</button>'
+  );
+}
+function saveObservation(){
+  var reviewer = document.getElementById('po-reviewer').value;
+  var reviewee = document.getElementById('po-reviewee').value;
+  var session = document.getElementById('po-session').value;
+  var list = document.getElementById('peerreview-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + reviewer + ' → ' + reviewee + '</div><div class="secondary-text">' + session + ' session</div></div><div class="right"><span class="badge dashed">Scheduled</span><button class="link-btn" onclick="cancelObservation(this)">Cancel</button></div>';
+  list.appendChild(row);
+  closeModal();
+}
+function cancelObservation(btn){
+  btn.closest('.list-row').remove();
+}
+function viewRubric(btn){
+  var row = btn.closest('.list-row');
+  var title = row.querySelector('.primary-text').textContent;
+  openModal('Rubric — ' + title,
+    rubricScoreRow('Preparation',5,5) + rubricScoreRow('Delivery',4,5) + rubricScoreRow('Student engagement',5,5) + rubricScoreRow('Clarity',4,5),
+    '<button class="primary" onclick="closeModal()">Close</button>'
+  );
+}
+function rubricScoreRow(name, score, max){
+  return '<div class="rubric-row"><span>' + name + '</span><strong>' + score + ' / ' + max + '</strong></div>';
+}
+
+/* ---------- research ---------- */
+function openLogResearch(){
+  openModal('Log contribution',
+    formInput('Title','rs-title','e.g. Paper or grant title') +
+    '<div class="form-row-2">' + formSelect('Type','rs-type',['Publication','Grant','Conference presentation']) + formInput('Year','rs-year','2026') + '</div>' +
+    formTextarea('Details','rs-details'),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveResearch()">Save</button>'
+  );
+}
+function saveResearch(){
+  var title = document.getElementById('rs-title').value || 'Untitled contribution';
+  var type = document.getElementById('rs-type').value;
+  var year = document.getElementById('rs-year').value;
+  var list = document.getElementById('research-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + title + '</div><div class="secondary-text">' + type + ', ' + year + '</div></div><div class="right"><span class="badge outline">Logged</span></div>';
+  list.appendChild(row);
+  closeModal();
+}
+</script>
+</body>
+</html>

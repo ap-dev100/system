@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ING ERP — Finance Department</title>
+<style>
+  :root{
+    --surface-1:#fafafa;
+    --surface-2:#f2f2f2;
+    --border:#e6e6e6;
+    --border-strong:#cfcfcf;
+    --text-primary:#111111;
+    --text-secondary:#5a5a5e;
+    --text-muted:#9a9a9e;
+    --fill-primary:#000000;
+    --on-primary:#ffffff;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--surface-2);color:var(--text-primary);}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;background:#fff;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:10px;}
+  .topbar .who{font-size:12px;color:var(--text-secondary);}
+  .topbar .who strong{color:var(--text-primary);font-weight:600;}
+  .app{display:flex;min-height:100vh;}
+  .sidebar{width:225px;flex-shrink:0;background:var(--surface-1);border-right:1px solid var(--border);padding:18px 12px;overflow-y:auto;}
+  .brand{display:flex;align-items:center;gap:10px;padding:0 8px 14px;}
+  .brand .mark{width:24px;height:24px;border-radius:6px;background:var(--fill-primary);flex-shrink:0;}
+  .brand .name{font-size:13px;font-weight:600;line-height:1.3;}
+  .brand .role{font-size:11px;color:var(--text-muted);line-height:1.3;}
+  .nav-item{display:block;padding:7px 10px;border-radius:7px;font-size:13px;color:var(--text-secondary);cursor:pointer;margin-bottom:2px;}
+  .nav-item:hover{background:var(--surface-2);}
+  .nav-item.active{background:var(--fill-primary);color:var(--on-primary);}
+  .nav-divider{border-top:1px solid var(--border);margin:10px 4px;}
+  .group{margin-bottom:12px;}
+  .group-label{font-size:11px;font-weight:600;color:var(--text-muted);margin:0 0 4px 10px;}
+  .main{flex:1;padding:32px 36px;min-width:0;}
+  .page{display:none;}
+  .page.active{display:block;}
+  .page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:12px;}
+  h1{font-size:22px;margin:0;font-weight:600;}
+  .subtitle{font-size:13px;color:var(--text-secondary);margin:5px 0 0;}
+  .section-label{font-size:12px;font-weight:600;color:var(--text-muted);margin:0 0 8px;}
+  button.primary{background:var(--fill-primary);color:var(--on-primary);border:none;border-radius:8px;padding:10px 16px;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;}
+  button.secondary{background:#fff;color:var(--text-primary);border:1px solid var(--border-strong);border-radius:8px;padding:10px 16px;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;}
+  .link-btn{background:none;border:none;color:var(--text-primary);font-size:12px;font-weight:600;text-decoration:underline;cursor:pointer;padding:0;white-space:nowrap;}
+  .toolbar{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;align-items:center;}
+  input[type=text], input[type=number], input[type=date], select, textarea{border:1px solid var(--border-strong);border-radius:8px;padding:10px 12px;font-size:13px;background:#fff;color:var(--text-primary);font-family:inherit;}
+  input[type=text]{flex:1;min-width:160px;}
+  select{width:170px;}
+  .badge{font-size:11px;padding:2px 9px;border-radius:999px;white-space:nowrap;}
+  .badge.filled{background:var(--fill-primary);color:var(--on-primary);}
+  .badge.outline{border:1px solid var(--border-strong);color:var(--text-secondary);}
+  .badge.dashed{border:1px dashed var(--border-strong);color:var(--text-secondary);}
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+  .stat-grid.cols-3{grid-template-columns:repeat(3,1fr);}
+  .stat-card{border:1px solid var(--border);border-radius:var(--radius);background:#fff;padding:16px 18px;}
+  .stat-value{font-size:20px;font-weight:700;}
+  .stat-label{font-size:12px;color:var(--text-secondary);margin-top:4px;}
+  .list{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:#fff;}
+  .list-row{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;gap:14px;border-bottom:1px solid var(--border);}
+  .list-row:last-child{border-bottom:none;}
+  .list-row .primary-text{font-size:14px;font-weight:600;}
+  .list-row .secondary-text{font-size:12px;color:var(--text-secondary);margin-top:3px;}
+  .list-row .right{display:flex;align-items:center;gap:10px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;}
+  .table-wrap{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:#fff;overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;}
+  th,td{padding:11px 13px;font-size:13px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;}
+  th{font-weight:600;color:var(--text-secondary);background:var(--surface-1);font-size:12px;}
+  tbody tr:last-child td{border-bottom:none;}
+  td.num{text-align:right;font-variant-numeric:tabular-nums;}
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:50;align-items:center;justify-content:center;padding:20px;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:#fff;border-radius:12px;max-width:460px;width:100%;max-height:86vh;overflow-y:auto;border:1px solid var(--border-strong);}
+  .modal-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);}
+  .modal-header h3{margin:0;font-size:16px;}
+  .modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-secondary);line-height:1;padding:4px;}
+  .modal-body{padding:18px 20px;}
+  .modal-footer{display:flex;justify-content:flex-end;gap:8px;padding:14px 20px;border-top:1px solid var(--border);}
+  .form-group{margin-bottom:14px;}
+  .form-group label{display:block;font-size:12px;color:var(--text-secondary);margin-bottom:5px;font-weight:600;}
+  .form-group input, .form-group select, .form-group textarea{width:100%;}
+  .form-group textarea{resize:vertical;min-height:70px;}
+  .form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px;}
+  .form-row-2 input, .form-row-2 select{width:100%;}
+  @media (max-width:640px){ .sidebar{display:none;} .main{padding:22px;} .stat-grid{grid-template-columns:1fr 1fr;} }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="who">Signed in as <strong>Mr. Rajan Shakya</strong> — Finance Manager</div>
+  <div class="who">Tenant accounts, ledgers, invoicing, and spend</div>
+</div>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="mark"></div><div><div class="name">ING ERP</div><div class="role">Finance</div></div></div>
+    <div class="nav-item active" data-page="dashboard" onclick="showPage('dashboard', this)">Dashboard</div>
+    <div class="nav-divider"></div>
+    <nav>
+      <div class="group"><p class="group-label">Student accounts</p>
+        <div class="nav-item" data-page="ledger" onclick="showPage('ledger', this)">Student ledger</div>
+        <div class="nav-item" data-page="invoicing" onclick="showPage('invoicing', this)">Automated invoicing</div>
+        <div class="nav-item" data-page="paymentgateway" onclick="showPage('paymentgateway', this)">Payment gateways</div>
+        <div class="nav-item" data-page="ageddebt" onclick="showPage('ageddebt', this)">Aged debt</div>
+        <div class="nav-item" data-page="scholarship" onclick="showPage('scholarship', this)">Scholarship funds</div>
+      </div>
+      <div class="group"><p class="group-label">Operations</p>
+        <div class="nav-item" data-page="procurement" onclick="showPage('procurement', this)">Expense procurement</div>
+        <div class="nav-item" data-page="vendorpay" onclick="showPage('vendorpay', this)">Vendor payments</div>
+        <div class="nav-item" data-page="budgetvariance" onclick="showPage('budgetvariance', this)">Budget variance</div>
+      </div>
+      <div class="group"><p class="group-label">Payroll &amp; compliance</p>
+        <div class="nav-item" data-page="payroll" onclick="showPage('payroll', this)">Payroll disbursal</div>
+        <div class="nav-item" data-page="tax" onclick="showPage('tax', this)">Tax compliance</div>
+        <div class="nav-item" data-page="audittrail" onclick="showPage('audittrail', this)">Audit trail</div>
+      </div>
+      <div class="group"><p class="group-label">Corporate</p>
+        <div class="nav-item" data-page="consolidation" onclick="showPage('consolidation', this)">Group consolidation</div>
+        <div class="nav-item" data-page="bankrecon" onclick="showPage('bankrecon', this)">Bank reconciliation</div>
+        <div class="nav-item" data-page="depreciation" onclick="showPage('depreciation', this)">Asset depreciation</div>
+        <div class="nav-item" data-page="documentvault" onclick="showPage('documentvault', this)">Document vault</div>
+      </div>
+    </nav>
+  </aside>
+
+  <main class="main">
+
+    <section class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div><h1>Finance overview</h1><p class="subtitle">Tenant-level accounts and operational spend</p></div>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-value">NPR 1,224,000</div><div class="stat-label">Total tuition outstanding</div></div>
+        <div class="stat-card"><div class="stat-value">4</div><div class="stat-label">Overdue accounts</div></div>
+        <div class="stat-card"><div class="stat-value">Sep 30</div><div class="stat-label">Next payroll run</div></div>
+        <div class="stat-card"><div class="stat-value">1</div><div class="stat-label">Department over budget</div></div>
+      </div>
+      <div class="list" style="margin-bottom:20px;">
+        <div class="list-row"><div><div class="primary-text">Kiran Magar is 95 days overdue</div><div class="secondary-text">NPR 384,000 outstanding — final notice sent</div></div><div class="right"><button class="link-btn" onclick="goTo('ageddebt')">Review</button></div></div>
+        <div class="list-row"><div><div class="primary-text">1 intern payment ready to process</div><div class="secondary-text">Manish Karki — NPR 2,700, sent by Sales Unit</div></div><div class="right"><button class="link-btn" onclick="goTo('payroll')">Process</button></div></div>
+        <div class="list-row"><div><div class="primary-text">IT Support is 12.5% over budget</div><div class="secondary-text">NPR 2,250,000 actual vs NPR 2,000,000 budgeted</div></div><div class="right"><button class="link-btn" onclick="goTo('budgetvariance')">Review</button></div></div>
+      </div>
+      <div class="toolbar">
+        <button class="secondary" onclick="openRecordPayment()">+ Record payment</button>
+        <button class="secondary" onclick="openLogExpense()">+ Log expense</button>
+        <button class="secondary" onclick="openNewInvoiceBatch()">+ Generate invoice batch</button>
+      </div>
+    </section>
+
+    <section class="page" id="page-ledger">
+      <div class="page-header">
+        <div><h1>Student Ledger Matrix</h1><p class="subtitle">Tuition, deposits, scholarships, and balances</p></div>
+        <button class="primary" onclick="openRecordPayment()">+ Record payment</button>
+      </div>
+      <div class="toolbar"><input type="text" placeholder="Search students" oninput="filterRows(this,'#ledger-table','tbody tr')"></div>
+      <div class="table-wrap">
+        <table id="ledger-table">
+          <thead><tr><th>Student</th><th>Tuition</th><th>Paid</th><th>Balance</th><th>Scholarship</th><th>Status</th><th></th></tr></thead>
+          <tbody>
+            <tr><td>Aisha Karki</td><td class="num">480,000</td><td class="num">480,000</td><td class="num">0</td><td>—</td><td><span class="badge filled">Paid</span></td><td><button class="link-btn" onclick="viewLedgerHistory(this)">History</button></td></tr>
+            <tr><td>Bibek Rai</td><td class="num">480,000</td><td class="num">240,000</td><td class="num">240,000</td><td>—</td><td><span class="badge dashed">Partial</span></td><td><button class="link-btn" onclick="viewLedgerHistory(this)">History</button></td></tr>
+            <tr><td>Sunita Gurung</td><td class="num">480,000</td><td class="num">336,000</td><td class="num">0</td><td>Merit 30%</td><td><span class="badge filled">Paid</span></td><td><button class="link-btn" onclick="viewLedgerHistory(this)">History</button></td></tr>
+            <tr><td>Prakash Thapa</td><td class="num">480,000</td><td class="num">480,000</td><td class="num">0</td><td>—</td><td><span class="badge filled">Paid</span></td><td><button class="link-btn" onclick="viewLedgerHistory(this)">History</button></td></tr>
+            <tr><td>Manisha Shrestha</td><td class="num">480,000</td><td class="num">120,000</td><td class="num">360,000</td><td>—</td><td><span class="badge outline">Overdue</span></td><td><button class="link-btn" onclick="viewLedgerHistory(this)">History</button></td></tr>
+            <tr><td>Rajesh Karki</td><td class="num">480,000</td><td class="num">480,000</td><td class="num">0</td><td>—</td><td><span class="badge filled">Paid</span></td><td><button class="link-btn" onclick="viewLedgerHistory(this)">History</button></td></tr>
+            <tr><td>Nisha Adhikari</td><td class="num">480,000</td><td class="num">336,000</td><td class="num">0</td><td>Merit 30%</td><td><span class="badge filled">Paid</span></td><td><button class="link-btn" onclick="viewLedgerHistory(this)">History</button></td></tr>
+            <tr><td>Suman Basnet</td><td class="num">480,000</td><td class="num">240,000</td><td class="num">240,000</td><td>—</td><td><span class="badge dashed">Partial</span></td><td><button class="link-btn" onclick="viewLedgerHistory(this)">History</button></td></tr>
+            <tr><td>Anita Poudel</td><td class="num">480,000</td><td class="num">480,000</td><td class="num">0</td><td>—</td><td><span class="badge filled">Paid</span></td><td><button class="link-btn" onclick="viewLedgerHistory(this)">History</button></td></tr>
+            <tr><td>Kiran Magar</td><td class="num">480,000</td><td class="num">96,000</td><td class="num">384,000</td><td>—</td><td><span class="badge outline">Overdue</span></td><td><button class="link-btn" onclick="viewLedgerHistory(this)">History</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="page" id="page-invoicing">
+      <div class="page-header">
+        <div><h1>Automated Invoicing Engine</h1><p class="subtitle">Batch billing by semester and program</p></div>
+        <button class="primary" onclick="openNewInvoiceBatch()">+ Generate batch</button>
+      </div>
+      <div class="stat-grid cols-3">
+        <div class="stat-card"><div class="stat-value">42</div><div class="stat-label">Invoices this semester</div></div>
+        <div class="stat-card"><div class="stat-value">NPR 20.16M</div><div class="stat-label">Total billed</div></div>
+        <div class="stat-card"><div class="stat-value">2</div><div class="stat-label">Flagged for manual review</div></div>
+      </div>
+      <div class="list" id="invoicing-list">
+        <div class="list-row"><div><div class="primary-text">Semester 1 — BSc Computer Science</div><div class="secondary-text">42 students billed</div></div><div class="right"><span class="badge filled">Sent</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Semester 1 — BA Business</div><div class="secondary-text">28 students billed</div></div><div class="right"><span class="badge filled">Sent</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Semester 1 — BBA</div><div class="secondary-text">2 exceptions flagged — module enrollment mismatch</div></div><div class="right"><span class="badge dashed">Needs review</span><button class="link-btn" onclick="reviewInvoiceBatch(this)">Review</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-paymentgateway">
+      <div class="page-header">
+        <div><h1>Payment Gateway Integrations</h1><p class="subtitle">Bank transfer, card, and mobile payment rails</p></div>
+        <button class="primary" onclick="openAddGateway()">+ Add gateway</button>
+      </div>
+      <div class="list" id="paymentgateway-list">
+        <div class="list-row"><div><div class="primary-text">eSewa</div><div class="secondary-text">Mobile payment — 18 transactions today</div></div><div class="right"><span class="badge filled">Connected</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Khalti</div><div class="secondary-text">Mobile payment — 12 transactions today</div></div><div class="right"><span class="badge filled">Connected</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Nabil Bank Gateway</div><div class="secondary-text">Bank transfer — 6 transactions today</div></div><div class="right"><span class="badge filled">Connected</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Visa / Mastercard Portal</div><div class="secondary-text">Credit card — 4 transactions today</div></div><div class="right"><span class="badge filled">Connected</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-ageddebt">
+      <div class="page-header">
+        <div><h1>Aged Debt Dashboard</h1><p class="subtitle">Overdue accounts grouped by age</p></div>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-value">2</div><div class="stat-label">30 days</div></div>
+        <div class="stat-card"><div class="stat-value">1</div><div class="stat-label">60 days</div></div>
+        <div class="stat-card"><div class="stat-value">1</div><div class="stat-label">90+ days</div></div>
+        <div class="stat-card"><div class="stat-value">NPR 1,224,000</div><div class="stat-label">Total overdue</div></div>
+      </div>
+      <div class="list" id="ageddebt-list">
+        <div class="list-row"><div><div class="primary-text">Bibek Rai</div><div class="secondary-text">32 days overdue — NPR 240,000</div></div><div class="right"><span class="badge dashed">Reminder sent</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Suman Basnet</div><div class="secondary-text">28 days overdue — NPR 240,000</div></div><div class="right"><span class="badge dashed">Reminder sent</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Manisha Shrestha</div><div class="secondary-text">65 days overdue — NPR 360,000 — also on Academic Probation and churn risk</div></div><div class="right"><span class="badge outline">Second notice</span><button class="link-btn" onclick="escalateDebt(this)">Escalate</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Kiran Magar</div><div class="secondary-text">95 days overdue — NPR 384,000 — also flagged in Probation and IT misbehavior</div></div><div class="right"><span class="badge outline">Final notice</span><button class="link-btn" onclick="escalateDebt(this)">Escalate to RTE</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-scholarship">
+      <div class="page-header">
+        <div><h1>Scholarship Fund Adjuster</h1><p class="subtitle">Depletion tracking across sponsorship pools</p></div>
+        <button class="primary" onclick="openNewDisbursement()">+ New disbursement</button>
+      </div>
+      <div class="list" id="scholarship-list" style="margin-bottom:20px;">
+        <div class="list-row"><div><div class="primary-text">Merit Scholarship Pool</div><div class="secondary-text">NPR 288,000 disbursed of NPR 2,000,000 — 14.4% depleted</div></div><div class="right"><span class="secondary-text">NPR 1,712,000 left</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Need-Based Aid Fund</div><div class="secondary-text">NPR 450,000 disbursed of NPR 1,500,000 — 30% depleted</div></div><div class="right"><span class="secondary-text">NPR 1,050,000 left</span></div></div>
+      </div>
+      <p class="section-label">Recent disbursements</p>
+      <div class="list" id="scholarship-history">
+        <div class="list-row"><div class="primary-text">Sunita Gurung</div><div class="right"><span class="secondary-text">NPR 144,000 — Merit Scholarship, Dean's List</span></div></div>
+        <div class="list-row"><div class="primary-text">Nisha Adhikari</div><div class="right"><span class="secondary-text">NPR 144,000 — Merit Scholarship</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-procurement">
+      <div class="page-header">
+        <div><h1>Expense Procurement Routing</h1><p class="subtitle">Multi-tier authorization against budget rules</p></div>
+        <button class="primary" onclick="openLogExpense()">+ Log expense</button>
+      </div>
+      <div class="list" id="procurement-list">
+        <div class="list-row"><div><div class="primary-text">Lab PC replacement (5 units)</div><div class="secondary-text">IT Support — NPR 250,000 — Tier 2</div></div><div class="right"><span class="badge dashed">Pending Finance approval</span><button class="link-btn" onclick="approveExpense(this)">Approve</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Open Day marketing spend</div><div class="secondary-text">DMU — NPR 60,000 — Tier 1</div></div><div class="right"><span class="badge filled">Approved</span></div></div>
+        <div class="list-row"><div><div class="primary-text">HPC Cluster node expansion</div><div class="secondary-text">R&amp;D Wing — NPR 800,000 — Tier 3</div></div><div class="right"><span class="badge outline">Pending Operations Head</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-vendorpay">
+      <div class="page-header">
+        <div><h1>Vendor Payment Scheduler</h1><p class="subtitle">Accounts payable and cash outflow priority</p></div>
+        <button class="primary" onclick="openNewVendorPayment()">+ Schedule payment</button>
+      </div>
+      <div class="list" id="vendorpay-list">
+        <div class="list-row"><div><div class="primary-text">Kathmandu Print House</div><div class="secondary-text">Due Sep 20 — normal priority</div></div><div class="right"><span class="secondary-text">NPR 45,000</span><span class="badge dashed">Scheduled</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Everest Media Publishers</div><div class="secondary-text">Due Sep 18 — normal priority</div></div><div class="right"><span class="secondary-text">NPR 32,000</span><span class="badge dashed">Scheduled</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Dell Nepal</div><div class="secondary-text">Due Sep 25 — high priority — hardware supplier</div></div><div class="right"><span class="secondary-text">NPR 250,000</span><span class="badge outline">Pending approval</span><button class="link-btn" onclick="approveVendorPayment(this)">Approve</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-budgetvariance">
+      <div class="page-header">
+        <div><h1>Budget Variance Analytics</h1><p class="subtitle">Actual spend against forecast, by department</p></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Department</th><th>Budgeted</th><th>Actual</th><th>Variance</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>Academics</td><td class="num">5,000,000</td><td class="num">4,800,000</td><td class="num">-4.0%</td><td><span class="badge filled">Under budget</span></td></tr>
+            <tr><td>IT Support</td><td class="num">2,000,000</td><td class="num">2,250,000</td><td class="num">+12.5%</td><td><span class="badge outline">Over budget</span></td></tr>
+            <tr><td>DMU (Marketing)</td><td class="num">1,500,000</td><td class="num">1,470,000</td><td class="num">-2.0%</td><td><span class="badge filled">On track</span></td></tr>
+            <tr><td>R&amp;D Wing</td><td class="num">3,000,000</td><td class="num">2,890,000</td><td class="num">-3.7%</td><td><span class="badge filled">Under budget</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="page" id="page-payroll">
+      <div class="page-header">
+        <div><h1>Payroll Disbursal Manager</h1><p class="subtitle">Base salary, tax, insurance, and intern payments</p></div>
+        <button class="primary" onclick="runPayroll()">Run payroll</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Staff</th><th>Base salary</th><th>Tax</th><th>Insurance</th><th>Net pay</th><th>Status</th><th></th></tr></thead>
+          <tbody id="payroll-tbody">
+            <tr><td>Dr. Meera Joshi</td><td class="num">120,000</td><td class="num">18,000</td><td class="num">3,000</td><td class="num">99,000</td><td><span class="badge filled">Processed</span></td><td></td></tr>
+            <tr><td>Dr. Anil Sharma</td><td class="num">130,000</td><td class="num">19,500</td><td class="num">3,000</td><td class="num">107,500</td><td><span class="badge filled">Processed</span></td><td></td></tr>
+            <tr><td>Dr. Priya Basnet</td><td class="num">125,000</td><td class="num">18,750</td><td class="num">3,000</td><td class="num">103,250</td><td><span class="badge filled">Processed</span></td><td></td></tr>
+            <tr><td>Manish Karki (intern)</td><td class="num">2,700</td><td class="num">0</td><td class="num">0</td><td class="num">2,700</td><td><span class="badge dashed">Ready</span></td><td><button class="link-btn" onclick="processPayment(this)">Process</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="page" id="page-tax">
+      <div class="page-header">
+        <div><h1>Tax Compliance Calculator</h1><p class="subtitle">Payroll withholding, VAT, and corporate tax</p></div>
+      </div>
+      <div class="list" id="tax-list">
+        <div class="list-row"><div><div class="primary-text">Payroll withholding tax</div><div class="secondary-text">Sep 2026 — NPR 187,500</div></div><div class="right"><span class="badge filled">Filed</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Institutional corporate tax</div><div class="secondary-text">Q3 2026 — NPR 1,200,000 — due Oct 15</div></div><div class="right"><span class="badge dashed">Due soon</span><button class="link-btn" onclick="fileTax(this)">File now</button></div></div>
+        <div class="list-row"><div><div class="primary-text">VAT on vendor purchases</div><div class="secondary-text">Sep 2026 — NPR 45,000</div></div><div class="right"><span class="badge filled">Filed</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-audittrail">
+      <div class="page-header">
+        <div><h1>Audit Trail Recorder</h1><p class="subtitle">Immutable log of adjustments, refunds, and write-offs</p></div>
+        <button class="secondary" onclick="openNewAdjustment()">+ Record adjustment</button>
+      </div>
+      <div class="list" id="audittrail-list">
+        <div class="list-row"><div><div class="primary-text">Refund issued</div><div class="secondary-text">Rajan Shakya — NPR 20,000 to Bibek Rai, overpayment</div></div><div class="right"><span class="secondary-text">Sep 3</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Write-off approved</div><div class="secondary-text">Rajan Shakya — NPR 15,000 bad debt</div></div><div class="right"><span class="secondary-text">Sep 5</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Journal adjustment</div><div class="secondary-text">Rajan Shakya — reclassified NPR 8,000</div></div><div class="right"><span class="secondary-text">Sep 6</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-consolidation">
+      <div class="page-header">
+        <div><h1>Group Financial Consolidation</h1><p class="subtitle">Local tenant data structured for corporate aggregation</p></div>
+        <button class="primary" onclick="pushConsolidation()">Push to group consolidation</button>
+      </div>
+      <div class="stat-grid cols-3">
+        <div class="stat-card"><div class="stat-value">NPR 20.16M</div><div class="stat-label">This campus revenue</div></div>
+        <div class="stat-card"><div class="stat-value">NPR 85M</div><div class="stat-label">Group-wide revenue</div></div>
+        <div class="stat-card"><div class="stat-value">23.7%</div><div class="stat-label">This campus's share</div></div>
+      </div>
+      <div class="list">
+        <div class="list-row"><div class="primary-text">ING College — this campus</div><div class="right"><span class="secondary-text">NPR 20.16M</span></div></div>
+        <div class="list-row"><div class="primary-text">ING College — Pokhara Campus</div><div class="right"><span class="secondary-text">NPR 34.2M</span></div></div>
+        <div class="list-row"><div class="primary-text">ING College — Biratnagar Campus</div><div class="right"><span class="secondary-text">NPR 30.6M</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-bankrecon">
+      <div class="page-header">
+        <div><h1>Bank Reconciliation Module</h1><p class="subtitle">Matching statements against ledger entries</p></div>
+      </div>
+      <div class="stat-grid cols-3">
+        <div class="stat-card"><div class="stat-value">340</div><div class="stat-label">Statement lines</div></div>
+        <div class="stat-card"><div class="stat-value">335</div><div class="stat-label">Auto-matched</div></div>
+        <div class="stat-card"><div class="stat-value">5</div><div class="stat-label">Unmatched</div></div>
+      </div>
+      <div class="list" id="bankrecon-list">
+        <div class="list-row"><div><div class="primary-text">Deposit — NPR 45,000</div><div class="secondary-text">Sep 8 — no matching invoice found</div></div><div class="right"><button class="link-btn" onclick="matchTransaction(this)">Match manually</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Deposit — NPR 12,000</div><div class="secondary-text">Sep 7 — no matching invoice found</div></div><div class="right"><button class="link-btn" onclick="matchTransaction(this)">Match manually</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-depreciation">
+      <div class="page-header">
+        <div><h1>Fixed Asset Depreciation Tracker</h1><p class="subtitle">Property, vehicles, and high-value computer labs</p></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Asset</th><th>Purchase value</th><th>Current value</th><th>Depreciation / yr</th><th>Years remaining</th></tr></thead>
+          <tbody>
+            <tr><td>HPC Cluster Node 3</td><td class="num">1,800,000</td><td class="num">1,440,000</td><td class="num">20%</td><td class="num">4</td></tr>
+            <tr><td>Lab PC #14</td><td class="num">85,000</td><td class="num">51,000</td><td class="num">20%</td><td class="num">2</td></tr>
+            <tr><td>Campus Van (Fleet)</td><td class="num">2,500,000</td><td class="num">1,750,000</td><td class="num">15%</td><td class="num">5</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="page" id="page-documentvault">
+      <div class="page-header">
+        <div><h1>Financial Document Vault</h1><p class="subtitle">Purchase orders, filings, and audit confirmations</p></div>
+        <button class="primary" onclick="openUploadDoc()">+ Upload document</button>
+      </div>
+      <div class="list" id="documentvault-list">
+        <div class="list-row"><div><div class="primary-text">Q3 2026 Balance Sheet</div><div class="secondary-text">Balance sheet — Sep 1</div></div><div class="right"><span class="badge outline">Restricted</span></div></div>
+        <div class="list-row"><div><div class="primary-text">AI-Assisted Curriculum Mapping — Grant Agreement</div><div class="secondary-text">Grant document — Jun 2, linked to R&amp;D Wing</div></div><div class="right"><span class="badge outline">Restricted</span></div></div>
+        <div class="list-row"><div><div class="primary-text">IT Hardware PO — Dell Nepal</div><div class="secondary-text">Purchase order — Aug 28</div></div><div class="right"><span class="badge outline">Restricted</span></div></div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this) closeModal()">
+  <div class="modal">
+    <div class="modal-header"><h3 id="modal-title"></h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer" id="modal-footer"></div>
+  </div>
+</div>
+
+<script>
+var modalContext = null;
+var STUDENTS = ['Aisha Karki','Bibek Rai','Sunita Gurung','Prakash Thapa','Manisha Shrestha','Rajesh Karki','Nisha Adhikari','Suman Basnet','Anita Poudel','Kiran Magar'];
+
+function showPage(id, el){
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
+  if(el) el.classList.add('active');
+}
+function goTo(id){
+  showPage(id, document.querySelector('.nav-item[data-page="' + id + '"]'));
+}
+function filterRows(inputEl, containerSelector, rowSelector){
+  var q = inputEl.value.toLowerCase();
+  document.querySelectorAll(containerSelector + ' ' + rowSelector).forEach(function(row){
+    row.style.display = row.textContent.toLowerCase().indexOf(q) > -1 ? '' : 'none';
+  });
+}
+
+/* ---------- modal shell ---------- */
+function openModal(title, bodyHtml, footerHtml){
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = bodyHtml;
+  document.getElementById('modal-footer').innerHTML = footerHtml || '<button class="secondary" onclick="closeModal()">Close</button>';
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal(){
+  document.getElementById('modal-overlay').classList.remove('open');
+  modalContext = null;
+}
+function formInput(label,id,val,type){
+  type = type || 'text';
+  return '<div class="form-group"><label>' + label + '</label><input type="' + type + '" id="' + id + '" value="' + (val===undefined?'':val) + '"></div>';
+}
+function formTextarea(label,id){
+  return '<div class="form-group"><label>' + label + '</label><textarea id="' + id + '"></textarea></div>';
+}
+function formSelect(label,id,opts){
+  var o = opts.map(function(x){ return '<option>' + x + '</option>'; }).join('');
+  return '<div class="form-group"><label>' + label + '</label><select id="' + id + '">' + o + '</select></div>';
+}
+
+/* ---------- student ledger ---------- */
+function openRecordPayment(){
+  openModal('Record payment',
+    formSelect('Student','rp-student', STUDENTS) +
+    '<div class="form-row-2">' + formInput('Amount','rp-amount','') + formSelect('Method','rp-method',['eSewa','Khalti','Bank transfer','Card']) + '</div>',
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="savePayment()">Record</button>'
+  );
+}
+function savePayment(){
+  var student = document.getElementById('rp-student').value;
+  var amount = parseInt(document.getElementById('rp-amount').value) || 0;
+  var rows = document.querySelectorAll('#ledger-table tbody tr');
+  rows.forEach(function(tr){
+    if(tr.children[0].textContent === student){
+      var paidCell = tr.children[2];
+      var balCell = tr.children[3];
+      var newPaid = parseInt(paidCell.textContent.replace(/,/g,'')) + amount;
+      var newBal = Math.max(0, parseInt(balCell.textContent.replace(/,/g,'')) - amount);
+      paidCell.textContent = newPaid.toLocaleString();
+      balCell.textContent = newBal.toLocaleString();
+      var statusCell = tr.children[5];
+      statusCell.innerHTML = newBal === 0 ? '<span class="badge filled">Paid</span>' : '<span class="badge dashed">Partial</span>';
+    }
+  });
+  closeModal();
+}
+function viewLedgerHistory(btn){
+  var tr = btn.closest('tr');
+  var name = tr.children[0].textContent;
+  openModal('Ledger history — ' + name,
+    '<div class="list-row" style="border:none;padding:6px 0;"><span>Tuition invoice issued</span><span class="secondary-text">Jul 1</span></div>' +
+    '<div class="list-row" style="border:none;padding:6px 0;"><span>Payment received</span><span class="secondary-text">Jul 15</span></div>' +
+    '<div class="list-row" style="border:none;padding:6px 0;"><span>Payment received</span><span class="secondary-text">Aug 20</span></div>',
+    '<button class="primary" onclick="closeModal()">Close</button>'
+  );
+}
+
+/* ---------- invoicing ---------- */
+function openNewInvoiceBatch(){
+  openModal('Generate invoice batch',
+    formSelect('Program','ib-program',['BSc Computer Science','BA Business','BBA']) +
+    formInput('Semester','ib-semester','Semester 1'),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveInvoiceBatch()">Generate and send</button>'
+  );
+}
+function saveInvoiceBatch(){
+  var program = document.getElementById('ib-program').value;
+  var semester = document.getElementById('ib-semester').value;
+  var list = document.getElementById('invoicing-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + semester + ' — ' + program + '</div><div class="secondary-text">Batch generated just now</div></div><div class="right"><span class="badge filled">Sent</span></div>';
+  list.appendChild(row);
+  closeModal();
+}
+function reviewInvoiceBatch(btn){
+  var row = btn.closest('.list-row');
+  row.querySelector('.right').innerHTML = '<span class="badge filled">Sent</span>';
+  btn.remove();
+}
+
+/* ---------- payment gateways ---------- */
+function openAddGateway(){
+  openModal('Add gateway',
+    formInput('Gateway name','ag-name','') +
+    formSelect('Type','ag-type',['Mobile payment','Bank transfer','Credit card']),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveGateway()">Connect</button>'
+  );
+}
+function saveGateway(){
+  var name = document.getElementById('ag-name').value || 'Untitled gateway';
+  var type = document.getElementById('ag-type').value;
+  var list = document.getElementById('paymentgateway-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + name + '</div><div class="secondary-text">' + type + ' — 0 transactions today</div></div><div class="right"><span class="badge filled">Connected</span></div>';
+  list.appendChild(row);
+  closeModal();
+}
+
+/* ---------- aged debt ---------- */
+function escalateDebt(btn){
+  var row = btn.closest('.list-row');
+  var badge = row.querySelector('.badge');
+  badge.textContent = 'Escalated';
+  badge.className = 'badge filled';
+  btn.remove();
+}
+
+/* ---------- scholarship funds ---------- */
+function openNewDisbursement(){
+  openModal('New disbursement',
+    formSelect('Student','nd-student', STUDENTS) +
+    '<div class="form-row-2">' + formSelect('Fund','nd-fund',['Merit Scholarship Pool','Need-Based Aid Fund']) + formInput('Amount','nd-amount','') + '</div>',
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveDisbursement()">Disburse</button>'
+  );
+}
+function saveDisbursement(){
+  var student = document.getElementById('nd-student').value;
+  var fund = document.getElementById('nd-fund').value;
+  var amount = document.getElementById('nd-amount').value || '0';
+  var list = document.getElementById('scholarship-history');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div class="primary-text">' + student + '</div><div class="right"><span class="secondary-text">NPR ' + amount + ' — ' + fund + '</span></div>';
+  list.appendChild(row);
+  closeModal();
+}
+
+/* ---------- expense procurement ---------- */
+function openLogExpense(){
+  openModal('Log expense request',
+    formInput('Description','le-desc','') +
+    '<div class="form-row-2">' + formInput('Department','le-dept','') + formInput('Amount','le-amount','') + '</div>',
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveExpense()">Submit</button>'
+  );
+}
+function saveExpense(){
+  var desc = document.getElementById('le-desc').value || 'Untitled expense';
+  var dept = document.getElementById('le-dept').value || 'Unspecified department';
+  var amount = document.getElementById('le-amount').value || '0';
+  var list = document.getElementById('procurement-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + desc + '</div><div class="secondary-text">' + dept + ' — NPR ' + amount + '</div></div><div class="right"><span class="badge dashed">Pending Finance approval</span><button class="link-btn" onclick="approveExpense(this)">Approve</button></div>';
+  list.appendChild(row);
+  closeModal();
+}
+function approveExpense(btn){
+  var row = btn.closest('.list-row');
+  row.querySelector('.right').innerHTML = '<span class="badge filled">Approved</span>';
+}
+
+/* ---------- vendor payments ---------- */
+function openNewVendorPayment(){
+  openModal('Schedule vendor payment',
+    formInput('Vendor','vp-vendor','') +
+    '<div class="form-row-2">' + formInput('Amount','vp-amount','') + formInput('Due date','vp-due','','date') + '</div>',
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveVendorPayment()">Schedule</button>'
+  );
+}
+function saveVendorPayment(){
+  var vendor = document.getElementById('vp-vendor').value || 'Unspecified vendor';
+  var amount = document.getElementById('vp-amount').value || '0';
+  var due = document.getElementById('vp-due').value || 'TBC';
+  var list = document.getElementById('vendorpay-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + vendor + '</div><div class="secondary-text">Due ' + due + '</div></div><div class="right"><span class="secondary-text">NPR ' + amount + '</span><span class="badge dashed">Scheduled</span></div>';
+  list.appendChild(row);
+  closeModal();
+}
+function approveVendorPayment(btn){
+  var row = btn.closest('.list-row');
+  var badge = row.querySelector('.badge');
+  badge.textContent = 'Scheduled';
+  badge.className = 'badge dashed';
+  btn.remove();
+}
+
+/* ---------- payroll ---------- */
+function processPayment(btn){
+  var tr = btn.closest('tr');
+  tr.children[5].innerHTML = '<span class="badge filled">Processed</span>';
+  btn.remove();
+  openModal('Payment processed', '<p style="font-size:13px;">NPR 2,700 has been disbursed to Manish Karki\'s registered account.</p>', '<button class="primary" onclick="closeModal()">Done</button>');
+}
+function runPayroll(){
+  openModal('Payroll run started', '<p style="font-size:13px;">All processed staff salaries have been confirmed. Any items marked "Ready" still require individual processing.</p>', '<button class="primary" onclick="closeModal()">Done</button>');
+}
+
+/* ---------- tax ---------- */
+function fileTax(btn){
+  var row = btn.closest('.list-row');
+  var badge = row.querySelector('.badge');
+  badge.textContent = 'Filed';
+  badge.className = 'badge filled';
+  btn.remove();
+}
+
+/* ---------- audit trail ---------- */
+function openNewAdjustment(){
+  openModal('Record adjustment',
+    formSelect('Type','na-type',['Refund','Write-off','Journal adjustment']) +
+    formInput('Amount','na-amount','') +
+    formTextarea('Description','na-desc'),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveAdjustment()">Record</button>'
+  );
+}
+function saveAdjustment(){
+  var type = document.getElementById('na-type').value;
+  var amount = document.getElementById('na-amount').value || '0';
+  var desc = document.getElementById('na-desc').value || '';
+  var list = document.getElementById('audittrail-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + type + '</div><div class="secondary-text">Rajan Shakya — NPR ' + amount + (desc ? (' — ' + desc) : '') + '</div></div><div class="right"><span class="secondary-text">Just now</span></div>';
+  list.prepend(row);
+  closeModal();
+}
+
+/* ---------- group consolidation ---------- */
+function pushConsolidation(){
+  openModal('Pushed to group consolidation', '<p style="font-size:13px;">This campus\'s revenue, expenses, and enrollment figures have been sent to the ING CEO\'s global financial dashboard.</p>', '<button class="primary" onclick="closeModal()">Done</button>');
+}
+
+/* ---------- bank reconciliation ---------- */
+function matchTransaction(btn){
+  var row = btn.closest('.list-row');
+  row.querySelector('.right').innerHTML = '<span class="badge filled">Matched</span>';
+}
+
+/* ---------- document vault ---------- */
+function openUploadDoc(){
+  openModal('Upload document',
+    formInput('Document name','ud-name','') +
+    formSelect('Type','ud-type',['Purchase order','Tax filing','Balance sheet','Audit confirmation']),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveDoc()">Upload</button>'
+  );
+}
+function saveDoc(){
+  var name = document.getElementById('ud-name').value || 'Untitled document';
+  var type = document.getElementById('ud-type').value;
+  var list = document.getElementById('documentvault-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + name + '</div><div class="secondary-text">' + type + ' — uploaded just now</div></div><div class="right"><span class="badge outline">Restricted</span></div>';
+  list.appendChild(row);
+  closeModal();
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ING ERP — Student Support Department</title>
+<style>
+  :root{
+    --surface-1:#fafafa;
+    --surface-2:#f2f2f2;
+    --border:#e6e6e6;
+    --border-strong:#cfcfcf;
+    --text-primary:#111111;
+    --text-secondary:#5a5a5e;
+    --text-muted:#9a9a9e;
+    --fill-primary:#000000;
+    --on-primary:#ffffff;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--surface-2);color:var(--text-primary);}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;background:#fff;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:10px;}
+  .topbar .who{font-size:12px;color:var(--text-secondary);}
+  .topbar .who strong{color:var(--text-primary);font-weight:600;}
+  .app{display:flex;min-height:100vh;}
+  .sidebar{width:225px;flex-shrink:0;background:var(--surface-1);border-right:1px solid var(--border);padding:18px 12px;overflow-y:auto;}
+  .brand{display:flex;align-items:center;gap:10px;padding:0 8px 14px;}
+  .brand .mark{width:24px;height:24px;border-radius:6px;background:var(--fill-primary);flex-shrink:0;}
+  .brand .name{font-size:13px;font-weight:600;line-height:1.3;}
+  .brand .role{font-size:11px;color:var(--text-muted);line-height:1.3;}
+  .nav-item{display:block;padding:7px 10px;border-radius:7px;font-size:13px;color:var(--text-secondary);cursor:pointer;margin-bottom:2px;}
+  .nav-item:hover{background:var(--surface-2);}
+  .nav-item.active{background:var(--fill-primary);color:var(--on-primary);}
+  .nav-divider{border-top:1px solid var(--border);margin:10px 4px;}
+  .group{margin-bottom:12px;}
+  .group-label{font-size:11px;font-weight:600;color:var(--text-muted);margin:0 0 4px 10px;}
+  .main{flex:1;padding:32px 36px;min-width:0;}
+  .page{display:none;}
+  .page.active{display:block;}
+  .page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:12px;}
+  h1{font-size:22px;margin:0;font-weight:600;}
+  .subtitle{font-size:13px;color:var(--text-secondary);margin:5px 0 0;}
+  .section-label{font-size:12px;font-weight:600;color:var(--text-muted);margin:0 0 8px;}
+  button.primary{background:var(--fill-primary);color:var(--on-primary);border:none;border-radius:8px;padding:10px 16px;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;}
+  button.secondary{background:#fff;color:var(--text-primary);border:1px solid var(--border-strong);border-radius:8px;padding:10px 16px;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;}
+  .link-btn{background:none;border:none;color:var(--text-primary);font-size:12px;font-weight:600;text-decoration:underline;cursor:pointer;padding:0;white-space:nowrap;}
+  .toolbar{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;align-items:center;}
+  input[type=text], input[type=number], input[type=date], select, textarea{border:1px solid var(--border-strong);border-radius:8px;padding:10px 12px;font-size:13px;background:#fff;color:var(--text-primary);font-family:inherit;}
+  input[type=text]{flex:1;min-width:160px;}
+  select{width:170px;}
+  .card{border:1px solid var(--border);border-radius:var(--radius);margin-bottom:12px;overflow:hidden;background:#fff;}
+  .card-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;cursor:pointer;gap:12px;}
+  .chev{color:var(--text-muted);font-size:14px;flex-shrink:0;}
+  .detail{border-top:1px solid var(--border);padding:14px 18px;background:var(--surface-1);display:none;}
+  .detail.open{display:block;}
+  .detail-label{font-size:11px;font-weight:600;color:var(--text-muted);margin:0 0 6px;}
+  .flag-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;}
+  .flag-row:last-child{border-bottom:none;}
+  .flag-row .dept{font-weight:600;color:var(--text-muted);font-size:11px;text-transform:uppercase;letter-spacing:.03em;min-width:80px;}
+  .badge{font-size:11px;padding:2px 9px;border-radius:999px;white-space:nowrap;}
+  .badge.filled{background:var(--fill-primary);color:var(--on-primary);}
+  .badge.outline{border:1px solid var(--border-strong);color:var(--text-secondary);}
+  .badge.dashed{border:1px dashed var(--border-strong);color:var(--text-secondary);}
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+  .stat-grid.cols-3{grid-template-columns:repeat(3,1fr);}
+  .stat-card{border:1px solid var(--border);border-radius:var(--radius);background:#fff;padding:16px 18px;}
+  .stat-value{font-size:22px;font-weight:700;}
+  .stat-label{font-size:12px;color:var(--text-secondary);margin-top:4px;}
+  .list{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:#fff;}
+  .list-row{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;gap:14px;border-bottom:1px solid var(--border);}
+  .list-row:last-child{border-bottom:none;}
+  .list-row .primary-text{font-size:14px;font-weight:600;}
+  .list-row .secondary-text{font-size:12px;color:var(--text-secondary);margin-top:3px;}
+  .list-row .right{display:flex;align-items:center;gap:10px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;}
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:50;align-items:center;justify-content:center;padding:20px;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:#fff;border-radius:12px;max-width:460px;width:100%;max-height:86vh;overflow-y:auto;border:1px solid var(--border-strong);}
+  .modal-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);}
+  .modal-header h3{margin:0;font-size:16px;}
+  .modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-secondary);line-height:1;padding:4px;}
+  .modal-body{padding:18px 20px;}
+  .modal-footer{display:flex;justify-content:flex-end;gap:8px;padding:14px 20px;border-top:1px solid var(--border);}
+  .form-group{margin-bottom:14px;}
+  .form-group label{display:block;font-size:12px;color:var(--text-secondary);margin-bottom:5px;font-weight:600;}
+  .form-group input, .form-group select, .form-group textarea{width:100%;}
+  .form-group textarea{resize:vertical;min-height:70px;}
+  .form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px;}
+  .form-row-2 input, .form-row-2 select{width:100%;}
+  @media (max-width:640px){ .sidebar{display:none;} .main{padding:22px;} .stat-grid{grid-template-columns:1fr 1fr;} }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="who">Signed in as <strong>Ms. Nirmala Adhikari</strong> — SSD Coordinator</div>
+  <div class="who">Non-academic student support and wellness</div>
+</div>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="mark"></div><div><div class="name">ING ERP</div><div class="role">Student Support</div></div></div>
+    <div class="nav-item active" data-page="dashboard" onclick="showPage('dashboard', this)">Dashboard</div>
+    <div class="nav-divider"></div>
+    <nav>
+      <div class="group"><p class="group-label">Wellness &amp; crisis</p>
+        <div class="nav-item" data-page="counseling" onclick="showPage('counseling', this)">Counseling log</div>
+        <div class="nav-item" data-page="crisis" onclick="showPage('crisis', this)">Crisis intervention</div>
+        <div class="nav-item" data-page="wellnessmaterial" onclick="showPage('wellnessmaterial', this)">Wellness material</div>
+        <div class="nav-item" data-page="welfaredispatch" onclick="showPage('welfaredispatch', this)">Welfare dispatch</div>
+      </div>
+      <div class="group"><p class="group-label">STAR &amp; escalation</p>
+        <div class="nav-item" data-page="starmeeting" onclick="showPage('starmeeting', this)">STAR meetings</div>
+        <div class="nav-item" data-page="incidents" onclick="showPage('incidents', this)">Incident complaints</div>
+        <div class="nav-item" data-page="misbehavior" onclick="showPage('misbehavior', this)">Misbehavior section</div>
+      </div>
+      <div class="group"><p class="group-label">Financial &amp; access</p>
+        <div class="nav-item" data-page="disability" onclick="showPage('disability', this)">Disability accommodations</div>
+        <div class="nav-item" data-page="hardshipfund" onclick="showPage('hardshipfund', this)">Hardship fund</div>
+        <div class="nav-item" data-page="scholarshipcalc" onclick="showPage('scholarshipcalc', this)">Scholarship calculator</div>
+      </div>
+      <div class="group"><p class="group-label">Student life</p>
+        <div class="nav-item" data-page="clubs" onclick="showPage('clubs', this)">Club hub</div>
+        <div class="nav-item" data-page="contenthub" onclick="showPage('contenthub', this)">Surveys &amp; polls</div>
+        <div class="nav-item" data-page="voting" onclick="showPage('voting', this)">Voting gateway</div>
+      </div>
+      <div class="group"><p class="group-label">Integration</p>
+        <div class="nav-item" data-page="newstudent" onclick="showPage('newstudent', this)">New student hub</div>
+        <div class="nav-item" data-page="international" onclick="showPage('international', this)">International students</div>
+        <div class="nav-item" data-page="peermentor" onclick="showPage('peermentor', this)">Peer mentorship</div>
+      </div>
+      <div class="group"><p class="group-label">Career &amp; alumni</p>
+        <div class="nav-item" data-page="career" onclick="showPage('career', this)">Career counseling</div>
+        <div class="nav-item" data-page="alumniservice" onclick="showPage('alumniservice', this)">Alumni services</div>
+      </div>
+    </nav>
+  </aside>
+
+  <main class="main">
+
+    <section class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div><h1>SSD overview</h1><p class="subtitle">Wellness, integration, and cross-departmental cases</p></div>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-value">8</div><div class="stat-label">Active counseling cases</div></div>
+        <div class="stat-card"><div class="stat-value">2</div><div class="stat-label">Open STAR cases</div></div>
+        <div class="stat-card"><div class="stat-value">1</div><div class="stat-label">Hardship fund pending</div></div>
+        <div class="stat-card"><div class="stat-value">0</div><div class="stat-label">Crisis alerts today</div></div>
+      </div>
+      <div class="list" style="margin-bottom:20px;">
+        <div class="list-row"><div><div class="primary-text">2 students need a STAR meeting</div><div class="secondary-text">Manisha Shrestha, Kiran Magar — flags across 5 departments</div></div><div class="right"><button class="link-btn" onclick="goTo('starmeeting')">Open</button></div></div>
+        <div class="list-row"><div><div class="primary-text">1 hardship fund application pending</div><div class="secondary-text">Manisha Shrestha — NPR 50,000 requested</div></div><div class="right"><button class="link-btn" onclick="goTo('hardshipfund')">Review</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Ahmed Hassan hasn't attended cultural orientation</div><div class="secondary-text">Also flagged for visa non-compliance in RTE</div></div><div class="right"><button class="link-btn" onclick="goTo('international')">Open</button></div></div>
+      </div>
+      <div class="toolbar">
+        <button class="secondary" onclick="openLogCounseling()">+ Log counseling session</button>
+        <button class="secondary" onclick="openNewStar()">+ New STAR case</button>
+        <button class="secondary" onclick="openLogIncident()">+ Log incident</button>
+      </div>
+    </section>
+
+    <section class="page" id="page-starmeeting">
+      <div class="page-header">
+        <div><h1>STAR Meeting Organizer</h1><p class="subtitle">Compiled multi-department history for at-risk students</p></div>
+        <button class="primary" onclick="openNewStar()">+ New STAR case</button>
+      </div>
+      <div id="starmeeting-list">
+        <div class="card">
+          <div class="card-header" onclick="toggleCard(this)">
+            <div><div class="primary-text">Manisha Shrestha</div><div class="secondary-text">Flags from Academics, Finance, DMU, and RTE</div></div>
+            <div class="right"><span class="badge dashed">Meeting scheduled</span><span class="chev">▸</span></div>
+          </div>
+          <div class="detail">
+            <p class="detail-label">Compiled cross-department history</p>
+            <div class="flag-row"><span class="dept">Academics</span><span>On Academic Probation — GPA below threshold, attendance below 75%</span></div>
+            <div class="flag-row"><span class="dept">Finance</span><span>NPR 360,000 overdue — 65 days, second notice sent</span></div>
+            <div class="flag-row"><span class="dept">DMU</span><span>Churn risk score 82/100 — high risk, outreach sent</span></div>
+            <div class="flag-row"><span class="dept">RTE</span><span>Graduation clearance blocked, flagged for cohort attrition</span></div>
+            <p class="detail-label" style="margin-top:12px;">Action steps</p>
+            <ul style="margin:0;padding-left:18px;font-size:13px;line-height:1.6;">
+              <li>PAT to hold a check-in this week</li>
+              <li>SSD hardship fund application to be reviewed</li>
+              <li>Finance to offer a staged payment plan</li>
+            </ul>
+            <button class="link-btn" style="margin-top:10px;" onclick="generateAgenda(this)">Generate agenda</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header" onclick="toggleCard(this)">
+            <div><div class="primary-text">Kiran Magar</div><div class="secondary-text">Flags from Academics, Finance, DMU, IT Support, and RTE</div></div>
+            <div class="right"><span class="badge dashed">Meeting scheduled</span><span class="chev">▸</span></div>
+          </div>
+          <div class="detail">
+            <p class="detail-label">Compiled cross-department history</p>
+            <div class="flag-row"><span class="dept">Academics</span><span>On Academic Probation — GPA below threshold</span></div>
+            <div class="flag-row"><span class="dept">Finance</span><span>NPR 384,000 overdue — 95 days, final notice sent</span></div>
+            <div class="flag-row"><span class="dept">DMU</span><span>Churn risk score 78/100 — high risk, outreach sent</span></div>
+            <div class="flag-row"><span class="dept">IT Support</span><span>Unauthorized lab login attempt — under review</span></div>
+            <div class="flag-row"><span class="dept">RTE</span><span>Graduation clearance blocked, flagged for cohort attrition</span></div>
+            <p class="detail-label" style="margin-top:12px;">Action steps</p>
+            <ul style="margin:0;padding-left:18px;font-size:13px;line-height:1.6;">
+              <li>SSD to schedule a welfare check-in</li>
+              <li>IT Support case to be reviewed jointly with SSD</li>
+              <li>RTE to confirm graduation timeline impact</li>
+            </ul>
+            <button class="link-btn" style="margin-top:10px;" onclick="generateAgenda(this)">Generate agenda</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="page-counseling">
+      <div class="page-header">
+        <div><h1>Student Wellness Counseling Log</h1><p class="subtitle">Encrypted appointment records</p></div>
+        <button class="primary" onclick="openLogCounseling()">+ Log session</button>
+      </div>
+      <div class="list" id="counseling-list">
+        <div class="list-row"><div><div class="primary-text">Manisha Shrestha</div><div class="secondary-text">Counselor: Ms. Nirmala Adhikari — next appointment Sep 15</div></div><div class="right"><span class="badge filled">Notes on file</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Bibek Rai</div><div class="secondary-text">Counselor: Mr. Prem Thapa — next appointment Sep 18</div></div><div class="right"><span class="badge filled">Notes on file</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-crisis">
+      <div class="page-header">
+        <div><h1>Crisis Intervention Network</h1><p class="subtitle">Priority routing for acute emergencies</p></div>
+        <button class="primary" onclick="openLogCrisis()">+ Log crisis alert</button>
+      </div>
+      <div class="stat-grid cols-3">
+        <div class="stat-card"><div class="stat-value">0</div><div class="stat-label">Alerts today</div></div>
+        <div class="stat-card"><div class="stat-value">2</div><div class="stat-label">Alerts this month</div></div>
+        <div class="stat-card"><div class="stat-value">12 min</div><div class="stat-label">Avg response time</div></div>
+      </div>
+      <div class="list" id="crisis-list">
+        <div class="list-row"><div><div class="primary-text">Housing emergency</div><div class="secondary-text">Aug 22 — resolved with temporary accommodation</div></div><div class="right"><span class="badge filled">Resolved</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Acute financial emergency</div><div class="secondary-text">Sep 1 — routed to Hardship Fund</div></div><div class="right"><span class="badge filled">Resolved</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-wellnessmaterial">
+      <div class="page-header">
+        <div><h1>Wellness Material Distribution</h1><p class="subtitle">Mental health articles and stress management</p></div>
+        <button class="primary" onclick="openDistributeMaterial()">+ Distribute material</button>
+      </div>
+      <div class="list" id="wellnessmaterial-list">
+        <div class="list-row"><div><div class="primary-text">Managing Exam Stress</div><div class="secondary-text">Article — all students — Sep 1</div></div><div class="right"><span class="badge filled">Sent</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Sleep and Academic Performance</div><div class="secondary-text">Video — all students — Sep 5</div></div><div class="right"><span class="badge filled">Sent</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-welfaredispatch">
+      <div class="page-header">
+        <div><h1>Welfare Call Dispatch Engine</h1><p class="subtitle">Routing follow-up support to other teams</p></div>
+        <button class="primary" onclick="openNewDispatch()">+ New dispatch</button>
+      </div>
+      <div class="list" id="welfaredispatch-list">
+        <div class="list-row"><div><div class="primary-text">Manisha Shrestha</div><div class="secondary-text">Attendance concern — routed to PAT</div></div><div class="right"><span class="badge filled">Acknowledged</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Kiran Magar</div><div class="secondary-text">Fee and attendance — routed to Finance and RTE</div></div><div class="right"><span class="badge filled">Acknowledged</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-incidents">
+      <div class="page-header">
+        <div><h1>Incident Complaint Log</h1><p class="subtitle">Disputes, bullying allegations, and non-academic cases</p></div>
+        <button class="primary" onclick="openLogIncident()">+ Log incident</button>
+      </div>
+      <div class="list" id="incidents-list">
+        <div class="list-row"><div><div class="primary-text">Roommate dispute, Hostel Block B</div><div class="secondary-text">Logged Sep 3</div></div><div class="right"><span class="badge dashed">Under mediation</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Bullying allegation — social media</div><div class="secondary-text">Logged Sep 6</div></div><div class="right"><span class="badge outline">Investigating</span><button class="link-btn" onclick="escalateIncident(this)">Escalate</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-misbehavior">
+      <div class="page-header">
+        <div><h1>SSD Student Misbehavior Section</h1><p class="subtitle">General conduct and pastoral infractions</p></div>
+        <button class="primary" onclick="openLogMisbehavior()">+ Log violation</button>
+      </div>
+      <div class="list" id="misbehavior-list">
+        <div class="list-row"><div><div class="primary-text">Kiran Magar</div><div class="secondary-text">Unauthorized lab access — escalated from IT Support</div></div><div class="right"><span class="badge dashed">Under review</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Code-of-conduct breach</div><div class="secondary-text">Reported by hostel warden — Sep 4</div></div><div class="right"><span class="badge outline">Pending</span><button class="link-btn" onclick="reviewMisbehavior(this)">Review</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-disability">
+      <div class="page-header">
+        <div><h1>Disability Accommodations Registry</h1><p class="subtitle">Learning needs and exam adjustments</p></div>
+        <button class="primary" onclick="openNewAccommodation()">+ New accommodation</button>
+      </div>
+      <div class="list" id="disability-list">
+        <div class="list-row"><div><div class="primary-text">Priya Manandhar</div><div class="secondary-text">Visual impairment — extended exam time 25%, screen reader access</div></div><div class="right"><span class="badge filled">Active</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-hardshipfund">
+      <div class="page-header">
+        <div><h1>Student Hardship Fund Manager</h1><p class="subtitle">Emergency financial grant applications</p></div>
+        <button class="primary" onclick="openNewHardship()">+ New application</button>
+      </div>
+      <div class="list" id="hardshipfund-list">
+        <div class="list-row"><div><div class="primary-text">Manisha Shrestha</div><div class="secondary-text">Family financial crisis — NPR 50,000 requested</div></div><div class="right"><span class="badge dashed">Pending review</span><button class="link-btn" onclick="approveHardship(this)">Approve</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-scholarshipcalc">
+      <div class="page-header">
+        <div><h1>Scholarship Allocation Calculator</h1><p class="subtitle">High school merit score to tuition discount</p></div>
+        <button class="primary" onclick="openNewCalculation()">+ New calculation</button>
+      </div>
+      <div class="list" id="scholarshipcalc-list">
+        <div class="list-row"><div><div class="primary-text">Sneha Tamang</div><div class="secondary-text">Foundation score 62% — from DMU's UPC pipeline</div></div><div class="right"><span class="secondary-text">15% discount calculated</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Bishal Gurung</div><div class="secondary-text">Foundation score 58% — from DMU's UPC pipeline</div></div><div class="right"><span class="secondary-text">10% discount calculated</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-clubs">
+      <div class="page-header">
+        <div><h1>Extra-Curricular Club Hub</h1><p class="subtitle">Membership, budgets, and activity logs</p></div>
+        <button class="primary" onclick="openNewClub()">+ New club</button>
+      </div>
+      <div class="list" id="clubs-list">
+        <div class="list-row"><div><div class="primary-text">Coding Club</div><div class="secondary-text">45 members — NPR 15,000 of 30,000 budget used</div></div><div class="right"><span class="badge filled">Active</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Debate Society</div><div class="secondary-text">28 members — NPR 8,000 of 20,000 budget used</div></div><div class="right"><span class="badge filled">Active</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-contenthub">
+      <div class="page-header">
+        <div><h1>Student Content Hub</h1><p class="subtitle">Surveys and polls on campus life</p></div>
+        <button class="primary" onclick="openNewSurvey()">+ New survey</button>
+      </div>
+      <div class="list" id="contenthub-list">
+        <div class="list-row"><div><div class="primary-text">Campus Catering Satisfaction</div><div class="secondary-text">420 responses</div></div><div class="right"><span class="secondary-text">72% satisfied</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Support Resources Awareness</div><div class="secondary-text">310 responses</div></div><div class="right"><span class="secondary-text">58% aware of counseling</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-voting">
+      <div class="page-header">
+        <div><h1>Voting Gateway</h1><p class="subtitle">Secure, verifiable student leadership elections</p></div>
+        <button class="primary" onclick="openNewElection()">+ New election</button>
+      </div>
+      <div class="list" id="voting-list">
+        <div class="list-row"><div><div class="primary-text">Student Council President 2026</div><div class="secondary-text">340 of 1,240 eligible voters — 27% turnout</div></div><div class="right"><span class="badge dashed">Voting open</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-newstudent">
+      <div class="page-header">
+        <div><h1>New Student Integration Hub</h1><p class="subtitle">Orientation and peer introduction</p></div>
+        <button class="primary" onclick="openNewOrientation()">+ New event</button>
+      </div>
+      <div class="list" id="newstudent-list">
+        <div class="list-row"><div><div class="primary-text">Fall Orientation Week</div><div class="secondary-text">Jul 10–14 — 340 attended</div></div><div class="right"><span class="badge filled">Completed</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-international">
+      <div class="page-header">
+        <div><h1>International Student Integration</h1><p class="subtitle">Arrival planning, housing, and cultural orientation</p></div>
+      </div>
+      <div class="list" id="international-list">
+        <div class="list-row"><div><div class="primary-text">Li Wei</div><div class="secondary-text">Arrival planning complete — housing assigned — orientation attended</div></div><div class="right"><span class="badge filled">Integrated</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Ahmed Hassan</div><div class="secondary-text">Arrival planning complete — housing assigned — orientation not yet attended</div></div><div class="right"><span class="badge dashed">In progress</span><button class="link-btn" onclick="scheduleOrientation(this)">Schedule orientation</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-peermentor">
+      <div class="page-header">
+        <div><h1>Peer Mentorship Bridges</h1><p class="subtitle">Pairing 1st years with high-performing upperclassmen</p></div>
+        <button class="primary" onclick="openNewPeerPairing()">+ New pairing</button>
+      </div>
+      <div class="list" id="peermentor-list">
+        <div class="list-row"><div><div class="primary-text">Kritika Sharma (1st year)</div><div class="secondary-text">Mentor: Sunita Gurung</div></div><div class="right"><span class="badge filled">Active</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Bimal Thapa (1st year)</div><div class="secondary-text">Mentor: Nisha Adhikari</div></div><div class="right"><span class="badge filled">Active</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-career">
+      <div class="page-header">
+        <div><h1>Career Counseling Portal</h1><p class="subtitle">Interview practice and resume workshops</p></div>
+        <button class="primary" onclick="openBookCareerSession()">+ Book session</button>
+      </div>
+      <div class="list" id="career-list">
+        <div class="list-row"><div><div class="primary-text">Nisha Adhikari</div><div class="secondary-text">Resume workshop — Sep 10</div></div><div class="right"><span class="badge filled">Completed</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Rajesh Karki</div><div class="secondary-text">Interview practice — Sep 20</div></div><div class="right"><span class="badge dashed">Scheduled</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-alumniservice">
+      <div class="page-header">
+        <div><h1>Alumni Service Connector</h1><p class="subtitle">Ongoing career advice and networking</p></div>
+      </div>
+      <div class="list" id="alumniservice-list">
+        <div class="list-row"><div><div class="primary-text">Sabina Thapa</div><div class="secondary-text">Offering career mentorship — Software Engineer at TechNova Solutions</div></div><div class="right"><span class="badge filled">Active</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Nabin Koirala</div><div class="secondary-text">Offering networking events — Data Analyst at Everest Analytics</div></div><div class="right"><span class="badge filled">Active</span></div></div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this) closeModal()">
+  <div class="modal">
+    <div class="modal-header"><h3 id="modal-title"></h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer" id="modal-footer"></div>
+  </div>
+</div>
+
+<script>
+var modalContext = null;
+var STUDENTS = ['Aisha Karki','Bibek Rai','Sunita Gurung','Prakash Thapa','Manisha Shrestha','Rajesh Karki','Nisha Adhikari','Suman Basnet','Anita Poudel','Kiran Magar'];
+
+function showPage(id, el){
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
+  if(el) el.classList.add('active');
+}
+function goTo(id){
+  showPage(id, document.querySelector('.nav-item[data-page="' + id + '"]'));
+}
+function toggleCard(header){
+  var card = header.parentElement;
+  var detail = card.querySelector('.detail');
+  var chev = header.querySelector('.chev');
+  var open = detail.classList.contains('open');
+  detail.classList.toggle('open', !open);
+  chev.textContent = open ? '▸' : '▾';
+}
+
+/* ---------- modal shell ---------- */
+function openModal(title, bodyHtml, footerHtml){
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = bodyHtml;
+  document.getElementById('modal-footer').innerHTML = footerHtml || '<button class="secondary" onclick="closeModal()">Close</button>';
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal(){
+  document.getElementById('modal-overlay').classList.remove('open');
+  modalContext = null;
+}
+function formInput(label,id,val,type){
+  type = type || 'text';
+  return '<div class="form-group"><label>' + label + '</label><input type="' + type + '" id="' + id + '" value="' + (val===undefined?'':val) + '"></div>';
+}
+function formTextarea(label,id){
+  return '<div class="form-group"><label>' + label + '</label><textarea id="' + id + '"></textarea></div>';
+}
+function formSelect(label,id,opts){
+  var o = opts.map(function(x){ return '<option>' + x + '</option>'; }).join('');
+  return '<div class="form-group"><label>' + label + '</label><select id="' + id + '">' + o + '</select></div>';
+}
+
+/* ---------- STAR meeting ---------- */
+function openNewStar(){
+  openModal('New STAR case',
+    formSelect('Student','ns-student', STUDENTS) +
+    formTextarea('Initial notes','ns-notes'),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveStarCase()">Create case</button>'
+  );
+}
+function saveStarCase(){
+  var student = document.getElementById('ns-student').value;
+  var list = document.getElementById('starmeeting-list');
+  var card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = '<div class="card-header" onclick="toggleCard(this)"><div><div class="primary-text">' + student + '</div><div class="secondary-text">Case just opened — compiling department history</div></div><div class="right"><span class="badge outline">New case</span><span class="chev">▸</span></div></div><div class="detail"><p class="detail-label">Compiled cross-department history</p><p style="font-size:13px;">Pulling records from Academics, Finance, DMU, IT Support, and RTE...</p><button class="link-btn" style="margin-top:10px;" onclick="generateAgenda(this)">Generate agenda</button></div>';
+  list.appendChild(card);
+  closeModal();
+}
+function generateAgenda(btn){
+  openModal('Agenda generated', '<p style="font-size:13px;">A STAR meeting agenda has been compiled from all linked department flags and sent to the assigned PAT, Finance, and RTE contacts.</p>', '<button class="primary" onclick="closeModal()">Done</button>');
+}
+
+/* ---------- counseling ---------- */
+function openLogCounseling(){
+  openModal('Log counseling session',
+    formSelect('Student','lc-student', STUDENTS) +
+    formInput('Next appointment','lc-next','','date') +
+    formTextarea('Confidential notes','lc-notes'),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveCounseling()">Log</button>'
+  );
+}
+function saveCounseling(){
+  var student = document.getElementById('lc-student').value;
+  var next = document.getElementById('lc-next').value || 'TBC';
+  var list = document.getElementById('counseling-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + student + '</div><div class="secondary-text">Counselor: Ms. Nirmala Adhikari — next appointment ' + next + '</div></div><div class="right"><span class="badge filled">Notes on file</span></div>';
+  list.appendChild(row);
+  closeModal();
+}
+
+/* ---------- crisis ---------- */
+function openLogCrisis(){
+  openModal('Log crisis alert',
+    formSelect('Type','lcr-type',['Financial emergency','Housing emergency','Mental health crisis']) +
+    formTextarea('Details','lcr-details'),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveCrisis()">Route now</button>'
+  );
+}
+function saveCrisis(){
+  var type = document.getElementById('lcr-type').value;
+  var list = document.getElementById('crisis-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + type + '</div><div class="secondary-text">Just now — routed to on-call coordinator</div></div><div class="right"><span class="badge dashed">In progress</span></div>';
+  list.prepend(row);
+  closeModal();
+}
+
+/* ---------- wellness material ---------- */
+function openDistributeMaterial(){
+  openModal('Distribute material',
+    formInput('Title','dm-title','') +
+    formSelect('Type','dm-type',['Article','Video','Guide']),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveMaterial()">Distribute</button>'
+  );
+}
+function saveMaterial(){
+  var title = document.getElementById('dm-title').value || 'Untitled material';
+  var type = document.getElementById('dm-type').value;
+  var list = document.getElementById('wellnessmaterial-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + title + '</div><div class="secondary-text">' + type + ' — all students — just now</div></div><div class="right"><span class="badge filled">Sent</span></div>';
+  list.appendChild(row);
+  closeModal();
+}
+
+/* ---------- welfare dispatch ---------- */
+function openNewDispatch(){
+  openModal('New dispatch',
+    formSelect('Student','nd-student', STUDENTS) +
+    '<div class="form-row-2">' + formInput('Issue','nd-issue','') + formSelect('Route to','nd-route',['PAT','Finance','RTE','IT Support']) + '</div>',
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveDispatch()">Dispatch</button>'
+  );
+}
+function saveDispatch(){
+  var student = document.getElementById('nd-student').value;
+  var issue = document.getElementById('nd-issue').value || 'Unspecified issue';
+  var route = document.getElementById('nd-route').value;
+  var list = document.getElementById('welfaredispatch-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + student + '</div><div class="secondary-text">' + issue + ' — routed to ' + route + '</div></div><div class="right"><span class="badge dashed">Pending acknowledgment</span></div>';
+  list.appendChild(row);
+  closeModal();
+}
+
+/* ---------- incidents ---------- */
+function openLogIncident(){
+  openModal('Log incident',
+    formInput('Summary','li-summary','') +
+    formTextarea('Details','li-details'),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveIncident()">Log</button>'
+  );
+}
+function saveIncident(){
+  var summary = document.getElementById('li-summary').value || 'Untitled incident';
+  var list = document.getElementById('incidents-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + summary + '</div><div class="secondary-text">Logged just now</div></div><div class="right"><span class="badge outline">Investigating</span><button class="link-btn" onclick="escalateIncident(this)">Escalate</button></div>';
+  list.appendChild(row);
+  closeModal();
+}
+function escalateIncident(btn){
+  var row = btn.closest('.list-row');
+  row.querySelector('.right').innerHTML = '<span class="badge filled">Escalated to Disciplinary Committee</span>';
+  btn.remove();
+}
+
+/* ---------- misbehavior ---------- */
+function openLogMisbehavior(){
+  openModal('Log violation',
+    formInput('Student / party','lm-student','') +
+    formTextarea('Description','lm-desc'),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveMisbehavior()">Log</button>'
+  );
+}
+function saveMisbehavior(){
+  var student = document.getElementById('lm-student').value || 'Unidentified party';
+  var desc = document.getElementById('lm-desc').value || 'Details pending';
+  var list = document.getElementById('misbehavior-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + student + '</div><div class="secondary-text">' + desc + ' — logged just now</div></div><div class="right"><span class="badge outline">Pending</span><button class="link-btn" onclick="reviewMisbehavior(this)">Review</button></div>';
+  list.appendChild(row);
+  closeModal();
+}
+function reviewMisbehavior(btn){
+  var row = btn.closest('.list-row');
+  row.querySelector('.right').innerHTML = '<span class="badge filled">Reviewed</span>';
+  btn.remove();
+}
+
+/* ---------- disability accommodations ---------- */
+function openNewAccommodation(){
+  openModal('New accommodation',
+    formInput('Student name','na-name','') +
+    formTextarea('Accommodation details','na-details'),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveAccommodation()">Save</button>'
+  );
+}
+function saveAccommodation(){
+  var name = document.getElementById('na-name').value || 'Unnamed student';
+  var details = document.getElementById('na-details').value || 'Details pending assessment';
+  var list = document.getElementById('disability-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + name + '</div><div class="secondary-text">' + details + '</div></div><div class="right"><span class="badge filled">Active</span></div>';
+  list.appendChild(row);
+  closeModal();
+}
+
+/* ---------- hardship fund ---------- */
+function openNewHardship(){
+  openModal('New hardship application',
+    formSelect('Student','nh-student', STUDENTS) +
+    '<div class="form-row-2">' + formInput('Reason','nh-reason','') + formInput('Amount requested','nh-amount','') + '</div>',
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveHardship()">Submit</button>'
+  );
+}
+function saveHardship(){
+  var student = document.getElementById('nh-student').value;
+  var reason = document.getElementById('nh-reason').value || 'Unspecified reason';
+  var amount = document.getElementById('nh-amount').value || '0';
+  var list = document.getElementById('hardshipfund-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + student + '</div><div class="secondary-text">' + reason + ' — NPR ' + amount + ' requested</div></div><div class="right"><span class="badge dashed">Pending review</span><button class="link-btn" onclick="approveHardship(this)">Approve</button></div>';
+  list.appendChild(row);
+  closeModal();
+}
+function approveHardship(btn){
+  var row = btn.closest('.list-row');
+  row.querySelector('.right').innerHTML = '<span class="badge filled">Approved — sent to Finance</span>';
+  btn.remove();
+}
+
+/* ---------- scholarship calculator ---------- */
+function openNewCalculation(){
+  openModal('New calculation',
+    formInput('Applicant name','nc-name','') +
+    formInput('Foundation score (%)','nc-score',''),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveCalculation()">Calculate</button>'
+  );
+}
+function saveCalculation(){
+  var name = document.getElementById('nc-name').value || 'Unnamed applicant';
+  var score = parseInt(document.getElementById('nc-score').value) || 0;
+  var discount = score >= 60 ? 15 : (score >= 50 ? 10 : 5);
+  var list = document.getElementById('scholarshipcalc-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + name + '</div><div class="secondary-text">Foundation score ' + score + '%</div></div><div class="right"><span class="secondary-text">' + discount + '% discount calculated</span></div>';
+  list.appendChild(row);
+  closeModal();
+}
+
+/* ---------- clubs ---------- */
+function openNewClub(){
+  openModal('New club',
+    formInput('Club name','ncl-name','') +
+    '<div class="form-row-2">' + formInput('Members','ncl-members','0') + formInput('Budget','ncl-budget','') + '</div>',
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveClub()">Save</button>'
+  );
+}
+function saveClub(){
+  var name = document.getElementById('ncl-name').value || 'Untitled club';
+  var members = document.getElementById('ncl-members').value || '0';
+  var budget = document.getElementById('ncl-budget').value || '0';
+  var list = document.getElementById('clubs-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + name + '</div><div class="secondary-text">' + members + ' members — NPR 0 of ' + budget + ' budget used</div></div><div class="right"><span class="badge filled">Active</span></div>';
+  list.appendChild(row);
+  closeModal();
+}
+
+/* ---------- surveys ---------- */
+function openNewSurvey(){
+  openModal('New survey',
+    formInput('Survey title','nsv-title',''),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveSurvey()">Publish</button>'
+  );
+}
+function saveSurvey(){
+  var title = document.getElementById('nsv-title').value || 'Untitled survey';
+  var list = document.getElementById('contenthub-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + title + '</div><div class="secondary-text">0 responses</div></div><div class="right"><span class="badge dashed">Live</span></div>';
+  list.appendChild(row);
+  closeModal();
+}
+
+/* ---------- voting ---------- */
+function openNewElection(){
+  openModal('New election',
+    formInput('Election name','nel-name',''),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveElection()">Open voting</button>'
+  );
+}
+function saveElection(){
+  var name = document.getElementById('nel-name').value || 'Untitled election';
+  var list = document.getElementById('voting-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + name + '</div><div class="secondary-text">0 of 1,240 eligible voters — 0% turnout</div></div><div class="right"><span class="badge dashed">Voting open</span></div>';
+  list.appendChild(row);
+  closeModal();
+}
+
+/* ---------- new student hub ---------- */
+function openNewOrientation(){
+  openModal('New event',
+    formInput('Event name','no-name','') +
+    formInput('Date','no-date','','date'),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveOrientation()">Save</button>'
+  );
+}
+function saveOrientation(){
+  var name = document.getElementById('no-name').value || 'Untitled event';
+  var date = document.getElementById('no-date').value || 'TBC';
+  var list = document.getElementById('newstudent-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + name + '</div><div class="secondary-text">' + date + '</div></div><div class="right"><span class="badge dashed">Planned</span></div>';
+  list.appendChild(row);
+  closeModal();
+}
+
+/* ---------- international ---------- */
+function scheduleOrientation(btn){
+  var row = btn.closest('.list-row');
+  row.querySelector('.secondary-text').textContent = row.querySelector('.secondary-text').textContent.replace('not yet attended', 'orientation scheduled');
+  row.querySelector('.right').innerHTML = '<span class="badge filled">Integrated</span>';
+}
+
+/* ---------- peer mentorship ---------- */
+function openNewPeerPairing(){
+  openModal('New pairing',
+    formInput('1st-year student','npp-student','') +
+    formSelect('Mentor','npp-mentor', STUDENTS),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="savePeerPairing()">Save</button>'
+  );
+}
+function savePeerPairing(){
+  var student = document.getElementById('npp-student').value || 'Unnamed student';
+  var mentor = document.getElementById('npp-mentor').value;
+  var list = document.getElementById('peermentor-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + student + ' (1st year)</div><div class="secondary-text">Mentor: ' + mentor + '</div></div><div class="right"><span class="badge filled">Active</span></div>';
+  list.appendChild(row);
+  closeModal();
+}
+
+/* ---------- career counseling ---------- */
+function openBookCareerSession(){
+  openModal('Book session',
+    formSelect('Student','bc-student', STUDENTS) +
+    formSelect('Session type','bc-type',['Resume workshop','Interview practice','Career advising']),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveCareerSession()">Book</button>'
+  );
+}
+function saveCareerSession(){
+  var student = document.getElementById('bc-student').value;
+  var type = document.getElementById('bc-type').value;
+  var list = document.getElementById('career-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + student + '</div><div class="secondary-text">' + type + ' — date TBC</div></div><div class="right"><span class="badge dashed">Scheduled</span></div>';
+  list.appendChild(row);
+  closeModal();
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ING ERP — IT Support</title>
+<style>
+  :root{
+    --surface-1:#fafafa;
+    --surface-2:#f2f2f2;
+    --border:#e6e6e6;
+    --border-strong:#cfcfcf;
+    --text-primary:#111111;
+    --text-secondary:#5a5a5e;
+    --text-muted:#9a9a9e;
+    --fill-primary:#000000;
+    --on-primary:#ffffff;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--surface-2);color:var(--text-primary);}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;background:#fff;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:10px;}
+  .topbar .who{font-size:12px;color:var(--text-secondary);}
+  .topbar .who strong{color:var(--text-primary);font-weight:600;}
+  .app{display:flex;min-height:100vh;}
+  .sidebar{width:225px;flex-shrink:0;background:var(--surface-1);border-right:1px solid var(--border);padding:18px 12px;overflow-y:auto;}
+  .brand{display:flex;align-items:center;gap:10px;padding:0 8px 14px;}
+  .brand .mark{width:24px;height:24px;border-radius:6px;background:var(--fill-primary);flex-shrink:0;}
+  .brand .name{font-size:13px;font-weight:600;line-height:1.3;}
+  .brand .role{font-size:11px;color:var(--text-muted);line-height:1.3;}
+  .nav-item{display:block;padding:7px 10px;border-radius:7px;font-size:13px;color:var(--text-secondary);cursor:pointer;margin-bottom:2px;}
+  .nav-item:hover{background:var(--surface-2);}
+  .nav-item.active{background:var(--fill-primary);color:var(--on-primary);}
+  .nav-divider{border-top:1px solid var(--border);margin:10px 4px;}
+  .group{margin-bottom:12px;}
+  .group-label{font-size:11px;font-weight:600;color:var(--text-muted);margin:0 0 4px 10px;}
+  .main{flex:1;padding:32px 36px;min-width:0;}
+  .page{display:none;}
+  .page.active{display:block;}
+  .page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:12px;}
+  h1{font-size:22px;margin:0;font-weight:600;}
+  .subtitle{font-size:13px;color:var(--text-secondary);margin:5px 0 0;}
+  .section-label{font-size:12px;font-weight:600;color:var(--text-muted);margin:0 0 8px;}
+  button.primary{background:var(--fill-primary);color:var(--on-primary);border:none;border-radius:8px;padding:10px 16px;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;}
+  button.secondary{background:#fff;color:var(--text-primary);border:1px solid var(--border-strong);border-radius:8px;padding:10px 16px;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;}
+  .link-btn{background:none;border:none;color:var(--text-primary);font-size:12px;font-weight:600;text-decoration:underline;cursor:pointer;padding:0;white-space:nowrap;}
+  .toolbar{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;align-items:center;}
+  input[type=text], input[type=number], input[type=date], select, textarea{border:1px solid var(--border-strong);border-radius:8px;padding:10px 12px;font-size:13px;background:#fff;color:var(--text-primary);font-family:inherit;}
+  input[type=text]{flex:1;min-width:160px;}
+  select{width:170px;}
+  .badge{font-size:11px;padding:2px 9px;border-radius:999px;white-space:nowrap;}
+  .badge.filled{background:var(--fill-primary);color:var(--on-primary);}
+  .badge.outline{border:1px solid var(--border-strong);color:var(--text-secondary);}
+  .badge.dashed{border:1px dashed var(--border-strong);color:var(--text-secondary);}
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+  .stat-grid.cols-3{grid-template-columns:repeat(3,1fr);}
+  .stat-card{border:1px solid var(--border);border-radius:var(--radius);background:#fff;padding:16px 18px;}
+  .stat-value{font-size:22px;font-weight:700;}
+  .stat-label{font-size:12px;color:var(--text-secondary);margin-top:4px;}
+  .list{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:#fff;}
+  .list-row{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;gap:14px;border-bottom:1px solid var(--border);}
+  .list-row:last-child{border-bottom:none;}
+  .list-row .primary-text{font-size:14px;font-weight:600;}
+  .list-row .secondary-text{font-size:12px;color:var(--text-secondary);margin-top:3px;}
+  .list-row .right{display:flex;align-items:center;gap:10px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;}
+  .table-wrap{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:#fff;overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;}
+  th,td{padding:11px 13px;font-size:13px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;}
+  th{font-weight:600;color:var(--text-secondary);background:var(--surface-1);font-size:12px;}
+  tbody tr:last-child td{border-bottom:none;}
+  td.num{text-align:right;font-variant-numeric:tabular-nums;}
+  .kanban{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+  .kanban-col{background:var(--surface-1);border:1px solid var(--border);border-radius:var(--radius);padding:10px;min-height:110px;}
+  .kanban-col h4{font-size:12px;margin:0 0 10px;color:var(--text-muted);font-weight:600;}
+  .kanban-card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:8px;font-size:12px;}
+  .kanban-card .kt{font-weight:600;font-size:13px;display:block;margin-bottom:4px;}
+  .kanban-card .link-btn{font-size:11px;}
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:50;align-items:center;justify-content:center;padding:20px;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:#fff;border-radius:12px;max-width:460px;width:100%;max-height:86vh;overflow-y:auto;border:1px solid var(--border-strong);}
+  .modal-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);}
+  .modal-header h3{margin:0;font-size:16px;}
+  .modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-secondary);line-height:1;padding:4px;}
+  .modal-body{padding:18px 20px;}
+  .modal-footer{display:flex;justify-content:flex-end;gap:8px;padding:14px 20px;border-top:1px solid var(--border);}
+  .form-group{margin-bottom:14px;}
+  .form-group label{display:block;font-size:12px;color:var(--text-secondary);margin-bottom:5px;font-weight:600;}
+  .form-group input, .form-group select, .form-group textarea{width:100%;}
+  .form-group textarea{resize:vertical;min-height:70px;}
+  .form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px;}
+  .form-row-2 input, .form-row-2 select{width:100%;}
+  @media (max-width:820px){ .kanban{grid-template-columns:1fr;} }
+  @media (max-width:640px){ .sidebar{display:none;} .main{padding:22px;} .stat-grid{grid-template-columns:1fr 1fr;} }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="who">Signed in as <strong>Mr. Deepak Karki</strong> — IT Support Manager</div>
+  <div class="who">Enterprise network, hardware, and the IT student intern program</div>
+</div>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="mark"></div><div><div class="name">ING ERP</div><div class="role">IT Support</div></div></div>
+    <div class="nav-item active" data-page="dashboard" onclick="showPage('dashboard', this)">Dashboard</div>
+    <div class="nav-divider"></div>
+    <nav>
+      <div class="group"><p class="group-label">Helpdesk</p>
+        <div class="nav-item" data-page="tickets" onclick="showPage('tickets', this)">Ticketing</div>
+        <div class="nav-item" data-page="kb" onclick="showPage('kb', this)">Knowledge base</div>
+        <div class="nav-item" data-page="escalation" onclick="showPage('escalation', this)">Incident escalation</div>
+      </div>
+      <div class="group"><p class="group-label">Infrastructure</p>
+        <div class="nav-item" data-page="uptime" onclick="showPage('uptime', this)">Network uptime</div>
+        <div class="nav-item" data-page="backups" onclick="showPage('backups', this)">Backup validation</div>
+        <div class="nav-item" data-page="diagnostics" onclick="showPage('diagnostics', this)">Hardware diagnostics</div>
+      </div>
+      <div class="group"><p class="group-label">Assets &amp; access</p>
+        <div class="nav-item" data-page="assets" onclick="showPage('assets', this)">Asset lifecycle</div>
+        <div class="nav-item" data-page="licenses" onclick="showPage('licenses', this)">Software licenses</div>
+        <div class="nav-item" data-page="twofa" onclick="showPage('twofa', this)">Two-factor auth</div>
+        <div class="nav-item" data-page="provisioning" onclick="showPage('provisioning', this)">Access provisioning</div>
+      </div>
+      <div class="group"><p class="group-label">Lab management</p>
+        <div class="nav-item" data-page="labconfig" onclick="showPage('labconfig', this)">Lab configuration</div>
+      </div>
+      <div class="group"><p class="group-label">Intern program</p>
+        <div class="nav-item" data-page="onboarding" onclick="showPage('onboarding', this)">Onboarding hub</div>
+        <div class="nav-item" data-page="shiftsync" onclick="showPage('shiftsync', this)">Shift sync</div>
+        <div class="nav-item" data-page="taskboard" onclick="showPage('taskboard', this)">Task board</div>
+        <div class="nav-item" data-page="skillspassport" onclick="showPage('skillspassport', this)">Skills passport</div>
+      </div>
+      <div class="group"><p class="group-label">Conduct</p>
+        <div class="nav-item" data-page="misbehavior" onclick="showPage('misbehavior', this)">Misbehavior tracker</div>
+      </div>
+    </nav>
+  </aside>
+
+  <main class="main">
+
+    <section class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div><h1>IT Support overview</h1><p class="subtitle">Network, hardware, and intern program status</p></div>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-value">12</div><div class="stat-label">Open tickets</div></div>
+        <div class="stat-card"><div class="stat-value">99.8%</div><div class="stat-label">Network uptime</div></div>
+        <div class="stat-card"><div class="stat-value">1</div><div class="stat-label">Backup verification failed</div></div>
+        <div class="stat-card"><div class="stat-value">3</div><div class="stat-label">Interns in program</div></div>
+      </div>
+      <div class="list" style="margin-bottom:20px;">
+        <div class="list-row"><div><div class="primary-text">1 critical ticket needs escalation</div><div class="secondary-text">#1042 — CS204 lab PC won't boot</div></div><div class="right"><button class="link-btn" onclick="goTo('escalation')">Escalate</button></div></div>
+        <div class="list-row"><div><div class="primary-text">VLE Content Storage backup failed verification</div><div class="secondary-text">3:00 AM run — needs re-validation</div></div><div class="right"><button class="link-btn" onclick="goTo('backups')">Review</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Anjali KC hasn't started onboarding</div><div class="secondary-text">0 of 5 training modules complete</div></div><div class="right"><button class="link-btn" onclick="goTo('onboarding')">Open</button></div></div>
+      </div>
+      <div class="toolbar">
+        <button class="secondary" onclick="openNewTicket()">+ New ticket</button>
+        <button class="secondary" onclick="openNewProvisioning()">+ Provision access</button>
+        <button class="secondary" onclick="openNewDeployment()">+ Deploy lab update</button>
+      </div>
+    </section>
+
+    <section class="page" id="page-tickets">
+      <div class="page-header">
+        <div><h1>ITIL Helpdesk Ticketing</h1><p class="subtitle">Bugs, network drops, and device configuration requests</p></div>
+        <button class="primary" onclick="openNewTicket()">+ New ticket</button>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-value">12</div><div class="stat-label">Open</div></div>
+        <div class="stat-card"><div class="stat-value">5</div><div class="stat-label">In progress</div></div>
+        <div class="stat-card"><div class="stat-value">8</div><div class="stat-label">Resolved today</div></div>
+        <div class="stat-card"><div class="stat-value">2h 15m</div><div class="stat-label">Avg resolution time</div></div>
+      </div>
+      <div class="toolbar"><input type="text" placeholder="Search tickets" oninput="filterRows(this,'#tickets-list','.list-row')"></div>
+      <div class="list" id="tickets-list">
+        <div class="list-row"><div><div class="primary-text">#1042 — CS204 lab PC won't boot</div><div class="secondary-text">Reported by Bikash Shrestha, Lab Assistant</div></div><div class="right"><span class="badge outline">High</span><span class="badge dashed">In progress</span></div></div>
+        <div class="list-row"><div><div class="primary-text">#1043 — Wi-Fi drops in Room B204</div><div class="secondary-text">Reported by Dr. Meera Joshi</div></div><div class="right"><span class="badge dashed">Medium</span><button class="link-btn" onclick="resolveTicket(this)">Resolve</button></div></div>
+        <div class="list-row"><div><div class="primary-text">#1044 — Password reset needed</div><div class="secondary-text">Reported by Manisha Shrestha, student</div></div><div class="right"><span class="badge filled">Resolved</span></div></div>
+        <div class="list-row"><div><div class="primary-text">#1045 — Printer offline, Library</div><div class="secondary-text">Reported by front desk</div></div><div class="right"><span class="badge dashed">Medium</span><button class="link-btn" onclick="resolveTicket(this)">Resolve</button></div></div>
+        <div class="list-row"><div><div class="primary-text">#1046 — Projector not connecting, A110</div><div class="secondary-text">Reported by Dr. Anil Sharma</div></div><div class="right"><span class="badge outline">High</span><button class="link-btn" onclick="resolveTicket(this)">Resolve</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-kb">
+      <div class="page-header">
+        <div><h1>Knowledge Base Repository</h1><p class="subtitle">Standard fixes for common issues</p></div>
+        <button class="primary" onclick="openNewArticle()">+ New article</button>
+      </div>
+      <div class="list" id="kb-list">
+        <div class="list-row"><div><div class="primary-text">How to reset your ING portal password</div><div class="secondary-text">Account</div></div><div class="right"><span class="secondary-text">1,240 views</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Fixing common Wi-Fi connectivity issues</div><div class="secondary-text">Network</div></div><div class="right"><span class="secondary-text">890 views</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Configuring lab printers</div><div class="secondary-text">Hardware</div></div><div class="right"><span class="secondary-text">340 views</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Setting up two-factor authentication</div><div class="secondary-text">Security</div></div><div class="right"><span class="secondary-text">610 views</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-escalation">
+      <div class="page-header">
+        <div><h1>Incident Escalation Timers</h1><p class="subtitle">SLA alerts for critical drops</p></div>
+      </div>
+      <div class="stat-grid cols-3">
+        <div class="stat-card"><div class="stat-value">1</div><div class="stat-label">SLA breach today</div></div>
+        <div class="stat-card"><div class="stat-value">8m</div><div class="stat-label">Avg escalation time</div></div>
+        <div class="stat-card"><div class="stat-value">1</div><div class="stat-label">Currently escalated</div></div>
+      </div>
+      <div class="list" id="escalation-list">
+        <div class="list-row"><div><div class="primary-text">#1042 — CS204 lab PC won't boot</div><div class="secondary-text">45 minutes elapsed — critical severity</div></div><div class="right"><span class="badge filled">Escalated to IT Officer</span></div></div>
+        <div class="list-row"><div><div class="primary-text">#1043 — Wi-Fi drops in Room B204</div><div class="secondary-text">20 minutes elapsed — medium severity</div></div><div class="right"><span class="badge outline">Within SLA</span><button class="link-btn" onclick="escalateNow(this)">Escalate now</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-uptime">
+      <div class="page-header">
+        <div><h1>Network Uptime Monitor</h1><p class="subtitle">Server health, access points, and bandwidth</p></div>
+      </div>
+      <div class="stat-grid cols-3">
+        <div class="stat-card"><div class="stat-value">99.8%</div><div class="stat-label">Uptime, 30 days</div></div>
+        <div class="stat-card"><div class="stat-value">24 / 25</div><div class="stat-label">Access points online</div></div>
+        <div class="stat-card"><div class="stat-value">68%</div><div class="stat-label">Bandwidth utilization</div></div>
+      </div>
+      <div class="list" id="uptime-list">
+        <div class="list-row"><div><div class="primary-text">Main Building Wi-Fi</div><div class="secondary-text">No incidents in 30 days</div></div><div class="right"><span class="badge filled">Online</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Library Wi-Fi</div><div class="secondary-text">No incidents in 30 days</div></div><div class="right"><span class="badge filled">Online</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Room B204 Access Point</div><div class="secondary-text">Linked to ticket #1043 — intermittent drops</div></div><div class="right"><span class="badge outline">Degraded</span><button class="link-btn" onclick="investigateAp(this)">Investigate</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Server Room</div><div class="secondary-text">Core switch and HPC uplink</div></div><div class="right"><span class="badge filled">Online</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-backups">
+      <div class="page-header">
+        <div><h1>Data Backup Validator</h1><p class="subtitle">Execution, verification, and encryption status</p></div>
+      </div>
+      <div class="stat-grid cols-3">
+        <div class="stat-card"><div class="stat-value">3</div><div class="stat-label">Backups run today</div></div>
+        <div class="stat-card"><div class="stat-value">2</div><div class="stat-label">Verified</div></div>
+        <div class="stat-card"><div class="stat-value">1</div><div class="stat-label">Failed verification</div></div>
+      </div>
+      <div class="list" id="backups-list">
+        <div class="list-row"><div><div class="primary-text">Student Records DB</div><div class="secondary-text">2:00 AM — encrypted</div></div><div class="right"><span class="badge filled">Verified</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Financial DB</div><div class="secondary-text">2:30 AM — encrypted</div></div><div class="right"><span class="badge filled">Verified</span></div></div>
+        <div class="list-row"><div><div class="primary-text">VLE Content Storage</div><div class="secondary-text">3:00 AM — encrypted</div></div><div class="right"><span class="badge outline">Verification failed</span><button class="link-btn" onclick="rerunValidation(this)">Re-run validation</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-diagnostics">
+      <div class="page-header">
+        <div><h1>Hardware Diagnostic System</h1><p class="subtitle">Remote logs flagging pending hardware failures</p></div>
+      </div>
+      <div class="list" id="diagnostics-list">
+        <div class="list-row"><div><div class="primary-text">Lab PC #14</div><div class="secondary-text">CS204 Lab — disk health warning</div></div><div class="right"><span class="badge outline">Flagged</span><button class="link-btn" onclick="scheduleRepair(this)">Schedule repair</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Lab PC #22</div><div class="secondary-text">CS204 Lab — overheating detected</div></div><div class="right"><span class="badge outline">Flagged</span><button class="link-btn" onclick="scheduleRepair(this)">Schedule repair</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Projector, Room B204</div><div class="secondary-text">No issues detected</div></div><div class="right"><span class="badge filled">Healthy</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-assets">
+      <div class="page-header">
+        <div><h1>Hardware Asset Lifecycle Matrix</h1><p class="subtitle">Procurement through disposal</p></div>
+        <button class="primary" onclick="openNewAsset()">+ New asset</button>
+      </div>
+      <div class="table-wrap">
+        <table id="assets-table">
+          <thead><tr><th>Asset</th><th>Serial</th><th>Status</th><th>Assigned to</th></tr></thead>
+          <tbody>
+            <tr><td>Lab PC #14</td><td>SN-88213</td><td><span class="badge filled">Deployed</span></td><td>CS204 Lab</td></tr>
+            <tr><td>HPC Cluster Node 3</td><td>SN-77102</td><td><span class="badge filled">Deployed</span></td><td>R&amp;D Wing</td></tr>
+            <tr><td>Projector, Room B204</td><td>SN-55210</td><td><span class="badge filled">Deployed</span></td><td>Academics</td></tr>
+            <tr><td>Old Lab PC #3</td><td>SN-12045</td><td><span class="badge outline">Disposed</span></td><td>—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="page" id="page-licenses">
+      <div class="page-header">
+        <div><h1>Software License Matrix</h1><p class="subtitle">Subscriptions and renewal tracking</p></div>
+        <button class="primary" onclick="openNewLicense()">+ Add license</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Software</th><th>Licenses total</th><th>In use</th><th>Renewal date</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>Microsoft 365</td><td class="num">500</td><td class="num">420</td><td>Dec 2026</td><td><span class="badge filled">Active</span></td></tr>
+            <tr><td>SQL Server Enterprise</td><td class="num">20</td><td class="num">18</td><td>Mar 2027</td><td><span class="badge filled">Active</span></td></tr>
+            <tr><td>Adobe Creative Cloud</td><td class="num">30</td><td class="num">25</td><td>Jan 2027</td><td><span class="badge dashed">Renewal soon</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="page" id="page-twofa">
+      <div class="page-header">
+        <div><h1>Two-Factor Authentication Manager</h1><p class="subtitle">Security keys, lockouts, and resets</p></div>
+        <button class="primary" onclick="openIssueKey()">+ Issue security key</button>
+      </div>
+      <div class="list" id="twofa-list">
+        <div class="list-row"><div><div class="primary-text">Dr. Meera Joshi</div><div class="secondary-text">Last reset: never needed</div></div><div class="right"><span class="badge filled">Active</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Dr. Anil Sharma</div><div class="secondary-text">Last reset: never needed</div></div><div class="right"><span class="badge filled">Active</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Kiran Magar</div><div class="secondary-text">Student — 3 failed attempts today</div></div><div class="right"><span class="badge outline">Locked out</span><button class="link-btn" onclick="resetMfa(this)">Reset MFA</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-provisioning">
+      <div class="page-header">
+        <div><h1>Access Provisioning Workflow</h1><p class="subtitle">Network profiles for newly hired staff</p></div>
+        <button class="primary" onclick="openNewProvisioning()">+ New request</button>
+      </div>
+      <div class="list" id="provisioning-list">
+        <div class="list-row"><div><div class="primary-text">Dr. Sita Poudel</div><div class="secondary-text">R&amp;D Wing faculty — email, VLE, lab access</div></div><div class="right"><span class="badge filled">Provisioned</span></div></div>
+        <div class="list-row"><div><div class="primary-text">New Lab Assistant (pending hire)</div><div class="secondary-text">Lab access, printer queue</div></div><div class="right"><span class="badge dashed">Pending approval</span><button class="link-btn" onclick="approveProvisioning(this)">Approve</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-labconfig">
+      <div class="page-header">
+        <div><h1>Lab Computer Configuration Management</h1><p class="subtitle">Remote software updates and OS patches</p></div>
+        <button class="primary" onclick="openNewDeployment()">+ New deployment</button>
+      </div>
+      <div class="list" id="labconfig-list">
+        <div class="list-row"><div><div class="primary-text">CS204 Lab</div><div class="secondary-text">SQL Server patch v2.1 — deployed by Bikash Shrestha</div></div><div class="right"><span class="badge filled">Complete</span></div></div>
+        <div class="list-row"><div><div class="primary-text">CS210 Lab</div><div class="secondary-text">OS security update — scheduled for tonight</div></div><div class="right"><span class="badge dashed">Scheduled</span><button class="link-btn" onclick="deployNow(this)">Deploy now</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-onboarding">
+      <div class="page-header">
+        <div><h1>Intern Onboarding Hub</h1><p class="subtitle">Training modules and access provisioning for new IT interns</p></div>
+        <button class="primary" onclick="openNewIntern()">+ New intern</button>
+      </div>
+      <div class="list" id="onboarding-list">
+        <div class="list-row"><div><div class="primary-text">Prabin Rai</div><div class="secondary-text">5 of 5 modules complete — fully provisioned</div></div><div class="right"><span class="badge filled">Complete</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Sujan Thapa</div><div class="secondary-text">3 of 5 modules complete — email + VPN provisioned</div></div><div class="right"><span class="badge dashed">In progress</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Anjali KC</div><div class="secondary-text">0 of 5 modules complete</div></div><div class="right"><span class="badge outline">Not started</span><button class="link-btn" onclick="startOnboarding(this)">Start onboarding</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-shiftsync">
+      <div class="page-header">
+        <div><h1>Intern Shift Sync Engine</h1><p class="subtitle">Matching support desk shifts to class timetables</p></div>
+        <button class="primary" onclick="openAssignShift()">+ Assign shift</button>
+      </div>
+      <div class="list" id="shiftsync-list">
+        <div class="list-row"><div><div class="primary-text">Sujan Thapa</div><div class="secondary-text">Mon &amp; Wed, 1:00–4:00 PM</div></div><div class="right"><span class="badge filled">No conflict</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Prabin Rai</div><div class="secondary-text">Tue &amp; Thu, 2:00–5:00 PM</div></div><div class="right"><span class="badge filled">No conflict</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Anjali KC</div><div class="secondary-text">Fri, 10:00 AM–4:00 PM — checking against class schedule</div></div><div class="right"><span class="badge dashed">Checking</span><button class="link-btn" onclick="confirmShift(this)">Confirm</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-taskboard">
+      <div class="page-header">
+        <div><h1>Intern Task Scoping Board</h1><p class="subtitle">Low-risk diagnostic and configuration tasks</p></div>
+        <button class="primary" onclick="openNewTask()">+ New task</button>
+      </div>
+      <div class="kanban">
+        <div class="kanban-col" id="col-todo"><h4>To do</h4>
+          <div class="kanban-card"><span class="kt">Reset 5 student passwords</span>Anjali KC<br><button class="link-btn" onclick="advanceTask(this)">Move to In Progress</button></div>
+        </div>
+        <div class="kanban-col" id="col-progress"><h4>In progress</h4>
+          <div class="kanban-card"><span class="kt">Update lab PC #14 diagnostics log</span>Sujan Thapa<br><button class="link-btn" onclick="advanceTask(this)">Move to Done</button></div>
+        </div>
+        <div class="kanban-col" id="col-done"><h4>Done</h4>
+          <div class="kanban-card"><span class="kt">Configure new printer in Library</span>Prabin Rai</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="page-skillspassport">
+      <div class="page-header">
+        <div><h1>Intern Skills Passport</h1><p class="subtitle">Networking, support, and repair competency tracking</p></div>
+        <button class="primary" onclick="openLogSkill()">+ Log skill progress</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Intern</th><th>Networking</th><th>Support</th><th>Repair</th></tr></thead>
+          <tbody>
+            <tr><td>Sujan Thapa</td><td>Intermediate</td><td>Advanced</td><td>Beginner</td></tr>
+            <tr><td>Prabin Rai</td><td>Advanced</td><td>Advanced</td><td>Intermediate</td></tr>
+            <tr><td>Anjali KC</td><td>Beginner</td><td>Beginner</td><td>Beginner</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="page" id="page-misbehavior">
+      <div class="page-header">
+        <div><h1>IT Support Student Misbehavior Tracker</h1><p class="subtitle">Tech-related conduct violations</p></div>
+        <button class="primary" onclick="openLogIncident()">+ Log incident</button>
+      </div>
+      <div class="list" id="misbehavior-list">
+        <div class="list-row"><div><div class="primary-text">Kiran Magar</div><div class="secondary-text">Unauthorized lab login attempt — Sep 3</div></div><div class="right"><span class="badge dashed">Under review</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Unidentified user</div><div class="secondary-text">Portal abuse — repeated spam submissions — Sep 5</div></div><div class="right"><span class="badge outline">Investigating</span><button class="link-btn" onclick="escalateMisbehavior(this)">Escalate to SSD</button></div></div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this) closeModal()">
+  <div class="modal">
+    <div class="modal-header"><h3 id="modal-title"></h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer" id="modal-footer"></div>
+  </div>
+</div>
+
+<script>
+var modalContext = null;
+var INTERNS = ['Sujan Thapa','Prabin Rai','Anjali KC'];
+
+function showPage(id, el){
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
+  if(el) el.classList.add('active');
+}
+function goTo(id){
+  showPage(id, document.querySelector('.nav-item[data-page="' + id + '"]'));
+}
+function filterRows(inputEl, containerSelector, rowSelector){
+  var q = inputEl.value.toLowerCase();
+  document.querySelectorAll(containerSelector + ' ' + rowSelector).forEach(function(row){
+    row.style.display = row.textContent.toLowerCase().indexOf(q) > -1 ? '' : 'none';
+  });
+}
+
+/* ---------- modal shell ---------- */
+function openModal(title, bodyHtml, footerHtml){
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = bodyHtml;
+  document.getElementById('modal-footer').innerHTML = footerHtml || '<button class="secondary" onclick="closeModal()">Close</button>';
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal(){
+  document.getElementById('modal-overlay').classList.remove('open');
+  modalContext = null;
+}
+function formInput(label,id,val,type){
+  type = type || 'text';
+  return '<div class="form-group"><label>' + label + '</label><input type="' + type + '" id="' + id + '" value="' + (val===undefined?'':val) + '"></div>';
+}
+function formTextarea(label,id){
+  return '<div class="form-group"><label>' + label + '</label><textarea id="' + id + '"></textarea></div>';
+}
+function formSelect(label,id,opts){
+  var o = opts.map(function(x){ return '<option>' + x + '</option>'; }).join('');
+  return '<div class="form-group"><label>' + label + '</label><select id="' + id + '">' + o + '</select></div>';
+}
+
+/* ---------- tickets ---------- */
+function openNewTicket(){
+  openModal('New ticket',
+    formInput('Issue summary','nt-summary','') +
+    '<div class="form-row-2">' + formInput('Reported by','nt-reporter','') + formSelect('Priority','nt-priority',['Low','Medium','High']) + '</div>',
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveTicket()">Create ticket</button>'
+  );
+}
+function saveTicket(){
+  var summary = document.getElementById('nt-summary').value || 'Untitled issue';
+  var reporter = document.getElementById('nt-reporter').value || 'Unspecified reporter';
+  var priority = document.getElementById('nt-priority').value;
+  var list = document.getElementById('tickets-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  var num = 1047 + document.querySelectorAll('#tickets-list .list-row').length - 5;
+  row.innerHTML = '<div><div class="primary-text">#' + num + ' — ' + summary + '</div><div class="secondary-text">Reported by ' + reporter + '</div></div><div class="right"><span class="badge ' + (priority==='High'?'outline':'dashed') + '">' + priority + '</span><button class="link-btn" onclick="resolveTicket(this)">Resolve</button></div>';
+  list.appendChild(row);
+  closeModal();
+}
+function resolveTicket(btn){
+  var row = btn.closest('.list-row');
+  var right = row.querySelector('.right');
+  right.innerHTML = '<span class="badge filled">Resolved</span>';
+}
+
+/* ---------- knowledge base ---------- */
+function openNewArticle(){
+  openModal('New article',
+    formInput('Title','ka-title','') +
+    formSelect('Category','ka-cat',['Account','Network','Hardware','Security']),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveArticle()">Publish</button>'
+  );
+}
+function saveArticle(){
+  var title = document.getElementById('ka-title').value || 'Untitled article';
+  var cat = document.getElementById('ka-cat').value;
+  var list = document.getElementById('kb-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + title + '</div><div class="secondary-text">' + cat + '</div></div><div class="right"><span class="secondary-text">0 views</span></div>';
+  list.appendChild(row);
+  closeModal();
+}
+
+/* ---------- escalation ---------- */
+function escalateNow(btn){
+  var row = btn.closest('.list-row');
+  row.querySelector('.right').innerHTML = '<span class="badge filled">Escalated to IT Officer</span>';
+}
+
+/* ---------- uptime ---------- */
+function investigateAp(btn){
+  var row = btn.closest('.list-row');
+  openModal('Investigation started', '<p style="font-size:13px;">A diagnostic sweep has been triggered on the Room B204 access point. Ticket #1043 has been linked to this investigation.</p>', '<button class="primary" onclick="closeModal()">Done</button>');
+}
+
+/* ---------- backups ---------- */
+function rerunValidation(btn){
+  var row = btn.closest('.list-row');
+  row.querySelector('.right').innerHTML = '<span class="badge filled">Verified</span>';
+}
+
+/* ---------- diagnostics ---------- */
+function scheduleRepair(btn){
+  var row = btn.closest('.list-row');
+  row.querySelector('.right').innerHTML = '<span class="badge dashed">Repair scheduled</span>';
+}
+
+/* ---------- assets ---------- */
+function openNewAsset(){
+  openModal('New asset',
+    formInput('Asset name','na-name','') +
+    '<div class="form-row-2">' + formInput('Serial number','na-serial','') + formInput('Assigned to','na-assigned','') + '</div>',
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveAsset()">Save</button>'
+  );
+}
+function saveAsset(){
+  var name = document.getElementById('na-name').value || 'Untitled asset';
+  var serial = document.getElementById('na-serial').value || 'SN-PENDING';
+  var assigned = document.getElementById('na-assigned').value || 'Unassigned';
+  var tbody = document.querySelector('#assets-table tbody');
+  var tr = document.createElement('tr');
+  tr.innerHTML = '<td>' + name + '</td><td>' + serial + '</td><td><span class="badge dashed">Procured</span></td><td>' + assigned + '</td>';
+  tbody.appendChild(tr);
+  closeModal();
+}
+
+/* ---------- licenses ---------- */
+function openNewLicense(){
+  openModal('Add license',
+    formInput('Software name','nl-name','') +
+    '<div class="form-row-2">' + formInput('Total licenses','nl-total','') + formInput('Renewal date','nl-renewal','','date') + '</div>',
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="closeModal()">Save</button>'
+  );
+}
+
+/* ---------- two-factor auth ---------- */
+function resetMfa(btn){
+  var row = btn.closest('.list-row');
+  row.querySelector('.right').innerHTML = '<span class="badge filled">Active</span>';
+}
+function openIssueKey(){
+  openModal('Issue security key',
+    formInput('User','ik-user','') +
+    formSelect('Key type','ik-type',['Hardware token','Authenticator app']),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="closeModal()">Issue key</button>'
+  );
+}
+
+/* ---------- access provisioning ---------- */
+function openNewProvisioning(){
+  openModal('New provisioning request',
+    formInput('Name','np-name','') +
+    formInput('Role','np-role','') +
+    formInput('Access requested','np-access','e.g. email, VLE, lab access'),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveProvisioning()">Submit</button>'
+  );
+}
+function saveProvisioning(){
+  var name = document.getElementById('np-name').value || 'Unnamed staff member';
+  var role = document.getElementById('np-role').value || 'Unspecified role';
+  var access = document.getElementById('np-access').value || 'standard access';
+  var list = document.getElementById('provisioning-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + name + '</div><div class="secondary-text">' + role + ' — ' + access + '</div></div><div class="right"><span class="badge dashed">Pending approval</span><button class="link-btn" onclick="approveProvisioning(this)">Approve</button></div>';
+  list.appendChild(row);
+  closeModal();
+}
+function approveProvisioning(btn){
+  var row = btn.closest('.list-row');
+  row.querySelector('.right').innerHTML = '<span class="badge filled">Provisioned</span>';
+}
+
+/* ---------- lab configuration ---------- */
+function openNewDeployment(){
+  openModal('New deployment',
+    formInput('Lab','nd-lab','') +
+    formInput('Update description','nd-desc',''),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveDeployment()">Schedule</button>'
+  );
+}
+function saveDeployment(){
+  var lab = document.getElementById('nd-lab').value || 'Untitled lab';
+  var desc = document.getElementById('nd-desc').value || 'Update pending details';
+  var list = document.getElementById('labconfig-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + lab + '</div><div class="secondary-text">' + desc + ' — scheduled</div></div><div class="right"><span class="badge dashed">Scheduled</span><button class="link-btn" onclick="deployNow(this)">Deploy now</button></div>';
+  list.appendChild(row);
+  closeModal();
+}
+function deployNow(btn){
+  var row = btn.closest('.list-row');
+  row.querySelector('.right').innerHTML = '<span class="badge filled">Complete</span>';
+}
+
+/* ---------- intern onboarding ---------- */
+function openNewIntern(){
+  openModal('New intern',
+    formInput('Intern name','ni-name',''),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveIntern()">Add</button>'
+  );
+}
+function saveIntern(){
+  var name = document.getElementById('ni-name').value || 'Unnamed intern';
+  var list = document.getElementById('onboarding-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + name + '</div><div class="secondary-text">0 of 5 modules complete</div></div><div class="right"><span class="badge outline">Not started</span><button class="link-btn" onclick="startOnboarding(this)">Start onboarding</button></div>';
+  list.appendChild(row);
+  closeModal();
+}
+function startOnboarding(btn){
+  var row = btn.closest('.list-row');
+  row.querySelector('.secondary-text').textContent = '1 of 5 modules complete — email provisioned';
+  row.querySelector('.right').innerHTML = '<span class="badge dashed">In progress</span>';
+}
+
+/* ---------- shift sync ---------- */
+function openAssignShift(){
+  openModal('Assign shift',
+    formSelect('Intern','as-intern', INTERNS) +
+    formInput('Days &amp; times','as-times','e.g. Mon and Wed, 1:00-4:00 PM'),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveShift()">Assign</button>'
+  );
+}
+function saveShift(){
+  var intern = document.getElementById('as-intern').value;
+  var times = document.getElementById('as-times').value || 'Schedule TBC';
+  var list = document.getElementById('shiftsync-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + intern + '</div><div class="secondary-text">' + times + ' — checking against class schedule</div></div><div class="right"><span class="badge dashed">Checking</span><button class="link-btn" onclick="confirmShift(this)">Confirm</button></div>';
+  list.appendChild(row);
+  closeModal();
+}
+function confirmShift(btn){
+  var row = btn.closest('.list-row');
+  row.querySelector('.right').innerHTML = '<span class="badge filled">No conflict</span>';
+}
+
+/* ---------- intern task board ---------- */
+function openNewTask(){
+  openModal('New task',
+    formInput('Task title','nt2-title','') +
+    formSelect('Assign to','nt2-assignee', INTERNS),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveTask()">Add to To do</button>'
+  );
+}
+function saveTask(){
+  var title = document.getElementById('nt2-title').value || 'Untitled task';
+  var assignee = document.getElementById('nt2-assignee').value;
+  var col = document.getElementById('col-todo');
+  var card = document.createElement('div');
+  card.className = 'kanban-card';
+  card.innerHTML = '<span class="kt">' + title + '</span>' + assignee + '<br><button class="link-btn" onclick="advanceTask(this)">Move to In Progress</button>';
+  col.appendChild(card);
+  closeModal();
+}
+function advanceTask(btn){
+  var card = btn.closest('.kanban-card');
+  var currentCol = card.parentElement.id;
+  var order = ['col-todo','col-progress','col-done'];
+  var idx = order.indexOf(currentCol);
+  if(idx === -1 || idx === order.length - 1) return;
+  var nextCol = document.getElementById(order[idx + 1]);
+  if(idx + 1 === order.length - 1){
+    btn.remove();
+  } else {
+    btn.textContent = 'Move to Done';
+  }
+  nextCol.appendChild(card);
+}
+
+/* ---------- skills passport ---------- */
+function openLogSkill(){
+  openModal('Log skill progress',
+    formSelect('Intern','ls-intern', INTERNS) +
+    '<div class="form-row-2">' + formSelect('Skill area','ls-area',['Networking','Support','Repair']) + formSelect('New level','ls-level',['Beginner','Intermediate','Advanced']) + '</div>',
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="closeModal()">Save</button>'
+  );
+}
+
+/* ---------- misbehavior tracker ---------- */
+function openLogIncident(){
+  openModal('Log incident',
+    formInput('Student / user','li-student','') +
+    formTextarea('Description','li-desc'),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveIncident()">Log</button>'
+  );
+}
+function saveIncident(){
+  var student = document.getElementById('li-student').value || 'Unidentified user';
+  var desc = document.getElementById('li-desc').value || 'Details pending investigation';
+  var list = document.getElementById('misbehavior-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + student + '</div><div class="secondary-text">' + desc + ' — logged just now</div></div><div class="right"><span class="badge outline">Investigating</span><button class="link-btn" onclick="escalateMisbehavior(this)">Escalate to SSD</button></div>';
+  list.appendChild(row);
+  closeModal();
+}
+function escalateMisbehavior(btn){
+  var row = btn.closest('.list-row');
+  row.querySelector('.right').innerHTML = '<span class="badge filled">Escalated to SSD</span>';
+}
+</script>
+</body>
+</html>
