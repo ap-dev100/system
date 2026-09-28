@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ING ERP — RTE</title>
+<style>
+  :root{
+    --surface-1:#fafafa;
+    --surface-2:#f2f2f2;
+    --border:#e6e6e6;
+    --border-strong:#cfcfcf;
+    --text-primary:#111111;
+    --text-secondary:#5a5a5e;
+    --text-muted:#9a9a9e;
+    --fill-primary:#000000;
+    --on-primary:#ffffff;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--surface-2);color:var(--text-primary);}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;background:#fff;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:10px;}
+  .topbar .who{font-size:12px;color:var(--text-secondary);}
+  .topbar .who strong{color:var(--text-primary);font-weight:600;}
+  .app{display:flex;min-height:100vh;}
+  .sidebar{width:225px;flex-shrink:0;background:var(--surface-1);border-right:1px solid var(--border);padding:18px 12px;overflow-y:auto;}
+  .brand{display:flex;align-items:center;gap:10px;padding:0 8px 14px;}
+  .brand .mark{width:24px;height:24px;border-radius:6px;background:var(--fill-primary);flex-shrink:0;}
+  .brand .name{font-size:13px;font-weight:600;line-height:1.3;}
+  .brand .role{font-size:11px;color:var(--text-muted);line-height:1.3;}
+  .nav-item{display:block;padding:7px 10px;border-radius:7px;font-size:13px;color:var(--text-secondary);cursor:pointer;margin-bottom:2px;}
+  .nav-item:hover{background:var(--surface-2);}
+  .nav-item.active{background:var(--fill-primary);color:var(--on-primary);}
+  .nav-divider{border-top:1px solid var(--border);margin:10px 4px;}
+  .group{margin-bottom:12px;}
+  .group-label{font-size:11px;font-weight:600;color:var(--text-muted);margin:0 0 4px 10px;}
+  .main{flex:1;padding:32px 36px;min-width:0;}
+  .page{display:none;}
+  .page.active{display:block;}
+  .page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:12px;}
+  h1{font-size:22px;margin:0;font-weight:600;}
+  .subtitle{font-size:13px;color:var(--text-secondary);margin:5px 0 0;}
+  .section-label{font-size:12px;font-weight:600;color:var(--text-muted);margin:0 0 8px;}
+  button.primary{background:var(--fill-primary);color:var(--on-primary);border:none;border-radius:8px;padding:10px 16px;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;}
+  button.secondary{background:#fff;color:var(--text-primary);border:1px solid var(--border-strong);border-radius:8px;padding:10px 16px;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;}
+  .link-btn{background:none;border:none;color:var(--text-primary);font-size:12px;font-weight:600;text-decoration:underline;cursor:pointer;padding:0;white-space:nowrap;}
+  .toolbar{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;align-items:center;}
+  input[type=text], input[type=number], input[type=date], select, textarea{border:1px solid var(--border-strong);border-radius:8px;padding:10px 12px;font-size:13px;background:#fff;color:var(--text-primary);font-family:inherit;}
+  input[type=text]{flex:1;min-width:160px;}
+  select{width:170px;}
+  .badge{font-size:11px;padding:2px 9px;border-radius:999px;white-space:nowrap;}
+  .badge.filled{background:var(--fill-primary);color:var(--on-primary);}
+  .badge.outline{border:1px solid var(--border-strong);color:var(--text-secondary);}
+  .badge.dashed{border:1px dashed var(--border-strong);color:var(--text-secondary);}
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+  .stat-grid.cols-3{grid-template-columns:repeat(3,1fr);}
+  .stat-card{border:1px solid var(--border);border-radius:var(--radius);background:#fff;padding:16px 18px;}
+  .stat-value{font-size:22px;font-weight:700;}
+  .stat-label{font-size:12px;color:var(--text-secondary);margin-top:4px;}
+  .list{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:#fff;}
+  .list-row{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;gap:14px;border-bottom:1px solid var(--border);}
+  .list-row:last-child{border-bottom:none;}
+  .list-row .primary-text{font-size:14px;font-weight:600;}
+  .list-row .secondary-text{font-size:12px;color:var(--text-secondary);margin-top:3px;}
+  .list-row .right{display:flex;align-items:center;gap:10px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;}
+  .table-wrap{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:#fff;overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;}
+  th,td{padding:11px 13px;font-size:13px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;}
+  th{font-weight:600;color:var(--text-secondary);background:var(--surface-1);font-size:12px;}
+  tbody tr:last-child td{border-bottom:none;}
+  td.num{text-align:right;font-variant-numeric:tabular-nums;}
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:50;align-items:center;justify-content:center;padding:20px;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:#fff;border-radius:12px;max-width:460px;width:100%;max-height:86vh;overflow-y:auto;border:1px solid var(--border-strong);}
+  .modal-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);}
+  .modal-header h3{margin:0;font-size:16px;}
+  .modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-secondary);line-height:1;padding:4px;}
+  .modal-body{padding:18px 20px;}
+  .modal-footer{display:flex;justify-content:flex-end;gap:8px;padding:14px 20px;border-top:1px solid var(--border);}
+  .form-group{margin-bottom:14px;}
+  .form-group label{display:block;font-size:12px;color:var(--text-secondary);margin-bottom:5px;font-weight:600;}
+  .form-group input, .form-group select, .form-group textarea{width:100%;}
+  .form-group textarea{resize:vertical;min-height:70px;}
+  .form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px;}
+  .form-row-2 input, .form-row-2 select{width:100%;}
+  @media (max-width:640px){ .sidebar{display:none;} .main{padding:22px;} .stat-grid{grid-template-columns:1fr 1fr;} }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="who">Signed in as <strong>Mr. Bijay Thapa</strong> — RTE Registrar</div>
+  <div class="who">Registry, Timetable, and Examinations</div>
+</div>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="mark"></div><div><div class="name">ING ERP</div><div class="role">RTE</div></div></div>
+    <div class="nav-item active" data-page="dashboard" onclick="showPage('dashboard', this)">Dashboard</div>
+    <div class="nav-divider"></div>
+    <nav>
+      <div class="group"><p class="group-label">Enrollment</p>
+        <div class="nav-item" data-page="enrollment" onclick="showPage('enrollment', this)">Enrollment registry</div>
+        <div class="nav-item" data-page="credittransfer" onclick="showPage('credittransfer', this)">Credit transfer</div>
+        <div class="nav-item" data-page="visa" onclick="showPage('visa', this)">Visa compliance</div>
+      </div>
+      <div class="group"><p class="group-label">Scheduling</p>
+        <div class="nav-item" data-page="timetable" onclick="showPage('timetable', this)">Timetabling engine</div>
+        <div class="nav-item" data-page="roomalloc" onclick="showPage('roomalloc', this)">Classroom allocator</div>
+        <div class="nav-item" data-page="calendar" onclick="showPage('calendar', this)">Academic calendar</div>
+      </div>
+      <div class="group"><p class="group-label">Examinations</p>
+        <div class="nav-item" data-page="examschedule" onclick="showPage('examschedule', this)">Exam schedule</div>
+        <div class="nav-item" data-page="invigilation" onclick="showPage('invigilation', this)">Invigilation roster</div>
+        <div class="nav-item" data-page="papervault" onclick="showPage('papervault', this)">Paper moderation vault</div>
+      </div>
+      <div class="group"><p class="group-label">Records</p>
+        <div class="nav-item" data-page="transcripts" onclick="showPage('transcripts', this)">Transcripts</div>
+        <div class="nav-item" data-page="gradechange" onclick="showPage('gradechange', this)">Grade change pipeline</div>
+        <div class="nav-item" data-page="certprint" onclick="showPage('certprint', this)">Certification printing</div>
+      </div>
+      <div class="group"><p class="group-label">Student cases</p>
+        <div class="nav-item" data-page="graduation" onclick="showPage('graduation', this)">Graduation status</div>
+        <div class="nav-item" data-page="mitigating" onclick="showPage('mitigating', this)">Mitigating circumstances</div>
+        <div class="nav-item" data-page="attrition" onclick="showPage('attrition', this)">Cohort attrition</div>
+      </div>
+    </nav>
+  </aside>
+
+  <main class="main">
+
+    <section class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div><h1>RTE overview</h1><p class="subtitle">Academic structures, schedules, and evaluation records</p></div>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-value">1,240</div><div class="stat-label">Active enrollments</div></div>
+        <div class="stat-card"><div class="stat-value">3</div><div class="stat-label">Exams scheduled this term</div></div>
+        <div class="stat-card"><div class="stat-value">2</div><div class="stat-label">Graduation clearances blocked</div></div>
+        <div class="stat-card"><div class="stat-value">1</div><div class="stat-label">Grade change pending approval</div></div>
+      </div>
+      <div class="list" style="margin-bottom:20px;">
+        <div class="list-row"><div><div class="primary-text">2 students blocked from graduation clearance</div><div class="secondary-text">Manisha Shrestha, Kiran Magar — outstanding fee balances</div></div><div class="right"><button class="link-btn" onclick="goTo('graduation')">Review</button></div></div>
+        <div class="list-row"><div><div class="primary-text">CS230 lab session has a room conflict</div><div class="secondary-text">Room B204 already booked at that time</div></div><div class="right"><button class="link-btn" onclick="goTo('timetable')">Resolve</button></div></div>
+        <div class="list-row"><div><div class="primary-text">1 grade change awaiting second approval</div><div class="secondary-text">CS204 Midterm — Rajesh Karki</div></div><div class="right"><button class="link-btn" onclick="goTo('gradechange')">Review</button></div></div>
+      </div>
+      <div class="toolbar">
+        <button class="secondary" onclick="openNewEnrollment()">+ New enrollment</button>
+        <button class="secondary" onclick="openBookRoom()">+ Book room</button>
+        <button class="secondary" onclick="openNewTranscript()">+ Request transcript</button>
+      </div>
+    </section>
+
+    <section class="page" id="page-enrollment">
+      <div class="page-header">
+        <div><h1>Student Enrollment Master Registry</h1><p class="subtitle">Unique IDs and enrollment states</p></div>
+        <button class="primary" onclick="openNewEnrollment()">+ New enrollment</button>
+      </div>
+      <div class="toolbar"><input type="text" placeholder="Search by name or ID" oninput="filterRows(this,'#enrollment-list','.list-row')"></div>
+      <div class="list" id="enrollment-list">
+        <div class="list-row"><div><div class="primary-text">ST1042 — Aisha Karki</div><div class="secondary-text">BSc Computer Science</div></div><div class="right"><span class="badge filled">Active</span></div></div>
+        <div class="list-row"><div><div class="primary-text">ST1043 — Bibek Rai</div><div class="secondary-text">BSc Computer Science</div></div><div class="right"><span class="badge filled">Active</span></div></div>
+        <div class="list-row"><div><div class="primary-text">ST1044 — Sunita Gurung</div><div class="secondary-text">BSc Computer Science</div></div><div class="right"><span class="badge filled">Active</span></div></div>
+        <div class="list-row"><div><div class="primary-text">ST1045 — Prakash Thapa</div><div class="secondary-text">BSc Computer Science</div></div><div class="right"><span class="badge filled">Active</span></div></div>
+        <div class="list-row"><div><div class="primary-text">ST1046 — Manisha Shrestha</div><div class="secondary-text">BSc Computer Science</div></div><div class="right"><span class="badge dashed">Active — fee hold</span></div></div>
+        <div class="list-row"><div><div class="primary-text">ST1047 — Rajesh Karki</div><div class="secondary-text">BSc Computer Science</div></div><div class="right"><span class="badge filled">Active</span></div></div>
+        <div class="list-row"><div><div class="primary-text">ST1048 — Nisha Adhikari</div><div class="secondary-text">BSc Computer Science</div></div><div class="right"><span class="badge filled">Active</span></div></div>
+        <div class="list-row"><div><div class="primary-text">ST1049 — Suman Basnet</div><div class="secondary-text">BSc Computer Science</div></div><div class="right"><span class="badge filled">Active</span></div></div>
+        <div class="list-row"><div><div class="primary-text">ST1050 — Anita Poudel</div><div class="secondary-text">BSc Computer Science</div></div><div class="right"><span class="badge filled">Active</span></div></div>
+        <div class="list-row"><div><div class="primary-text">ST1051 — Kiran Magar</div><div class="secondary-text">BSc Computer Science</div></div><div class="right"><span class="badge dashed">Active — fee hold</span></div></div>
+      </div>
+      <p class="secondary-text" style="margin-top:10px;">Showing 10 of 1,240 active enrollments.</p>
+    </section>
+
+    <section class="page" id="page-credittransfer">
+      <div class="page-header">
+        <div><h1>Credit Transfer Evaluator</h1><p class="subtitle">Equivalence for students transferring in</p></div>
+        <button class="primary" onclick="openNewTransfer()">+ New evaluation</button>
+      </div>
+      <div class="list" id="credittransfer-list">
+        <div class="list-row"><div><div class="primary-text">Ramesh KC</div><div class="secondary-text">Transferring from Kathmandu Tech College — 30 credits submitted</div></div><div class="right"><span class="secondary-text">24 credits granted</span><span class="badge filled">Evaluated</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-visa">
+      <div class="page-header">
+        <div><h1>Visa Compliance Dashboard</h1><p class="subtitle">Attendance and credit tracking for international students</p></div>
+      </div>
+      <div class="list" id="visa-list">
+        <div class="list-row"><div><div class="primary-text">Li Wei</div><div class="secondary-text">Student visa — 92% attendance — on track</div></div><div class="right"><span class="badge filled">Compliant</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Ahmed Hassan</div><div class="secondary-text">Student visa — 68% attendance — below required threshold</div></div><div class="right"><span class="badge outline">Non-compliant</span><button class="link-btn" onclick="notifyImmigration(this)">Notify immigration officer</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-timetable">
+      <div class="page-header">
+        <div><h1>Conflict-Free Timetabling Engine</h1><p class="subtitle">Preventing double-bookings across modules and rooms</p></div>
+      </div>
+      <div class="list" id="timetable-list">
+        <div class="list-row"><div><div class="primary-text">CS204 — Database Management Systems</div><div class="secondary-text">Mon &amp; Wed, 10:00–11:30 — Room B204</div></div><div class="right"><span class="badge filled">No conflict</span></div></div>
+        <div class="list-row"><div><div class="primary-text">CS210 — Software Engineering Principles</div><div class="secondary-text">Tue &amp; Thu, 2:00–3:30 — Room A110</div></div><div class="right"><span class="badge filled">No conflict</span></div></div>
+        <div class="list-row"><div><div class="primary-text">CS230 lab session</div><div class="secondary-text">Fri, 1:00–3:00 — Room B204 — clashes with existing booking</div></div><div class="right"><span class="badge outline">Conflict</span><button class="link-btn" onclick="resolveConflict(this)">Resolve conflict</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-roomalloc">
+      <div class="page-header">
+        <div><h1>Classroom Space Allocator</h1><p class="subtitle">Real-time room booking across campus</p></div>
+        <button class="primary" onclick="openBookRoom()">+ Book room</button>
+      </div>
+      <div class="list" id="roomalloc-list">
+        <div class="list-row"><div><div class="primary-text">Room B204</div><div class="secondary-text">Main Building — capacity 60 — CS204 lecture, Mon &amp; Wed 10:00</div></div><div class="right"><span class="badge filled">Booked</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Room A110</div><div class="secondary-text">Main Building — capacity 45 — CS210 lecture, Tue &amp; Thu 2:00</div></div><div class="right"><span class="badge filled">Booked</span></div></div>
+        <div class="list-row"><div><div class="primary-text">SQL Server Lab</div><div class="secondary-text">IT Building — capacity 30 — booked by Nisha Adhikari, Sep 14</div></div><div class="right"><span class="badge filled">Booked</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Room C101</div><div class="secondary-text">Main Building — capacity 40 — no bookings today</div></div><div class="right"><span class="badge outline">Available</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-calendar">
+      <div class="page-header">
+        <div><h1>Academic Calendar Orchestrator</h1><p class="subtitle">Term dates, reading weeks, and exam windows</p></div>
+        <button class="secondary" onclick="openEditCalendar()">Edit calendar</button>
+      </div>
+      <div class="list">
+        <div class="list-row"><div class="primary-text">Semester 1 start</div><div class="right"><span class="secondary-text">Jul 15, 2026</span></div></div>
+        <div class="list-row"><div class="primary-text">Reading week</div><div class="right"><span class="secondary-text">Oct 6–10, 2026</span></div></div>
+        <div class="list-row"><div class="primary-text">Dashain / Tihar break</div><div class="right"><span class="secondary-text">Oct 15–19, 2026</span></div></div>
+        <div class="list-row"><div class="primary-text">Exam window</div><div class="right"><span class="secondary-text">Oct 20–31, 2026</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-examschedule">
+      <div class="page-header">
+        <div><h1>Examination Schedule Builder</h1><p class="subtitle">Module groups mapped to halls and invigilators</p></div>
+        <button class="primary" onclick="openNewExam()">+ New exam</button>
+      </div>
+      <div class="list" id="examschedule-list">
+        <div class="list-row"><div><div class="primary-text">CS204 Midterm</div><div class="secondary-text">Oct 22 — Hall A — Rohan Adhikari, Sarita Koirala</div></div><div class="right"><span class="badge filled">Scheduled</span></div></div>
+        <div class="list-row"><div><div class="primary-text">CS210 Midterm</div><div class="secondary-text">Oct 23 — Hall B — invigilators not yet assigned</div></div><div class="right"><span class="badge dashed">Needs invigilators</span><button class="link-btn" onclick="assignInvigilators(this)">Assign invigilators</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-invigilation">
+      <div class="page-header">
+        <div><h1>Exam Hall Invigilation Rosterer</h1><p class="subtitle">Staff assignments and hour distribution</p></div>
+      </div>
+      <div class="list" id="invigilation-list">
+        <div class="list-row"><div><div class="primary-text">Mr. Rohan Adhikari</div><div class="secondary-text">6 hours this term — CS204 Midterm</div></div><div class="right"><span class="badge filled">Assigned</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Ms. Sarita Koirala</div><div class="secondary-text">6 hours this term — CS204 Midterm</div></div><div class="right"><span class="badge filled">Assigned</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Ms. Anita Bhandari</div><div class="secondary-text">0 hours this term — available</div></div><div class="right"><span class="badge outline">Unassigned</span><button class="link-btn" onclick="assignDuty(this)">Assign</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-papervault">
+      <div class="page-header">
+        <div><h1>Exam Paper Moderation Vault</h1><p class="subtitle">Encrypted storage for drafts and marking guides</p></div>
+      </div>
+      <div class="list" id="papervault-list">
+        <div class="list-row"><div><div class="primary-text">CS204 Midterm Draft</div><div class="secondary-text">Reviewed by Prof. David Whitfield, external examiner</div></div><div class="right"><span class="badge filled">Approved</span></div></div>
+        <div class="list-row"><div><div class="primary-text">CS210 Midterm Draft</div><div class="secondary-text">Awaiting external review</div></div><div class="right"><span class="badge dashed">Pending review</span><button class="link-btn" onclick="sendToExaminer(this)">Send to examiner</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-transcripts">
+      <div class="page-header">
+        <div><h1>Official Transcript Generator</h1><p class="subtitle">Cryptographically signed academic records</p></div>
+        <button class="primary" onclick="openNewTranscript()">+ Request transcript</button>
+      </div>
+      <div class="list" id="transcripts-list">
+        <div class="list-row"><div><div class="primary-text">Sunita Gurung</div><div class="secondary-text">Requested Sep 5</div></div><div class="right"><span class="badge filled">Generated &amp; signed</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Bibek Rai</div><div class="secondary-text">Requested Sep 8</div></div><div class="right"><span class="badge dashed">Pending generation</span><button class="link-btn" onclick="generateTranscript(this)">Generate</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-gradechange">
+      <div class="page-header">
+        <div><h1>Secure Grade Change Pipeline</h1><p class="subtitle">Dual approval required for finalized grades</p></div>
+        <button class="primary" onclick="openNewGradeChange()">+ New request</button>
+      </div>
+      <div class="list" id="gradechange-list">
+        <div class="list-row"><div><div class="primary-text">CS204 Midterm — Rajesh Karki correction</div><div class="secondary-text">First approval: Dr. Anil Sharma — Approved</div></div><div class="right"><span class="badge dashed">Awaiting second approval</span><button class="link-btn" onclick="secondApprove(this)">Approve as second reviewer</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-certprint">
+      <div class="page-header">
+        <div><h1>Certification Print Control</h1><p class="subtitle">Serialized diploma printing and release</p></div>
+        <button class="primary" onclick="openPrintBatch()">Print new batch</button>
+      </div>
+      <div class="list" id="certprint-list">
+        <div class="list-row"><div><div class="primary-text">BSc Computer Science — Sabina Thapa</div><div class="secondary-text">Serial DIP-2022-0142</div></div><div class="right"><span class="badge filled">Printed &amp; released</span></div></div>
+        <div class="list-row"><div><div class="primary-text">BSc Computer Science — Nabin Koirala</div><div class="secondary-text">Serial DIP-2021-0098</div></div><div class="right"><span class="badge filled">Printed &amp; released</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-graduation">
+      <div class="page-header">
+        <div><h1>Graduation Status Tracker</h1><p class="subtitle">Credits and fee clearance for graduation authorization</p></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Student</th><th>Credits</th><th>Fee clearance</th><th>Status</th><th></th></tr></thead>
+          <tbody>
+            <tr><td>Aisha Karki</td><td class="num">120 / 120</td><td>Clear</td><td><span class="badge filled">Cleared</span></td><td></td></tr>
+            <tr><td>Sunita Gurung</td><td class="num">120 / 120</td><td>Clear (scholarship)</td><td><span class="badge filled">Cleared</span></td><td></td></tr>
+            <tr><td>Manisha Shrestha</td><td class="num">110 / 120</td><td>NPR 360,000 outstanding</td><td><span class="badge outline">Blocked</span></td><td><button class="link-btn" onclick="recheckClearance(this)">Recheck</button></td></tr>
+            <tr><td>Kiran Magar</td><td class="num">108 / 120</td><td>NPR 384,000 outstanding</td><td><span class="badge outline">Blocked</span></td><td><button class="link-btn" onclick="recheckClearance(this)">Recheck</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="page" id="page-mitigating">
+      <div class="page-header">
+        <div><h1>Mitigating Circumstances Log</h1><p class="subtitle">Extension and deferral requests</p></div>
+        <button class="primary" onclick="openNewMitigating()">+ New request</button>
+      </div>
+      <div class="list" id="mitigating-list">
+        <div class="list-row"><div><div class="primary-text">Bibek Rai</div><div class="secondary-text">Medical — 3-day assignment extension</div></div><div class="right"><span class="badge filled">Approved</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Suman Basnet</div><div class="secondary-text">Family emergency — exam deferral request</div></div><div class="right"><span class="badge dashed">Pending</span><button class="link-btn" onclick="reviewMitigating(this)">Review</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-attrition">
+      <div class="page-header">
+        <div><h1>Cohort Attrition Tracker</h1><p class="subtitle">Flagging unexpected dropouts and deferrals</p></div>
+      </div>
+      <div class="stat-grid cols-3">
+        <div class="stat-card"><div class="stat-value">2.4%</div><div class="stat-label">Dropout rate this term</div></div>
+        <div class="stat-card"><div class="stat-value">3</div><div class="stat-label">Deferrals this term</div></div>
+        <div class="stat-card"><div class="stat-value">4</div><div class="stat-label">Flagged at-risk of attrition</div></div>
+      </div>
+      <div class="list" id="attrition-list">
+        <div class="list-row"><div><div class="primary-text">Manisha Shrestha</div><div class="secondary-text">Also on Academic Probation, churn risk, and fee hold</div></div><div class="right"><span class="badge outline">High risk</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Kiran Magar</div><div class="secondary-text">Also on Academic Probation, churn risk, IT misbehavior, and fee hold</div></div><div class="right"><span class="badge outline">High risk</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Suman Basnet</div><div class="secondary-text">Engagement lull, mitigating circumstance pending</div></div><div class="right"><span class="badge dashed">Monitoring</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Bibek Rai</div><div class="secondary-text">Partial fee payment, assignment lateness</div></div><div class="right"><span class="badge dashed">Monitoring</span></div></div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this) closeModal()">
+  <div class="modal">
+    <div class="modal-header"><h3 id="modal-title"></h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer" id="modal-footer"></div>
+  </div>
+</div>
+
+<script>
+var modalContext = null;
+
+function showPage(id, el){
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
+  if(el) el.classList.add('active');
+}
+function goTo(id){
+  showPage(id, document.querySelector('.nav-item[data-page="' + id + '"]'));
+}
+function filterRows(inputEl, containerSelector, rowSelector){
+  var q = inputEl.value.toLowerCase();
+  document.querySelectorAll(containerSelector + ' ' + rowSelector).forEach(function(row){
+    row.style.display = row.textContent.toLowerCase().indexOf(q) > -1 ? '' : 'none';
+  });
+}
+
+/* ---------- modal shell ---------- */
+function openModal(title, bodyHtml, footerHtml){
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = bodyHtml;
+  document.getElementById('modal-footer').innerHTML = footerHtml || '<button class="secondary" onclick="closeModal()">Close</button>';
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal(){
+  document.getElementById('modal-overlay').classList.remove('open');
+  modalContext = null;
+}
+function formInput(label,id,val,type){
+  type = type || 'text';
+  return '<div class="form-group"><label>' + label + '</label><input type="' + type + '" id="' + id + '" value="' + (val===undefined?'':val) + '"></div>';
+}
+function formTextarea(label,id){
+  return '<div class="form-group"><label>' + label + '</label><textarea id="' + id + '"></textarea></div>';
+}
+function formSelect(label,id,opts){
+  var o = opts.map(function(x){ return '<option>' + x + '</option>'; }).join('');
+  return '<div class="form-group"><label>' + label + '</label><select id="' + id + '">' + o + '</select></div>';
+}
+
+/* ---------- enrollment ---------- */
+function openNewEnrollment(){
+  openModal('New enrollment',
+    formInput('Student name','ne-name','') +
+    formSelect('Program','ne-program',['BSc Computer Science','BA Business','BBA']),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveEnrollment()">Generate ID &amp; enroll</button>'
+  );
+}
+function saveEnrollment(){
+  var name = document.getElementById('ne-name').value || 'Unnamed student';
+  var program = document.getElementById('ne-program').value;
+  var list = document.getElementById('enrollment-list');
+  var newId = 1052 + list.querySelectorAll('.list-row').length - 10;
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">ST' + newId + ' — ' + name + '</div><div class="secondary-text">' + program + '</div></div><div class="right"><span class="badge filled">Active</span></div>';
+  list.appendChild(row);
+  closeModal();
+}
+
+/* ---------- credit transfer ---------- */
+function openNewTransfer(){
+  openModal('New credit evaluation',
+    formInput('Applicant name','nt-name','') +
+    '<div class="form-row-2">' + formInput('Transferring from','nt-from','') + formInput('Credits submitted','nt-submitted','') + '</div>',
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveTransfer()">Save evaluation</button>'
+  );
+}
+function saveTransfer(){
+  var name = document.getElementById('nt-name').value || 'Unnamed applicant';
+  var from = document.getElementById('nt-from').value || 'Unspecified institution';
+  var submitted = document.getElementById('nt-submitted').value || '0';
+  var list = document.getElementById('credittransfer-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + name + '</div><div class="secondary-text">Transferring from ' + from + ' — ' + submitted + ' credits submitted</div></div><div class="right"><span class="badge dashed">Under evaluation</span></div>';
+  list.appendChild(row);
+  closeModal();
+}
+
+/* ---------- visa compliance ---------- */
+function notifyImmigration(btn){
+  var row = btn.closest('.list-row');
+  openModal('Immigration officer notified', '<p style="font-size:13px;">The visa compliance flag for this student has been forwarded to the designated immigration officer for review.</p>', '<button class="primary" onclick="closeModal()">Done</button>');
+}
+
+/* ---------- timetable ---------- */
+function resolveConflict(btn){
+  var row = btn.closest('.list-row');
+  modalContext = { row: row };
+  openModal('Resolve conflict', formSelect('Move to room','rc-room',['Room C101','Room A110 (evening slot)','SQL Server Lab']), '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveConflictResolution()">Reassign</button>');
+}
+function saveConflictResolution(){
+  var room = document.getElementById('rc-room').value;
+  var row = modalContext.row;
+  row.querySelector('.secondary-text').textContent = 'Fri, 1:00–3:00 — reassigned to ' + room;
+  row.querySelector('.right').innerHTML = '<span class="badge filled">No conflict</span>';
+  closeModal();
+}
+
+/* ---------- room allocator ---------- */
+function openBookRoom(){
+  openModal('Book room',
+    formSelect('Room','br-room',['Room B204','Room A110','SQL Server Lab','Room C101']) +
+    '<div class="form-row-2">' + formInput('Booked by','br-by','') + formInput('Date &amp; time','br-time','') + '</div>',
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveBooking()">Book</button>'
+  );
+}
+function saveBooking(){
+  var room = document.getElementById('br-room').value;
+  var by = document.getElementById('br-by').value || 'Unspecified requester';
+  var time = document.getElementById('br-time').value || 'time TBC';
+  var rows = document.querySelectorAll('#roomalloc-list .list-row');
+  rows.forEach(function(row){
+    if(row.querySelector('.primary-text').textContent === room){
+      row.querySelector('.secondary-text').textContent = row.querySelector('.secondary-text').textContent.split(' — capacity')[0] + ' — capacity ' + row.querySelector('.secondary-text').textContent.split('capacity ')[1].split(' —')[0] + ' — booked by ' + by + ', ' + time;
+      row.querySelector('.right').innerHTML = '<span class="badge filled">Booked</span>';
+    }
+  });
+  closeModal();
+}
+
+/* ---------- academic calendar ---------- */
+function openEditCalendar(){
+  openModal('Edit calendar',
+    formInput('Event name','ec-name','') +
+    formInput('Dates','ec-dates',''),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="closeModal()">Save</button>'
+  );
+}
+
+/* ---------- exam schedule ---------- */
+function openNewExam(){
+  openModal('New exam',
+    formInput('Module','ne2-module','') +
+    '<div class="form-row-2">' + formInput('Date','ne2-date','','date') + formInput('Hall','ne2-hall','') + '</div>',
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveExam()">Schedule</button>'
+  );
+}
+function saveExam(){
+  var module = document.getElementById('ne2-module').value || 'Untitled exam';
+  var date = document.getElementById('ne2-date').value || 'TBC';
+  var hall = document.getElementById('ne2-hall').value || 'Hall TBC';
+  var list = document.getElementById('examschedule-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + module + '</div><div class="secondary-text">' + date + ' — ' + hall + ' — invigilators not yet assigned</div></div><div class="right"><span class="badge dashed">Needs invigilators</span><button class="link-btn" onclick="assignInvigilators(this)">Assign invigilators</button></div>';
+  list.appendChild(row);
+  closeModal();
+}
+function assignInvigilators(btn){
+  var row = btn.closest('.list-row');
+  row.querySelector('.right').innerHTML = '<span class="badge filled">Scheduled</span>';
+}
+
+/* ---------- invigilation ---------- */
+function assignDuty(btn){
+  var row = btn.closest('.list-row');
+  row.querySelector('.right').innerHTML = '<span class="badge filled">Assigned</span>';
+}
+
+/* ---------- paper vault ---------- */
+function sendToExaminer(btn){
+  var row = btn.closest('.list-row');
+  row.querySelector('.right').innerHTML = '<span class="badge dashed">Sent to examiner</span>';
+  btn.remove();
+}
+
+/* ---------- transcripts ---------- */
+function openNewTranscript(){
+  openModal('Request transcript',
+    formInput('Student name','nt3-name',''),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveTranscriptRequest()">Request</button>'
+  );
+}
+function saveTranscriptRequest(){
+  var name = document.getElementById('nt3-name').value || 'Unnamed student';
+  var list = document.getElementById('transcripts-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + name + '</div><div class="secondary-text">Requested just now</div></div><div class="right"><span class="badge dashed">Pending generation</span><button class="link-btn" onclick="generateTranscript(this)">Generate</button></div>';
+  list.appendChild(row);
+  closeModal();
+}
+function generateTranscript(btn){
+  var row = btn.closest('.list-row');
+  row.querySelector('.right').innerHTML = '<span class="badge filled">Generated &amp; signed</span>';
+  btn.remove();
+}
+
+/* ---------- grade change ---------- */
+function openNewGradeChange(){
+  openModal('New grade change request',
+    formInput('Module &amp; student','gc-detail','') +
+    formTextarea('Reason','gc-reason'),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveGradeChange()">Submit for approval</button>'
+  );
+}
+function saveGradeChange(){
+  var detail = document.getElementById('gc-detail').value || 'Untitled request';
+  var list = document.getElementById('gradechange-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + detail + '</div><div class="secondary-text">Awaiting first approval</div></div><div class="right"><span class="badge dashed">Pending</span></div>';
+  list.appendChild(row);
+  closeModal();
+}
+function secondApprove(btn){
+  var row = btn.closest('.list-row');
+  row.querySelector('.right').innerHTML = '<span class="badge filled">Approved — grade updated</span>';
+  btn.remove();
+}
+
+/* ---------- certification printing ---------- */
+function openPrintBatch(){
+  openModal('Print new batch', '<p style="font-size:13px;">This will print and serialize diplomas for all students with cleared graduation status.</p>', '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveBatchPrint()">Print batch</button>');
+}
+function saveBatchPrint(){
+  var list = document.getElementById('certprint-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">BSc Computer Science — Aisha Karki</div><div class="secondary-text">Serial DIP-2026-0201</div></div><div class="right"><span class="badge filled">Printed &amp; released</span></div>';
+  list.appendChild(row);
+  closeModal();
+}
+
+/* ---------- graduation status ---------- */
+function recheckClearance(btn){
+  openModal('Clearance rechecked', '<p style="font-size:13px;">Finance confirms the outstanding balance has not changed. This student remains blocked until fees are settled.</p>', '<button class="primary" onclick="closeModal()">Close</button>');
+}
+
+/* ---------- mitigating circumstances ---------- */
+function openNewMitigating(){
+  openModal('New mitigating circumstances request',
+    formInput('Student name','nm-name','') +
+    '<div class="form-row-2">' + formSelect('Reason','nm-reason',['Medical','Family emergency','Other']) + formInput('Request','nm-request','e.g. extension, deferral') + '</div>',
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveMitigating()">Submit</button>'
+  );
+}
+function saveMitigating(){
+  var name = document.getElementById('nm-name').value || 'Unnamed student';
+  var reason = document.getElementById('nm-reason').value;
+  var request = document.getElementById('nm-request').value || 'Unspecified request';
+  var list = document.getElementById('mitigating-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + name + '</div><div class="secondary-text">' + reason + ' — ' + request + '</div></div><div class="right"><span class="badge dashed">Pending</span><button class="link-btn" onclick="reviewMitigating(this)">Review</button></div>';
+  list.appendChild(row);
+  closeModal();
+}
+function reviewMitigating(btn){
+  var row = btn.closest('.list-row');
+  row.querySelector('.right').innerHTML = '<span class="badge filled">Approved</span>';
+  btn.remove();
+}
+</script>
+</body>
+</html>

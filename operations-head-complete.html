@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ING ERP — Operations Head</title>
+<style>
+  :root{
+    --surface-1:#fafafa;
+    --surface-2:#f2f2f2;
+    --border:#e6e6e6;
+    --border-strong:#cfcfcf;
+    --text-primary:#111111;
+    --text-secondary:#5a5a5e;
+    --text-muted:#9a9a9e;
+    --fill-primary:#000000;
+    --on-primary:#ffffff;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--surface-2);color:var(--text-primary);}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;background:#fff;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:10px;}
+  .topbar .who{font-size:12px;color:var(--text-secondary);}
+  .topbar .who strong{color:var(--text-primary);font-weight:600;}
+  .app{display:flex;min-height:100vh;}
+  .sidebar{width:225px;flex-shrink:0;background:var(--surface-1);border-right:1px solid var(--border);padding:18px 12px;overflow-y:auto;}
+  .brand{display:flex;align-items:center;gap:10px;padding:0 8px 14px;}
+  .brand .mark{width:24px;height:24px;border-radius:6px;background:var(--fill-primary);flex-shrink:0;}
+  .brand .name{font-size:13px;font-weight:600;line-height:1.3;}
+  .brand .role{font-size:11px;color:var(--text-muted);line-height:1.3;}
+  .nav-item{display:block;padding:7px 10px;border-radius:7px;font-size:13px;color:var(--text-secondary);cursor:pointer;margin-bottom:2px;}
+  .nav-item:hover{background:var(--surface-2);}
+  .nav-item.active{background:var(--fill-primary);color:var(--on-primary);}
+  .nav-divider{border-top:1px solid var(--border);margin:10px 4px;}
+  .group{margin-bottom:12px;}
+  .group-label{font-size:11px;font-weight:600;color:var(--text-muted);margin:0 0 4px 10px;}
+  .main{flex:1;padding:32px 36px;min-width:0;}
+  .page{display:none;}
+  .page.active{display:block;}
+  .page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:12px;}
+  h1{font-size:22px;margin:0;font-weight:600;}
+  .subtitle{font-size:13px;color:var(--text-secondary);margin:5px 0 0;}
+  .section-label{font-size:12px;font-weight:600;color:var(--text-muted);margin:0 0 8px;}
+  button.primary{background:var(--fill-primary);color:var(--on-primary);border:none;border-radius:8px;padding:10px 16px;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;}
+  button.secondary{background:#fff;color:var(--text-primary);border:1px solid var(--border-strong);border-radius:8px;padding:10px 16px;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;}
+  .link-btn{background:none;border:none;color:var(--text-primary);font-size:12px;font-weight:600;text-decoration:underline;cursor:pointer;padding:0;white-space:nowrap;}
+  .toolbar{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;align-items:center;}
+  input[type=text], input[type=number], input[type=date], select, textarea{border:1px solid var(--border-strong);border-radius:8px;padding:10px 12px;font-size:13px;background:#fff;color:var(--text-primary);font-family:inherit;}
+  input[type=text]{flex:1;min-width:160px;}
+  select{width:170px;}
+  .badge{font-size:11px;padding:2px 9px;border-radius:999px;white-space:nowrap;}
+  .badge.filled{background:var(--fill-primary);color:var(--on-primary);}
+  .badge.outline{border:1px solid var(--border-strong);color:var(--text-secondary);}
+  .badge.dashed{border:1px dashed var(--border-strong);color:var(--text-secondary);}
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+  .stat-grid.cols-3{grid-template-columns:repeat(3,1fr);}
+  .stat-card{border:1px solid var(--border);border-radius:var(--radius);background:#fff;padding:16px 18px;}
+  .stat-value{font-size:20px;font-weight:700;}
+  .stat-label{font-size:12px;color:var(--text-secondary);margin-top:4px;}
+  .dept-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
+  .dept-card{border:1px solid var(--border);border-radius:var(--radius);background:#fff;padding:16px 18px;}
+  .dept-card h4{margin:0 0 10px;font-size:13px;font-weight:600;}
+  .dept-card .metric{display:flex;justify-content:space-between;font-size:12px;color:var(--text-secondary);padding:3px 0;}
+  .dept-card .metric strong{color:var(--text-primary);font-weight:600;}
+  .list{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:#fff;}
+  .list-row{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;gap:14px;border-bottom:1px solid var(--border);}
+  .list-row:last-child{border-bottom:none;}
+  .list-row .primary-text{font-size:14px;font-weight:600;}
+  .list-row .secondary-text{font-size:12px;color:var(--text-secondary);margin-top:3px;}
+  .list-row .right{display:flex;align-items:center;gap:10px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;}
+  .table-wrap{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:#fff;overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;}
+  th,td{padding:11px 13px;font-size:13px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;}
+  th{font-weight:600;color:var(--text-secondary);background:var(--surface-1);font-size:12px;}
+  tbody tr:last-child td{border-bottom:none;}
+  td.num{text-align:right;font-variant-numeric:tabular-nums;}
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:50;align-items:center;justify-content:center;padding:20px;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:#fff;border-radius:12px;max-width:460px;width:100%;max-height:86vh;overflow-y:auto;border:1px solid var(--border-strong);}
+  .modal-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);}
+  .modal-header h3{margin:0;font-size:16px;}
+  .modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-secondary);line-height:1;padding:4px;}
+  .modal-body{padding:18px 20px;}
+  .modal-footer{display:flex;justify-content:flex-end;gap:8px;padding:14px 20px;border-top:1px solid var(--border);}
+  .form-group{margin-bottom:14px;}
+  .form-group label{display:block;font-size:12px;color:var(--text-secondary);margin-bottom:5px;font-weight:600;}
+  .form-group input, .form-group select, .form-group textarea{width:100%;}
+  .form-group textarea{resize:vertical;min-height:70px;}
+  .form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px;}
+  .form-row-2 input, .form-row-2 select{width:100%;}
+  @media (max-width:820px){ .dept-grid{grid-template-columns:1fr 1fr;} }
+  @media (max-width:640px){ .sidebar{display:none;} .main{padding:22px;} .stat-grid{grid-template-columns:1fr 1fr;} .dept-grid{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="who">Signed in as <strong>Mr. Vivek Malla</strong> — Operations Head / CTO</div>
+  <div class="who">Cross-department operational control, this campus</div>
+</div>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="mark"></div><div><div class="name">ING ERP</div><div class="role">Operations Head</div></div></div>
+    <div class="nav-item active" data-page="dashboard" onclick="showPage('dashboard', this)">Dashboard</div>
+    <div class="nav-divider"></div>
+    <nav>
+      <div class="group"><p class="group-label">Oversight</p>
+        <div class="nav-item" data-page="crossdept" onclick="showPage('crossdept', this)">Cross-dept dashboard</div>
+        <div class="nav-item" data-page="staffoutput" onclick="showPage('staffoutput', this)">Staff output</div>
+        <div class="nav-item" data-page="biexport" onclick="showPage('biexport', this)">BI reports</div>
+      </div>
+      <div class="group"><p class="group-label">Alerts &amp; resolution</p>
+        <div class="nav-item" data-page="slabreach" onclick="showPage('slabreach', this)">SLA breaches</div>
+        <div class="nav-item" data-page="conflict" onclick="showPage('conflict', this)">Conflict arbitration</div>
+        <div class="nav-item" data-page="reallocation" onclick="showPage('reallocation', this)">Resource reallocation</div>
+      </div>
+      <div class="group"><p class="group-label">Infrastructure</p>
+        <div class="nav-item" data-page="infrahealth" onclick="showPage('infrahealth', this)">Infrastructure health</div>
+        <div class="nav-item" data-page="apicommand" onclick="showPage('apicommand', this)">API command center</div>
+        <div class="nav-item" data-page="disasterrecovery" onclick="showPage('disasterrecovery', this)">Disaster recovery</div>
+      </div>
+      <div class="group"><p class="group-label">Security &amp; access</p>
+        <div class="nav-item" data-page="security" onclick="showPage('security', this)">Security auditing</div>
+        <div class="nav-item" data-page="accessmatrix" onclick="showPage('accessmatrix', this)">Access matrix</div>
+        <div class="nav-item" data-page="emergency" onclick="showPage('emergency', this)">Emergency overrides</div>
+      </div>
+      <div class="group"><p class="group-label">Configuration</p>
+        <div class="nav-item" data-page="schema" onclick="showPage('schema', this)">Schema customizer</div>
+        <div class="nav-item" data-page="automators" onclick="showPage('automators', this)">Process automators</div>
+        <div class="nav-item" data-page="dataexport" onclick="showPage('dataexport', this)">Data export</div>
+      </div>
+    </nav>
+  </aside>
+
+  <main class="main">
+
+    <section class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div><h1>Operations overview</h1><p class="subtitle">All 12 departments, one control surface</p></div>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-value">12</div><div class="stat-label">Departments monitored</div></div>
+        <div class="stat-card"><div class="stat-value">2</div><div class="stat-label">Active SLA breaches</div></div>
+        <div class="stat-card"><div class="stat-value">1</div><div class="stat-label">Open conflict to arbitrate</div></div>
+        <div class="stat-card"><div class="stat-value">99.8%</div><div class="stat-label">Platform uptime</div></div>
+      </div>
+      <div class="list" style="margin-bottom:20px;">
+        <div class="list-row"><div><div class="primary-text">2 SLA breaches need attention</div><div class="secondary-text">IT ticket #1042 critical, CS210 grade entry overdue</div></div><div class="right"><button class="link-btn" onclick="goTo('slabreach')">Review</button></div></div>
+        <div class="list-row"><div><div class="primary-text">HPC Cluster budget overrun needs arbitration</div><div class="secondary-text">IT Support vs Finance — R&amp;D expansion request</div></div><div class="right"><button class="link-btn" onclick="goTo('conflict')">Resolve</button></div></div>
+        <div class="list-row"><div><div class="primary-text">VLE Content Storage backup still unverified</div><div class="secondary-text">Flagged by IT Support — disaster recovery at risk</div></div><div class="right"><button class="link-btn" onclick="goTo('disasterrecovery')">Investigate</button></div></div>
+      </div>
+      <div class="toolbar">
+        <button class="secondary" onclick="openReallocate()">+ Reallocate resource</button>
+        <button class="secondary" onclick="openNewAutomation()">+ New automation rule</button>
+        <button class="secondary" onclick="sendBiReport()">Send BI report now</button>
+      </div>
+    </section>
+
+    <section class="page" id="page-crossdept">
+      <div class="page-header">
+        <div><h1>Cross-Department Operational Dashboard</h1><p class="subtitle">Live academic, marketing, financial, and support metrics</p></div>
+      </div>
+      <div class="dept-grid">
+        <div class="dept-card"><h4>Academics</h4>
+          <div class="metric"><span>Class average</span><strong>82%</strong></div>
+          <div class="metric"><span>On probation</span><strong>2</strong></div>
+        </div>
+        <div class="dept-card"><h4>Finance</h4>
+          <div class="metric"><span>Tuition outstanding</span><strong>NPR 1,224,000</strong></div>
+          <div class="metric"><span>Dept over budget</span><strong>1 (IT Support)</strong></div>
+        </div>
+        <div class="dept-card"><h4>DMU (Marketing)</h4>
+          <div class="metric"><span>Leads today</span><strong>34</strong></div>
+          <div class="metric"><span>Churn risk</span><strong>4 students</strong></div>
+        </div>
+        <div class="dept-card"><h4>Sales Unit</h4>
+          <div class="metric"><span>Conversion rate</span><strong>18%</strong></div>
+          <div class="metric"><span>Interns active</span><strong>6</strong></div>
+        </div>
+        <div class="dept-card"><h4>IT Support</h4>
+          <div class="metric"><span>Open tickets</span><strong>12</strong></div>
+          <div class="metric"><span>Network uptime</span><strong>99.8%</strong></div>
+        </div>
+        <div class="dept-card"><h4>RTE</h4>
+          <div class="metric"><span>Graduation blocks</span><strong>2</strong></div>
+          <div class="metric"><span>Exams scheduled</span><strong>3</strong></div>
+        </div>
+        <div class="dept-card"><h4>SSD</h4>
+          <div class="metric"><span>Open STAR cases</span><strong>2</strong></div>
+          <div class="metric"><span>Counseling cases</span><strong>8</strong></div>
+        </div>
+        <div class="dept-card"><h4>HR</h4>
+          <div class="metric"><span>Open positions</span><strong>3</strong></div>
+          <div class="metric"><span>Reviews due</span><strong>5</strong></div>
+        </div>
+        <div class="dept-card"><h4>Resource Dept</h4>
+          <div class="metric"><span>Open procurement</span><strong>2</strong></div>
+          <div class="metric"><span>Contracts expiring</span><strong>1</strong></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="page-staffoutput">
+      <div class="page-header">
+        <div><h1>Staff Output Aggregator</h1><p class="subtitle">Identifying bottlenecks across departments</p></div>
+      </div>
+      <div class="list">
+        <div class="list-row"><div><div class="primary-text">Academics</div><div class="secondary-text">92% of assignments graded on time</div></div><div class="right"><span class="badge filled">On track</span></div></div>
+        <div class="list-row"><div><div class="primary-text">IT Support</div><div class="secondary-text">12 open tickets, avg resolution 2h 15m</div></div><div class="right"><span class="badge filled">On track</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Sales Unit</div><div class="secondary-text">142 calls per day, 18% conversion</div></div><div class="right"><span class="badge filled">On track</span></div></div>
+        <div class="list-row"><div><div class="primary-text">HR</div><div class="secondary-text">5 quarterly reviews overdue this month</div></div><div class="right"><span class="badge outline">Bottleneck</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-biexport">
+      <div class="page-header">
+        <div><h1>Business Intelligence Exporter</h1><p class="subtitle">Scheduled reports for the College CEO</p></div>
+        <button class="primary" onclick="openNewReport()">+ New scheduled report</button>
+      </div>
+      <div class="list" id="biexport-list">
+        <div class="list-row"><div><div class="primary-text">Weekly Operations Summary</div><div class="secondary-text">Weekly — last sent Sep 8</div></div><div class="right"><button class="link-btn" onclick="sendReportNow(this)">Send now</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Monthly Financial Snapshot</div><div class="secondary-text">Monthly — last sent Sep 1</div></div><div class="right"><button class="link-btn" onclick="sendReportNow(this)">Send now</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-slabreach">
+      <div class="page-header">
+        <div><h1>SLA Breach Alerter</h1><p class="subtitle">Delayed tickets, procurement, and grade entries</p></div>
+      </div>
+      <div class="list" id="slabreach-list">
+        <div class="list-row"><div><div class="primary-text">IT ticket #1042 — CS204 lab PC won't boot</div><div class="secondary-text">45 minutes overdue — already escalated to IT Officer</div></div><div class="right"><span class="badge outline">Critical</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Grade entry — CS210 Midterm</div><div class="secondary-text">2 days overdue</div></div><div class="right"><span class="badge dashed">Medium</span><button class="link-btn" onclick="notifyHead(this)">Notify department head</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-conflict">
+      <div class="page-header">
+        <div><h1>Cross-Department Conflict Arbitrator</h1><p class="subtitle">Resolving blocking resource conflicts</p></div>
+      </div>
+      <div class="list" id="conflict-list">
+        <div class="list-row"><div><div class="primary-text">Room B204 double-booked</div><div class="secondary-text">Academics vs RTE scheduling — resolved by RTE, room reassigned</div></div><div class="right"><span class="badge filled">Resolved</span></div></div>
+        <div class="list-row"><div><div class="primary-text">HPC Cluster budget overrun</div><div class="secondary-text">IT Support vs Finance — R&amp;D expansion request pending sign-off</div></div><div class="right"><span class="badge outline">Needs arbitration</span><button class="link-btn" onclick="resolveConflict(this)">Resolve</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-reallocation">
+      <div class="page-header">
+        <div><h1>Resource Reallocation Portal</h1><p class="subtitle">Fast transfer of staff, budget, or hardware</p></div>
+        <button class="primary" onclick="openReallocate()">+ New reallocation</button>
+      </div>
+      <div class="list" id="reallocation-list">
+        <div class="list-row"><div><div class="primary-text">2 spare lab PCs</div><div class="secondary-text">From IT Support surplus — to R&amp;D Wing</div></div><div class="right"><span class="badge dashed">Pending approval</span><button class="link-btn" onclick="approveTransfer(this)">Approve transfer</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-infrahealth">
+      <div class="page-header">
+        <div><h1>Infrastructure Health Monitor</h1><p class="subtitle">Application performance and server response</p></div>
+      </div>
+      <div class="stat-grid cols-3">
+        <div class="stat-card"><div class="stat-value">99.9%</div><div class="stat-label">App uptime</div></div>
+        <div class="stat-card"><div class="stat-value">180ms</div><div class="stat-label">Avg response time</div></div>
+        <div class="stat-card"><div class="stat-value">62%</div><div class="stat-label">Server load</div></div>
+      </div>
+      <div class="list">
+        <div class="list-row"><div class="primary-text">ERP Core API</div><div class="right"><span class="badge filled">Healthy</span></div></div>
+        <div class="list-row"><div class="primary-text">Student Portal</div><div class="right"><span class="badge filled">Healthy</span></div></div>
+        <div class="list-row"><div><div class="primary-text">VLE Content Storage</div><div class="secondary-text">Backup verification failed — flagged by IT Support</div></div><div class="right"><span class="badge outline">Degraded</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-apicommand">
+      <div class="page-header">
+        <div><h1>API Integration Command Center</h1><p class="subtitle">Health, throughput, and error rates</p></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Integration</th><th>Health</th><th>Throughput</th><th>Error rate</th></tr></thead>
+          <tbody>
+            <tr><td>eSewa Payment Gateway</td><td><span class="badge filled">Healthy</span></td><td class="num">1,200 req/day</td><td class="num">0.2%</td></tr>
+            <tr><td>SMS Gateway</td><td><span class="badge filled">Healthy</span></td><td class="num">450 req/day</td><td class="num">0.1%</td></tr>
+            <tr><td>HPC Cluster API</td><td><span class="badge outline">Degraded</span></td><td class="num">80 req/day</td><td class="num">4.2%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="page" id="page-disasterrecovery">
+      <div class="page-header">
+        <div><h1>Disaster Recovery Manager</h1><p class="subtitle">Failover readiness</p></div>
+        <button class="secondary" onclick="runFailoverTest()">Run failover test</button>
+      </div>
+      <div class="stat-grid cols-3">
+        <div class="stat-card"><div class="stat-value">4h</div><div class="stat-label">Recovery time objective</div></div>
+        <div class="stat-card"><div class="stat-value">15 min</div><div class="stat-label">Recovery point objective</div></div>
+        <div class="stat-card"><div class="stat-value">Aug 20</div><div class="stat-label">Last failover test</div></div>
+      </div>
+      <div class="list" id="disasterrecovery-list">
+        <div class="list-row"><div><div class="primary-text">Student Records DB</div><div class="secondary-text">Verified backup</div></div><div class="right"><span class="badge filled">Failover ready</span></div></div>
+        <div class="list-row"><div><div class="primary-text">VLE Content Storage</div><div class="secondary-text">Verification failed — see IT Support backup validator</div></div><div class="right"><span class="badge outline">Not ready</span><button class="link-btn" onclick="investigateDr(this)">Investigate</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-security">
+      <div class="page-header">
+        <div><h1>Tenant Security Auditing</h1><p class="subtitle">User activity anomalies and configuration changes</p></div>
+      </div>
+      <div class="list" id="security-list">
+        <div class="list-row"><div><div class="primary-text">Kiran Magar</div><div class="secondary-text">3 failed MFA attempts, resolved by IT Support</div></div><div class="right"><span class="badge filled">Reviewed</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Dr. Sita Poudel</div><div class="secondary-text">Login from an unrecognized location</div></div><div class="right"><span class="badge outline">Flagged</span><button class="link-btn" onclick="investigateSecurity(this)">Investigate</button></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-accessmatrix">
+      <div class="page-header">
+        <div><h1>System Access Matrix Reviewer</h1><p class="subtitle">Who holds administrative access</p></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>User</th><th>Admin scope</th></tr></thead>
+          <tbody>
+            <tr><td>Mr. Deepak Karki</td><td>IT Support — full admin</td></tr>
+            <tr><td>Mr. Rajan Shakya</td><td>Finance — full admin</td></tr>
+            <tr><td>Ms. Anjana Bhattarai</td><td>HR — full admin</td></tr>
+            <tr><td>Mr. Bijay Thapa</td><td>RTE — full admin</td></tr>
+            <tr><td>Ms. Nirmala Adhikari</td><td>SSD — full admin</td></tr>
+            <tr><td>Mr. Vivek Malla</td><td>All departments — master oversight</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="page" id="page-emergency">
+      <div class="page-header">
+        <div><h1>Emergency Override Controls</h1><p class="subtitle">Freeze or lock modules during active incidents</p></div>
+      </div>
+      <div class="list" id="emergency-list">
+        <div class="list-row"><div><div class="primary-text">Payment Gateway</div><div class="secondary-text">Currently active</div></div><div class="right"><button class="secondary" onclick="toggleEmergency(this)">Freeze module</button></div></div>
+        <div class="list-row"><div><div class="primary-text">Student Portal</div><div class="secondary-text">Currently active</div></div><div class="right"><button class="secondary" onclick="toggleEmergency(this)">Freeze module</button></div></div>
+      </div>
+      <p class="secondary-text" style="margin-top:10px;">Freezing a module immediately blocks new transactions until manually restored. Use only during active incidents.</p>
+    </section>
+
+    <section class="page" id="page-schema">
+      <div class="page-header">
+        <div><h1>Data Schema Customizer</h1><p class="subtitle">Local fields without touching the master schema</p></div>
+        <button class="primary" onclick="openNewField()">+ New custom field</button>
+      </div>
+      <div class="list" id="schema-list">
+        <div class="list-row"><div><div class="primary-text">Scholarship Source</div><div class="secondary-text">Student Ledger module — added by Finance</div></div><div class="right"><span class="badge filled">Active</span></div></div>
+        <div class="list-row"><div><div class="primary-text">UPC Eligibility Flag</div><div class="secondary-text">Student record module — added by DMU</div></div><div class="right"><span class="badge filled">Active</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-automators">
+      <div class="page-header">
+        <div><h1>Operational Process Automator</h1><p class="subtitle">Visual rules linking cross-department steps</p></div>
+        <button class="primary" onclick="openNewAutomation()">+ New rule</button>
+      </div>
+      <div class="list" id="automators-list">
+        <div class="list-row"><div><div class="primary-text">New hire IT setup</div><div class="secondary-text">Trigger: HR logs a new hire → Action: IT Support provisioning request created</div></div><div class="right"><span class="badge filled">Active</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Fee overdue escalation</div><div class="secondary-text">Trigger: fee 90+ days overdue → Action: RTE graduation block + SSD STAR case</div></div><div class="right"><span class="badge filled">Active</span></div></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-dataexport">
+      <div class="page-header">
+        <div><h1>Data Export Pipeline Control</h1><p class="subtitle">Secure tenant data extraction</p></div>
+        <button class="primary" onclick="runExport()">Run export now</button>
+      </div>
+      <div class="list" id="dataexport-list">
+        <div class="list-row"><div><div class="primary-text">Full tenant backup</div><div class="secondary-text">Internal cold storage — last run Sep 13</div></div><div class="right"><span class="badge filled">Success</span></div></div>
+        <div class="list-row"><div><div class="primary-text">Student records export</div><div class="secondary-text">Group consolidation — last run Sep 1</div></div><div class="right"><span class="badge filled">Success</span></div></div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this) closeModal()">
+  <div class="modal">
+    <div class="modal-header"><h3 id="modal-title"></h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer" id="modal-footer"></div>
+  </div>
+</div>
+
+<script>
+var modalContext = null;
+
+function showPage(id, el){
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
+  if(el) el.classList.add('active');
+}
+function goTo(id){
+  showPage(id, document.querySelector('.nav-item[data-page="' + id + '"]'));
+}
+
+/* ---------- modal shell ---------- */
+function openModal(title, bodyHtml, footerHtml){
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = bodyHtml;
+  document.getElementById('modal-footer').innerHTML = footerHtml || '<button class="secondary" onclick="closeModal()">Close</button>';
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal(){
+  document.getElementById('modal-overlay').classList.remove('open');
+  modalContext = null;
+}
+function formInput(label,id,val,type){
+  type = type || 'text';
+  return '<div class="form-group"><label>' + label + '</label><input type="' + type + '" id="' + id + '" value="' + (val===undefined?'':val) + '"></div>';
+}
+function formTextarea(label,id){
+  return '<div class="form-group"><label>' + label + '</label><textarea id="' + id + '"></textarea></div>';
+}
+function formSelect(label,id,opts){
+  var o = opts.map(function(x){ return '<option>' + x + '</option>'; }).join('');
+  return '<div class="form-group"><label>' + label + '</label><select id="' + id + '">' + o + '</select></div>';
+}
+
+/* ---------- BI exporter ---------- */
+function openNewReport(){
+  openModal('New scheduled report',
+    formInput('Report name','nr-name','') +
+    formSelect('Frequency','nr-freq',['Daily','Weekly','Monthly']),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveReport()">Schedule</button>'
+  );
+}
+function saveReport(){
+  var name = document.getElementById('nr-name').value || 'Untitled report';
+  var freq = document.getElementById('nr-freq').value;
+  var list = document.getElementById('biexport-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + name + '</div><div class="secondary-text">' + freq + ' — not yet sent</div></div><div class="right"><button class="link-btn" onclick="sendReportNow(this)">Send now</button></div>';
+  list.appendChild(row);
+  closeModal();
+}
+function sendReportNow(btn){
+  var row = btn.closest('.list-row');
+  row.querySelector('.secondary-text').textContent = row.querySelector('.secondary-text').textContent.split(' — ')[0] + ' — sent just now';
+  openModal('Report sent', '<p style="font-size:13px;">This report has been emailed to the College CEO.</p>', '<button class="primary" onclick="closeModal()">Done</button>');
+}
+function sendBiReport(){
+  openModal('BI report sent', '<p style="font-size:13px;">The Weekly Operations Summary has been compiled from all 12 departments and sent to the College CEO.</p>', '<button class="primary" onclick="closeModal()">Done</button>');
+}
+
+/* ---------- SLA breach ---------- */
+function notifyHead(btn){
+  var row = btn.closest('.list-row');
+  row.querySelector('.right').innerHTML = '<span class="badge filled">Department head notified</span>';
+  btn.remove();
+}
+
+/* ---------- conflict arbitration ---------- */
+function resolveConflict(btn){
+  var row = btn.closest('.list-row');
+  modalContext = { row: row };
+  openModal('Resolve conflict', formTextarea('Arbitration decision','rc-decision'), '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveArbitration()">Confirm decision</button>');
+}
+function saveArbitration(){
+  var row = modalContext.row;
+  row.querySelector('.right').innerHTML = '<span class="badge filled">Resolved</span>';
+  closeModal();
+}
+
+/* ---------- resource reallocation ---------- */
+function openReallocate(){
+  openModal('New reallocation',
+    formInput('Resource','rl-resource','') +
+    '<div class="form-row-2">' + formInput('From department','rl-from','') + formInput('To department','rl-to','') + '</div>',
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveReallocation()">Submit</button>'
+  );
+}
+function saveReallocation(){
+  var resource = document.getElementById('rl-resource').value || 'Untitled resource';
+  var from = document.getElementById('rl-from').value || 'Unspecified department';
+  var to = document.getElementById('rl-to').value || 'Unspecified department';
+  var list = document.getElementById('reallocation-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + resource + '</div><div class="secondary-text">From ' + from + ' — to ' + to + '</div></div><div class="right"><span class="badge dashed">Pending approval</span><button class="link-btn" onclick="approveTransfer(this)">Approve transfer</button></div>';
+  list.appendChild(row);
+  closeModal();
+}
+function approveTransfer(btn){
+  var row = btn.closest('.list-row');
+  row.querySelector('.right').innerHTML = '<span class="badge filled">Transferred</span>';
+  btn.remove();
+}
+
+/* ---------- disaster recovery ---------- */
+function runFailoverTest(){
+  openModal('Failover test running', '<p style="font-size:13px;">Simulated failover initiated across all core systems. Results will be logged once the test completes.</p>', '<button class="primary" onclick="closeModal()">Done</button>');
+}
+function investigateDr(btn){
+  var row = btn.closest('.list-row');
+  openModal('Investigation opened', '<p style="font-size:13px;">Linked to IT Support\'s backup validator for VLE Content Storage. A re-validation has been requested.</p>', '<button class="primary" onclick="closeModal()">Done</button>');
+}
+
+/* ---------- security auditing ---------- */
+function investigateSecurity(btn){
+  var row = btn.closest('.list-row');
+  row.querySelector('.right').innerHTML = '<span class="badge filled">Under investigation</span>';
+  btn.remove();
+}
+
+/* ---------- emergency overrides ---------- */
+function toggleEmergency(btn){
+  var row = btn.closest('.list-row');
+  var frozen = btn.textContent.indexOf('Freeze') !== -1;
+  row.querySelector('.secondary-text').textContent = frozen ? 'Frozen — new transactions blocked' : 'Currently active';
+  btn.textContent = frozen ? 'Restore module' : 'Freeze module';
+}
+
+/* ---------- schema customizer ---------- */
+function openNewField(){
+  openModal('New custom field',
+    formInput('Field name','nf-name','') +
+    formInput('Module','nf-module',''),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveField()">Add field</button>'
+  );
+}
+function saveField(){
+  var name = document.getElementById('nf-name').value || 'Untitled field';
+  var module = document.getElementById('nf-module').value || 'Unspecified module';
+  var list = document.getElementById('schema-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">' + name + '</div><div class="secondary-text">' + module + ' module — added by Operations Head</div></div><div class="right"><span class="badge filled">Active</span></div>';
+  list.appendChild(row);
+  closeModal();
+}
+
+/* ---------- process automators ---------- */
+function openNewAutomation(){
+  openModal('New automation rule',
+    formInput('Trigger','na-trigger','e.g. HR logs a new hire') +
+    formInput('Action','na-action','e.g. IT Support provisioning created'),
+    '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveAutomation()">Activate rule</button>'
+  );
+}
+function saveAutomation(){
+  var trigger = document.getElementById('na-trigger').value || 'Untitled trigger';
+  var action = document.getElementById('na-action').value || 'Untitled action';
+  var list = document.getElementById('automators-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  row.innerHTML = '<div><div class="primary-text">New rule</div><div class="secondary-text">Trigger: ' + trigger + ' &rarr; Action: ' + action + '</div></div><div class="right"><span class="badge filled">Active</span></div>';
+  list.appendChild(row);
+  closeModal();
+}
+
+/* ---------- data export ---------- */
+function runExport(){
+  var list = document.getElementById('dataexport-list');
+  var row = document.createElement('div');
+  row.className = 'list-row';
+  var d = new Date();
+  row.innerHTML = '<div><div class="primary-text">Ad hoc tenant export</div><div class="secondary-text">Internal cold storage — ' + (d.getMonth()+1) + '/' + d.getDate() + '</div></div><div class="right"><span class="badge filled">Success</span></div>';
+  list.prepend(row);
+  openModal('Export complete', '<p style="font-size:13px;">A full tenant data bundle has been extracted and securely stored.</p>', '<button class="primary" onclick="closeModal()">Done</button>');
+}
+</script>
+</body>
+</html>

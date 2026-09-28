@@ -1,0 +1,944 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ING ERP — Academic Officer Operations</title>
+    <style>
+      :root {
+        --surface-1: #fafafa;
+        --surface-2: #f2f2f2;
+        --border: #e6e6e6;
+        --border-strong: #cfcfcf;
+        --text-primary: #111111;
+        --text-secondary: #5a5a5e;
+        --text-muted: #9a9a9e;
+        --fill-primary: #000000;
+        --on-primary: #ffffff;
+        --radius: 10px;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+          Arial, sans-serif;
+        background: var(--surface-2);
+        color: var(--text-primary);
+      }
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 24px;
+        background: #fff;
+        border-bottom: 1px solid var(--border);
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .topbar .who {
+        font-size: 12px;
+        color: var(--text-secondary);
+      }
+      .topbar .who strong {
+        color: var(--text-primary);
+        font-weight: 600;
+      }
+      .topbar .right-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .app {
+        display: flex;
+        min-height: 100vh;
+      }
+      .sidebar {
+        width: 220px;
+        flex-shrink: 0;
+        background: var(--surface-1);
+        border-right: 1px solid var(--border);
+        padding: 20px 12px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0 8px 16px;
+      }
+      .brand .mark {
+        width: 24px;
+        height: 24px;
+        border-radius: 6px;
+        background: var(--fill-primary);
+        flex-shrink: 0;
+      }
+      .brand .name {
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 1.3;
+      }
+      .brand .role {
+        font-size: 11px;
+        color: var(--text-muted);
+        line-height: 1.3;
+      }
+      .nav-item {
+        display: block;
+        padding: 8px 10px;
+        border-radius: 7px;
+        font-size: 13px;
+        color: var(--text-secondary);
+        cursor: pointer;
+        margin-bottom: 2px;
+      }
+      .nav-item:hover {
+        background: var(--surface-2);
+      }
+      .nav-item.active {
+        background: var(--fill-primary);
+        color: var(--on-primary);
+      }
+      .nav-divider {
+        border-top: 1px solid var(--border);
+        margin: 12px 4px;
+      }
+      .group {
+        margin-bottom: 18px;
+      }
+      .group-label {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-muted);
+        margin: 0 0 6px 10px;
+      }
+      .main {
+        flex: 1;
+        padding: 32px 36px;
+        min-width: 0;
+      }
+      .page {
+        display: none;
+      }
+      .page.active {
+        display: block;
+      }
+      .page-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: 22px;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      h1 {
+        font-size: 22px;
+        margin: 0;
+        font-weight: 600;
+      }
+      .subtitle {
+        font-size: 13px;
+        color: var(--text-secondary);
+        margin: 5px 0 0;
+      }
+      button.primary {
+        background: var(--fill-primary);
+        color: var(--on-primary);
+        border: none;
+        border-radius: 8px;
+        padding: 10px 16px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      button.secondary {
+        background: #fff;
+        color: var(--text-primary);
+        border: 1px solid var(--border-strong);
+        border-radius: 8px;
+        padding: 10px 16px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      .link-btn {
+        background: none;
+        border: none;
+        color: var(--text-primary);
+        font-size: 12px;
+        font-weight: 600;
+        text-decoration: underline;
+        cursor: pointer;
+        padding: 0;
+        white-space: nowrap;
+      }
+      .toolbar {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 18px;
+        flex-wrap: wrap;
+      }
+      input[type="text"],
+      input[type="number"],
+      input[type="date"],
+      select,
+      textarea {
+        border: 1px solid var(--border-strong);
+        border-radius: 8px;
+        padding: 10px 12px;
+        font-size: 13px;
+        background: #fff;
+        color: var(--text-primary);
+        font-family: inherit;
+      }
+      input[type="text"] {
+        flex: 1;
+        min-width: 160px;
+      }
+      select {
+        width: 170px;
+      }
+      .card {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        margin-bottom: 12px;
+        overflow: hidden;
+        background: #fff;
+      }
+      .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 18px;
+        cursor: pointer;
+        gap: 12px;
+      }
+      .badge {
+        font-size: 11px;
+        padding: 2px 9px;
+        border-radius: 999px;
+        white-space: nowrap;
+        cursor: default;
+      }
+      .badge.filled {
+        background: var(--fill-primary);
+        color: var(--on-primary);
+      }
+      .badge.outline {
+        border: 1px solid var(--border-strong);
+        color: var(--text-secondary);
+      }
+      .badge.dashed {
+        border: 1px dashed var(--border-strong);
+        color: var(--text-secondary);
+      }
+      .badge.clickable {
+        cursor: pointer;
+      }
+      .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+      .stat-grid.cols-4 {
+        grid-template-columns: repeat(4, 1fr);
+      }
+      .stat-card {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: #fff;
+        padding: 16px 18px;
+      }
+      .stat-value {
+        font-size: 24px;
+        font-weight: 700;
+      }
+      .stat-label {
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-top: 4px;
+      }
+      .list {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+        background: #fff;
+      }
+      .list-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 18px;
+        gap: 14px;
+        border-bottom: 1px solid var(--border);
+      }
+      .list-row:last-child {
+        border-bottom: none;
+      }
+      .list-row.clickable {
+        cursor: pointer;
+      }
+      .list-row.clickable:hover {
+        background: var(--surface-1);
+      }
+      .list-row .primary-text {
+        font-size: 14px;
+        font-weight: 600;
+      }
+      .list-row .secondary-text {
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-top: 3px;
+      }
+      .list-row .right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-shrink: 0;
+      }
+      .table-wrap {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+        background: #fff;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        padding: 12px 14px;
+        font-size: 13px;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+      }
+      th {
+        font-weight: 600;
+        color: var(--text-secondary);
+        background: var(--surface-1);
+        font-size: 12px;
+      }
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+      td.num {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+      td.avg {
+        font-weight: 700;
+        text-align: right;
+      }
+      .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        z-index: 50;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      .modal-overlay.open {
+        display: flex;
+      }
+      .modal {
+        background: #fff;
+        border-radius: 12px;
+        max-width: 480px;
+        width: 100%;
+        max-height: 86vh;
+        overflow-y: auto;
+        border: 1px solid var(--border-strong);
+      }
+      .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border);
+      }
+      .modal-header h3 {
+        margin: 0;
+        font-size: 16px;
+      }
+      .modal-close {
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        color: var(--text-secondary);
+        line-height: 1;
+        padding: 4px;
+      }
+      .modal-body {
+        padding: 18px 20px;
+      }
+      .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        padding: 14px 20px;
+        border-top: 1px solid var(--border);
+      }
+      .form-group {
+        margin-bottom: 14px;
+      }
+      .form-group label {
+        display: block;
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-bottom: 5px;
+        font-weight: 600;
+      }
+      .form-group input,
+      .form-group select,
+      .form-group textarea {
+        width: 100%;
+      }
+      .form-group textarea {
+        resize: vertical;
+        min-height: 70px;
+      }
+      .form-row-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 10px;
+      }
+      .form-row-2 input {
+        width: 100%;
+      }
+      @media (max-width: 640px) {
+        .sidebar {
+          display: none;
+        }
+        .main {
+          padding: 22px;
+        }
+        .stat-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="topbar">
+      <div class="who">
+        Signed in as <strong>Academic Officer Level</strong> — Operations &amp;
+        Data CRUD
+      </div>
+      <div class="right-group">
+        <span class="who"
+          >Department Lead: <strong>Academics Head</strong></span
+        >
+        <select id="course-switch">
+          <option>All Modules &amp; Academic Records</option>
+          <option>CS204 — Database Management Systems</option>
+          <option>CS210 — Software Engineering Principles</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="app">
+      <!-- Optimized & Consolidated Sidebar -->
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="mark"></div>
+          <div>
+            <div class="name">ING ERP</div>
+            <div class="role">Academic Officer</div>
+          </div>
+        </div>
+        <div
+          class="nav-item active"
+          data-page="ops-dashboard"
+          onclick="showPage('ops-dashboard', this)"
+        >
+          Officer Console
+        </div>
+        <div class="nav-divider"></div>
+        <nav>
+          <!-- Merged Group 1: Curriculum & Teaching Materials -->
+          <div class="group">
+            <p class="group-label">Curriculum &amp; Delivery</p>
+            <div
+              class="nav-item"
+              data-page="courses-vle"
+              onclick="showPage('courses-vle', this)"
+            >
+              Syllabus &amp; VLE Uploads
+            </div>
+            <div
+              class="nav-item"
+              data-page="lesson-plans"
+              onclick="showPage('lesson-plans', this)"
+            >
+              Lesson Plan Review
+            </div>
+          </div>
+          <!-- Merged Group 2: Student Roster & Tracking -->
+          <div class="group">
+            <p class="group-label">Student Management</p>
+            <div
+              class="nav-item"
+              data-page="attendance-logs"
+              onclick="showPage('attendance-logs', this)"
+            >
+              Attendance &amp; Logs
+            </div>
+            <div
+              class="nav-item"
+              data-page="gradebook-crud"
+              onclick="showPage('gradebook-crud', this)"
+            >
+              Gradebook &amp; Assignments
+            </div>
+            <div
+              class="nav-item"
+              data-page="probation-cases"
+              onclick="showPage('probation-cases', this)"
+            >
+              Probation &amp; Case Filing
+            </div>
+          </div>
+          <!-- Merged Group 3: Department Appraisals & Self Review -->
+          <div class="group">
+            <p class="group-label">Governance &amp; Appraisals</p>
+            <div
+              class="nav-item"
+              data-page="three-month-review"
+              onclick="showPage('three-month-review', this)"
+            >
+              3-Month Review
+            </div>
+          </div>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <!-- Officer Console Dashboard -->
+        <section class="page active" id="page-ops-dashboard">
+          <div class="page-header">
+            <div>
+              <h1>Academic Operations Console</h1>
+              <p class="subtitle">
+                Primary execution and CRUD entry portal for academic logistics.
+              </p>
+            </div>
+          </div>
+          <div class="stat-grid cols-4">
+            <div class="stat-card">
+              <div class="stat-value">12</div>
+              <div class="stat-label">Pending Lesson Plans</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">45</div>
+              <div class="stat-label">Submissions to Process</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">3</div>
+              <div class="stat-label">Open Probation Cases</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">100%</div>
+              <div class="stat-label">Roster Sync Health</div>
+            </div>
+          </div>
+
+          <div class="toolbar">
+            <button class="primary" onclick="openAddCourseModal()">
+              + Add New Course Record
+            </button>
+            <button class="secondary" onclick="openUploadContentModal()">
+              + Upload VLE Asset
+            </button>
+            <button class="secondary" onclick="openCreateProbationModal()">
+              + File Probation Entry
+            </button>
+          </div>
+
+          <div class="list">
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Pending Syllabus Audit — CS230</div>
+                <div class="secondary-text">
+                  Submitted by Faculty for initial verification
+                </div>
+              </div>
+              <div class="right">
+                <button
+                  class="link-btn"
+                  onclick="openVerifyModal('CS230 Syllabus')"
+                >
+                  Verify
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">
+                  Assignment Portal Setup — Assignment 3
+                </div>
+                <div class="secondary-text">
+                  Requires submission window configuration
+                </div>
+              </div>
+              <div class="right">
+                <button class="link-btn" onclick="openConfigAssignmentModal()">
+                  Configure
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Syllabus & VLE Uploads -->
+        <section class="page" id="page-courses-vle">
+          <div class="page-header">
+            <div>
+              <h1>Course Records &amp; VLE Management</h1>
+              <p class="subtitle">
+                Maintain course descriptors, syllabi, and learning resources.
+              </p>
+            </div>
+            <button class="primary" onclick="openAddCourseModal()">
+              + Add Course Entry
+            </button>
+          </div>
+          <div class="toolbar">
+            <input
+              type="text"
+              placeholder="Search courses or VLE resources"
+              oninput="filterRows(this, '#vle-table', 'tbody tr')"
+            />
+          </div>
+          <div class="table-wrap">
+            <table id="vle-table">
+              <thead>
+                <tr>
+                  <th>Course / File Title</th>
+                  <th>Code</th>
+                  <th>Type</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Database Management Systems</td>
+                  <td>CS204</td>
+                  <td>Core Syllabus</td>
+                  <td><span class="badge filled">Active</span></td>
+                  <td>
+                    <button class="link-btn" onclick="editRow(this)">
+                      Edit
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Normalization Lecture Walkthrough</td>
+                  <td>CS204</td>
+                  <td>Video (MP4)</td>
+                  <td><span class="badge outline">Published</span></td>
+                  <td>
+                    <button class="link-btn" onclick="editRow(this)">
+                      Edit
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Lesson Plan Verification -->
+        <section class="page" id="page-lesson-plans">
+          <div class="page-header">
+            <div>
+              <h1>Lesson Plan Repository &amp; Verification</h1>
+              <p class="subtitle">
+                Verify and log faculty weekly teaching plans.
+              </p>
+            </div>
+          </div>
+          <div class="list">
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Week 8 — Indexing &amp; Hashing</div>
+                <div class="secondary-text">
+                  Faculty: Dr. Meera Joshi — CS204
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge dashed">Pending Review</span
+                ><button class="link-btn" onclick="openReviewLessonPlanModal()">
+                  Process Entry
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Attendance Logs -->
+        <section class="page" id="page-attendance-logs">
+          <div class="page-header">
+            <div>
+              <h1>Roster Attendance &amp; Incident Logging</h1>
+              <p class="subtitle">
+                Batch processing and attendance corrections.
+              </p>
+            </div>
+          </div>
+          <div class="notice">
+            Roster sync active for Semester 1 cohorts. All manual overrides are
+            logged for head audit.
+          </div>
+          <div class="list">
+            <div class="list-row">
+              <div>
+                <div class="primary-text">
+                  CS204 — Database Systems (Mon Session)
+                </div>
+                <div class="secondary-text">
+                  42 Students Enrolled — 3 Absences Flagged
+                </div>
+              </div>
+              <div class="right">
+                <button class="link-btn" onclick="goTo('ops-dashboard')">
+                  Inspect Log
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Gradebook CRUD & Assignment Entries -->
+        <section class="page" id="page-gradebook-crud">
+          <div class="page-header">
+            <div>
+              <h1>Gradebook CRUD &amp; Weight Config</h1>
+              <p class="subtitle">
+                Input student grades, update scores, and set rubrics.
+              </p>
+            </div>
+            <button class="secondary" onclick="openRubricModal()">
+              Set Module Rubric
+            </button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Student Name</th>
+                  <th>Student ID</th>
+                  <th>Quiz 1 (10%)</th>
+                  <th>Assignment 1 (20%)</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Aisha Karki</td>
+                  <td>ST1042</td>
+                  <td>8/10</td>
+                  <td>17/20</td>
+                  <td>
+                    <button class="link-btn" onclick="editGradeModal(this)">
+                      Update Entry
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Kiran Magar</td>
+                  <td>ST1051</td>
+                  <td>4/10</td>
+                  <td>10/20</td>
+                  <td>
+                    <button class="link-btn" onclick="editGradeModal(this)">
+                      Update Entry
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Probation File Entry -->
+        <section class="page" id="page-probation-cases">
+          <div class="page-header">
+            <div>
+              <h1>Academic Probation Case Filing</h1>
+              <p class="subtitle">
+                Log at-risk students and issue warning notices.
+              </p>
+            </div>
+            <button class="primary" onclick="openCreateProbationModal()">
+              + Create New Case File
+            </button>
+          </div>
+          <div class="list">
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Manisha Shrestha (ST1046)</div>
+                <div class="secondary-text">GPA Threshold Breach (< 2.0)</div>
+              </div>
+              <div class="right">
+                <span class="badge dashed">Warning Issued</span
+                ><button class="link-btn" onclick="viewCaseDetail(this)">
+                  View File
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Transparent 3-Month Performance Review Portal -->
+        <section class="page" id="page-three-month-review">
+          <div class="page-header">
+            <div>
+              <h1>3-Month Performance Review (Transparent)</h1>
+              <p class="subtitle">
+                Quarterly self-evaluation and transparent head feedback portal.
+              </p>
+            </div>
+          </div>
+          <div class="card" style="padding: 18px">
+            <div class="form-group">
+              <label>Officer Self-Assessment Notes</label
+              ><textarea
+                id="self-review"
+                placeholder="Detail your quarterly accomplishments, data entries completed, and process improvements..."
+              ></textarea>
+            </div>
+            <button class="primary" onclick="saveSelfReview()">
+              Submit Self Review
+            </button>
+          </div>
+          <div class="card" style="padding: 18px; margin-top: 16px">
+            <p class="detail-label">Head Assessment Feedback (Transparent)</p>
+            <p style="font-size: 13px; color: var(--text-secondary)">
+              Feedback from Academics Head will appear here upon evaluation
+              cycle closure.
+            </p>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- Modal Shell -->
+    <div
+      class="modal-overlay"
+      id="modal-overlay"
+      onclick="if (event.target === this) closeModal();"
+    >
+      <div class="modal">
+        <div class="modal-header">
+          <h3 id="modal-title">Action Window</h3>
+          <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body" id="modal-body"></div>
+        <div class="modal-footer" id="modal-footer"></div>
+      </div>
+    </div>
+
+    <script>
+      function showPage(id, el) {
+        document.querySelectorAll(".page").forEach(function (p) {
+          p.classList.remove("active");
+        });
+        document.getElementById("page-" + id).classList.add("active");
+        document.querySelectorAll(".nav-item").forEach(function (n) {
+          n.classList.remove("active");
+        });
+        if (el) el.classList.add("active");
+      }
+      function goTo(id) {
+        var target = document.querySelector(
+          '.nav-item[data-page="' + id + '"]',
+        );
+        showPage(id, target);
+      }
+      function filterRows(inputEl, containerSelector, rowSelector) {
+        var q = inputEl.value.toLowerCase();
+        document
+          .querySelectorAll(containerSelector + " " + rowSelector)
+          .forEach(function (row) {
+            row.style.display =
+              row.textContent.toLowerCase().indexOf(q) > -1 ? "" : "none";
+          });
+      }
+      function openModal(title, bodyHtml, footerHtml) {
+        document.getElementById("modal-title").textContent = title;
+        document.getElementById("modal-body").innerHTML = bodyHtml;
+        document.getElementById("modal-footer").innerHTML =
+          footerHtml ||
+          '<button class="secondary" onclick="closeModal()">Close</button>';
+        document.getElementById("modal-overlay").classList.add("open");
+      }
+      function closeModal() {
+        document.getElementById("modal-overlay").classList.remove("open");
+      }
+
+      /* Modal Actions */
+      function openAddCourseModal() {
+        openModal(
+          "Add Course Entry",
+          '<div class="form-group"><label>Course Code</label><input type="text" placeholder="e.g. CS250"></div>' +
+            '<div class="form-group"><label>Course Title</label><input type="text" placeholder="e.g. Data Structures"></div>' +
+            '<div class="form-group"><label>Credits</label><input type="number" placeholder="6"></div>',
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="closeModal()">Save Entry</button>',
+        );
+      }
+      function openUploadContentModal() {
+        openModal(
+          "Upload VLE Resource",
+          '<div class="form-group"><label>Resource Title</label><input type="text" placeholder="e.g. Lecture 1 Slides"></div>' +
+            '<div class="form-group"><label>Target Course</label><select><option>CS204</option><option>CS210</option></select></div>' +
+            '<div class="form-group"><label>File Upload</label><input type="file"></div>',
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="closeModal()">Upload File</button>',
+        );
+      }
+      function openCreateProbationModal() {
+        openModal(
+          "File Probation Case",
+          '<div class="form-group"><label>Student Name / ID</label><input type="text" placeholder="e.g. Kiran Magar (ST1051)"></div>' +
+            '<div class="form-group"><label>Reason for Action</label><select><option>GPA Breach (< 2.0)</option><option>Attendance Shortage (< 75%)</option></select></div>' +
+            '<div class="form-group"><label>Notes</label><textarea placeholder="Specify warning details..."></textarea></div>',
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="closeModal()">Issue Notice</button>',
+        );
+      }
+      function openReviewLessonPlanModal() {
+        openModal(
+          "Process Lesson Plan",
+          '<p style="font-size:13px;">Reviewing submission for CS204 Week 8.</p>' +
+            '<div class="form-group"><label>Status</label><select><option>Approve</option><option>Request Revision</option></select></div>',
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="closeModal()">Submit Decision</button>',
+        );
+      }
+      function editGradeModal(btn) {
+        openModal(
+          "Update Grade Entry",
+          '<div class="form-group"><label>Quiz 1 Score</label><input type="number" value="8"></div>' +
+            '<div class="form-group"><label>Assignment 1 Score</label><input type="number" value="17"></div>',
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="closeModal()">Save Grade</button>',
+        );
+      }
+      function saveSelfReview() {
+        openModal(
+          "Self Review Saved",
+          '<p style="font-size:13px;">Your quarterly 3-month self-assessment has been successfully logged and routed to the Academics Head for review.</p>',
+          '<button class="primary" onclick="closeModal()">Done</button>',
+        );
+      }
+    </script>
+  </body>
+</html>

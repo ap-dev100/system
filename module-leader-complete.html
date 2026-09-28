@@ -1,0 +1,2128 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ING ERP — Module Leader Portal</title>
+    <style>
+      :root {
+        --surface-1: #fafafa;
+        --surface-2: #f2f2f2;
+        --border: #e6e6e6;
+        --border-strong: #cfcfcf;
+        --text-primary: #111111;
+        --text-secondary: #5a5a5e;
+        --text-muted: #9a9a9e;
+        --fill-primary: #000000;
+        --on-primary: #ffffff;
+        --radius: 10px;
+        --accent-subtle: #f0f0f5;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+          Arial, sans-serif;
+        background: var(--surface-2);
+        color: var(--text-primary);
+        -webkit-font-smoothing: antialiased;
+      }
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 24px;
+        background: #fff;
+        border-bottom: 1px solid var(--border);
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .topbar .who {
+        font-size: 12px;
+        color: var(--text-secondary);
+      }
+      .topbar .who strong {
+        color: var(--text-primary);
+        font-weight: 600;
+      }
+      .topbar .right-group {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+      }
+      .app {
+        display: flex;
+        min-height: calc(100vh - 45px);
+      }
+      .sidebar {
+        width: 230px;
+        flex-shrink: 0;
+        background: var(--surface-1);
+        border-right: 1px solid var(--border);
+        padding: 20px 12px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0 8px 16px;
+      }
+      .brand .mark {
+        width: 26px;
+        height: 26px;
+        border-radius: 6px;
+        background: var(--fill-primary);
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-weight: bold;
+        font-size: 12px;
+      }
+      .brand .name {
+        font-size: 13px;
+        font-weight: 700;
+        line-height: 1.2;
+        letter-spacing: -0.2px;
+      }
+      .brand .role {
+        font-size: 11px;
+        color: var(--text-muted);
+        line-height: 1.2;
+      }
+      .nav-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 10px;
+        border-radius: 7px;
+        font-size: 13px;
+        color: var(--text-secondary);
+        cursor: pointer;
+        margin-bottom: 2px;
+        transition:
+          background 0.15s ease,
+          color 0.15s ease;
+      }
+      .nav-item:hover {
+        background: var(--surface-2);
+        color: var(--text-primary);
+      }
+      .nav-item.active {
+        background: var(--fill-primary);
+        color: var(--on-primary);
+        font-weight: 500;
+      }
+      .nav-divider {
+        border-top: 1px solid var(--border);
+        margin: 12px 4px;
+      }
+      .group {
+        margin-bottom: 18px;
+      }
+      .group-label {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-muted);
+        margin: 0 0 6px 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .main {
+        flex: 1;
+        padding: 32px 36px;
+        min-width: 0;
+      }
+      .page {
+        display: none;
+      }
+      .page.active {
+        display: block;
+      }
+      .page-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: 22px;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      h1 {
+        font-size: 22px;
+        margin: 0;
+        font-weight: 600;
+        letter-spacing: -0.3px;
+      }
+      .subtitle {
+        font-size: 13px;
+        color: var(--text-secondary);
+        margin: 5px 0 0;
+      }
+      button.primary {
+        background: var(--fill-primary);
+        color: var(--on-primary);
+        border: 1px solid var(--fill-primary);
+        border-radius: 8px;
+        padding: 9px 16px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: opacity 0.15s ease;
+      }
+      button.primary:hover {
+        opacity: 0.88;
+      }
+      button.secondary {
+        background: #fff;
+        color: var(--text-primary);
+        border: 1px solid var(--border-strong);
+        border-radius: 8px;
+        padding: 9px 16px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: background 0.15s ease;
+      }
+      button.secondary:hover {
+        background: var(--surface-1);
+      }
+      .link-btn {
+        background: none;
+        border: none;
+        color: var(--text-primary);
+        font-size: 12px;
+        font-weight: 600;
+        text-decoration: underline;
+        cursor: pointer;
+        padding: 0;
+        white-space: nowrap;
+      }
+      .toolbar {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 18px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      input[type="text"],
+      input[type="number"],
+      input[type="date"],
+      input[type="datetime-local"],
+      select,
+      textarea {
+        border: 1px solid var(--border-strong);
+        border-radius: 8px;
+        padding: 10px 12px;
+        font-size: 13px;
+        background: #fff;
+        color: var(--text-primary);
+        font-family: inherit;
+        outline: none;
+        transition: border-color 0.15s ease;
+      }
+      input[type="text"]:focus,
+      input[type="number"]:focus,
+      input[type="date"]:focus,
+      input[type="datetime-local"]:focus,
+      select:focus,
+      textarea:focus {
+        border-color: var(--text-primary);
+      }
+      input[type="text"] {
+        flex: 1;
+        min-width: 160px;
+      }
+      select {
+        min-width: 160px;
+      }
+      .card {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        margin-bottom: 12px;
+        overflow: hidden;
+        background: #fff;
+        transition: border-color 0.15s ease;
+      }
+      .card:hover {
+        border-color: var(--border-strong);
+      }
+      .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 18px;
+        cursor: pointer;
+        gap: 12px;
+        user-select: none;
+      }
+      .badge {
+        font-size: 11px;
+        padding: 2px 9px;
+        border-radius: 999px;
+        white-space: nowrap;
+        font-weight: 500;
+      }
+      .badge.filled {
+        background: var(--fill-primary);
+        color: var(--on-primary);
+      }
+      .badge.outline {
+        border: 1px solid var(--border-strong);
+        color: var(--text-secondary);
+      }
+      .badge.dashed {
+        border: 1px dashed var(--border-strong);
+        color: var(--text-secondary);
+      }
+      .badge.amber {
+        background: #fef3c7;
+        color: #92400e;
+        border: 1px solid #fde68a;
+      }
+      .badge.green {
+        background: #dcfce7;
+        color: #166534;
+        border: 1px solid #bbf7d0;
+      }
+      .meta {
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin: 5px 0 0;
+      }
+      .title-row {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .card-title {
+        font-size: 14px;
+        font-weight: 600;
+      }
+      .chev {
+        color: var(--text-muted);
+        font-size: 14px;
+        flex-shrink: 0;
+        transition: transform 0.2s ease;
+      }
+      .detail {
+        border-top: 1px solid var(--border);
+        padding: 18px;
+        background: var(--surface-1);
+        display: none;
+      }
+      .detail.open {
+        display: block;
+      }
+      .detail-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-muted);
+        margin: 12px 0 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+      }
+      .detail-label:first-child {
+        margin-top: 0;
+      }
+      .detail p {
+        font-size: 13px;
+        margin: 0 0 10px;
+        line-height: 1.55;
+        color: var(--text-primary);
+      }
+      .outcomes {
+        margin: 0 0 12px;
+        padding-left: 18px;
+        font-size: 13px;
+        line-height: 1.6;
+      }
+      .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+      .stat-grid.cols-4 {
+        grid-template-columns: repeat(4, 1fr);
+      }
+      .stat-card {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: #fff;
+        padding: 16px 18px;
+      }
+      .stat-value {
+        font-size: 24px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+      }
+      .stat-label {
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-top: 4px;
+      }
+      .list {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+        background: #fff;
+      }
+      .list-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 18px;
+        gap: 14px;
+        border-bottom: 1px solid var(--border);
+      }
+      .list-row:last-child {
+        border-bottom: none;
+      }
+      .list-row .primary-text {
+        font-size: 14px;
+        font-weight: 600;
+      }
+      .list-row .secondary-text {
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-top: 3px;
+      }
+      .list-row .right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-shrink: 0;
+      }
+      .table-wrap {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+        background: #fff;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        padding: 12px 14px;
+        font-size: 13px;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+      }
+      th {
+        font-weight: 600;
+        color: var(--text-secondary);
+        background: var(--surface-1);
+        font-size: 12px;
+      }
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+      td.num {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+      .bar-track {
+        background: var(--surface-2);
+        border-radius: 6px;
+        height: 8px;
+        width: 120px;
+        overflow: hidden;
+        flex-shrink: 0;
+      }
+      .bar-fill {
+        background: var(--fill-primary);
+        height: 100%;
+      }
+      .config-card {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: #fff;
+        padding: 16px 18px;
+        margin-bottom: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .config-card input[type="number"] {
+        width: 70px;
+        text-align: right;
+      }
+
+      /* Modal Styling */
+      .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        z-index: 50;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        backdrop-filter: blur(2px);
+      }
+      .modal-overlay.open {
+        display: flex;
+      }
+      .modal {
+        background: #fff;
+        border-radius: 12px;
+        max-width: 540px;
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+        border: 1px solid var(--border-strong);
+        box-shadow:
+          0 20px 25px -5px rgba(0, 0, 0, 0.1),
+          0 8px 10px -6px rgba(0, 0, 0, 0.1);
+      }
+      .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border);
+      }
+      .modal-header h3 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 600;
+      }
+      .modal-close {
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        color: var(--text-secondary);
+        line-height: 1;
+        padding: 4px 8px;
+        border-radius: 4px;
+      }
+      .modal-close:hover {
+        background: var(--surface-2);
+      }
+      .modal-body {
+        padding: 20px;
+      }
+      .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        padding: 14px 20px;
+        border-top: 1px solid var(--border);
+        background: var(--surface-1);
+        border-bottom-left-radius: 12px;
+        border-bottom-right-radius: 12px;
+      }
+      .form-group {
+        margin-bottom: 14px;
+      }
+      .form-group label {
+        display: block;
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-bottom: 5px;
+        font-weight: 600;
+      }
+      .form-group input,
+      .form-group select,
+      .form-group textarea {
+        width: 100%;
+      }
+      .form-group textarea {
+        resize: vertical;
+        min-height: 80px;
+      }
+      .form-row-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 10px;
+      }
+
+      /* Attendees Selector Pills */
+      .attendees-selector {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        padding: 8px;
+        border: 1px solid var(--border-strong);
+        border-radius: 8px;
+        background: #fff;
+        max-height: 120px;
+        overflow-y: auto;
+      }
+      .attendee-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        background: var(--surface-2);
+        color: var(--text-secondary);
+        cursor: pointer;
+        user-select: none;
+        border: 1px solid transparent;
+        transition: all 0.15s ease;
+      }
+      .attendee-pill input {
+        display: none;
+      }
+      .attendee-pill.selected {
+        background: var(--fill-primary);
+        color: var(--on-primary);
+      }
+
+      /* Meeting Minutes Custom Design Elements */
+      .attendee-tag {
+        display: inline-block;
+        font-size: 11px;
+        background: #eef2ff;
+        color: #3730a3;
+        padding: 2px 8px;
+        border-radius: 4px;
+        margin: 2px 4px 2px 0;
+        font-weight: 500;
+      }
+      .action-item-box {
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 8px 12px;
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 13px;
+      }
+      .action-item-box input[type="checkbox"] {
+        cursor: pointer;
+      }
+
+      @media (max-width: 640px) {
+        .sidebar {
+          display: none;
+        }
+        .main {
+          padding: 20px;
+        }
+        .stat-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+        .stat-grid.cols-4 {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="topbar">
+      <div class="who">
+        Signed in as <strong>Dr. Anil Sharma</strong> — Module Leader
+      </div>
+      <div class="right-group">
+        <span class="who"
+          >End-of-module reports route to your Course Leader</span
+        >
+        <span class="who"
+          ><strong>CS204</strong> — Database Management Systems</span
+        >
+      </div>
+    </div>
+
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="mark">I</div>
+          <div>
+            <div class="name">ING ERP</div>
+            <div class="role">Module Leader</div>
+          </div>
+        </div>
+        <div
+          class="nav-item active"
+          data-page="dashboard"
+          onclick="showPage('dashboard', this)"
+        >
+          <span>Dashboard</span>
+        </div>
+        <div class="nav-divider"></div>
+        <nav>
+          <div class="group">
+            <p class="group-label">Team &amp; Meetings</p>
+            <div
+              class="nav-item"
+              data-page="team"
+              onclick="showPage('team', this)"
+            >
+              <span>Team coordinator</span>
+            </div>
+            <div
+              class="nav-item"
+              data-page="minutes"
+              onclick="showPage('minutes', this)"
+            >
+              <span>Meeting Minutes</span>
+              <span
+                class="badge filled"
+                id="minutes-count-badge"
+                style="font-size: 10px; padding: 1px 6px"
+                >3</span
+              >
+            </div>
+          </div>
+          <div class="group">
+            <p class="group-label">Assessment</p>
+            <div
+              class="nav-item"
+              data-page="rubrics"
+              onclick="showPage('rubrics', this)"
+            >
+              <span>Rubrics &amp; templates</span>
+            </div>
+            <div
+              class="nav-item"
+              data-page="secondmarking"
+              onclick="showPage('secondmarking', this)"
+            >
+              <span>Second marking</span>
+            </div>
+          </div>
+          <div class="group">
+            <p class="group-label">Quality assurance</p>
+            <div
+              class="nav-item"
+              data-page="anomaly"
+              onclick="showPage('anomaly', this)"
+            >
+              <span>Marking quality</span>
+            </div>
+            <div
+              class="nav-item"
+              data-page="vault"
+              onclick="showPage('vault', this)"
+            >
+              <span>Examiner vault</span>
+            </div>
+          </div>
+          <div class="group">
+            <p class="group-label">Reporting</p>
+            <div
+              class="nav-item"
+              data-page="performance"
+              onclick="showPage('performance', this)"
+            >
+              <span>Performance report</span>
+            </div>
+          </div>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <!-- PAGE 1: DASHBOARD -->
+        <section class="page active" id="page-dashboard">
+          <div class="page-header">
+            <div>
+              <h1>CS204 module overview</h1>
+              <p class="subtitle">Database Management Systems, Semester 1</p>
+            </div>
+          </div>
+          <div class="stat-grid cols-4">
+            <div class="stat-card">
+              <div class="stat-value">5</div>
+              <div class="stat-label">Team members</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">2</div>
+              <div class="stat-label">Papers needing a second marker</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">2</div>
+              <div class="stat-label">Flagged for marking variance</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">4.2/5</div>
+              <div class="stat-label">Avg module feedback</div>
+            </div>
+          </div>
+          <div class="list" style="margin-bottom: 20px">
+            <div class="list-row">
+              <div>
+                <div class="primary-text">
+                  2 papers are awaiting a second marker
+                </div>
+                <div class="secondary-text">Bibek Rai, Manisha Shrestha</div>
+              </div>
+              <div class="right">
+                <button class="link-btn" onclick="goTo('secondmarking')">
+                  Assign now
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">
+                  2 markers flagged for high variance
+                </div>
+                <div class="secondary-text">Sarita Koirala, Anita Bhandari</div>
+              </div>
+              <div class="right">
+                <button class="link-btn" onclick="goTo('anomaly')">
+                  Review
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">
+                  Latest Team Meeting: Moderation &amp; Midterm Sync
+                </div>
+                <div class="secondary-text">
+                  Recorded on Sep 18, 2026 — 4 attendees
+                </div>
+              </div>
+              <div class="right">
+                <button class="link-btn" onclick="goTo('minutes')">
+                  View minutes
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="toolbar">
+            <button class="secondary" onclick="openAssignDuty()">
+              + Assign duty
+            </button>
+            <button class="secondary" onclick="openNewMinutesModal()">
+              + Log meeting minutes
+            </button>
+            <button class="secondary" onclick="openNewRubric()">
+              + New rubric
+            </button>
+            <button class="secondary" onclick="openUploadVault()">
+              + Upload to vault
+            </button>
+          </div>
+        </section>
+
+        <!-- PAGE 2: TEAM COORDINATOR -->
+        <section class="page" id="page-team">
+          <div class="page-header">
+            <div>
+              <h1>Module Teaching Team Coordinator</h1>
+              <p class="subtitle">
+                Lecturers, tutors, and lab assistants on CS204
+              </p>
+            </div>
+            <button class="primary" onclick="openAssignDuty()">
+              + Assign duty
+            </button>
+          </div>
+          <div class="list" id="team-list">
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Dr. Meera Joshi</div>
+                <div class="secondary-text">
+                  Lecturer — main lecture, Mon &amp; Wed 10:00
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge filled">On track</span>
+                <button class="link-btn" onclick="openAssignDuty(this)">
+                  Reassign
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Mr. Rohan Adhikari</div>
+                <div class="secondary-text">
+                  Assigned: Week 7 seminar — Joins &amp; Subqueries, Group B
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge filled">On track</span>
+                <button class="link-btn" onclick="openAssignDuty(this)">
+                  Reassign
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Ms. Sarita Koirala</div>
+                <div class="secondary-text">
+                  Assigned: Marking batch 3 — 14 papers, Group C
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge outline">Overdue</span>
+                <button class="link-btn" onclick="openAssignDuty(this)">
+                  Reassign
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Mr. Bikash Shrestha</div>
+                <div class="secondary-text">
+                  Lab assistant — assigned: Lab 5 setup, SQL Server configs
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge filled">On track</span>
+                <button class="link-btn" onclick="openAssignDuty(this)">
+                  Reassign
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Ms. Anita Bhandari</div>
+                <div class="secondary-text">
+                  Graduate TA — assigned: Week 7 seminar — Joins &amp;
+                  Subqueries, Group D
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge filled">On track</span>
+                <button class="link-btn" onclick="openAssignDuty(this)">
+                  Reassign
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- PAGE 3: MEETING MINUTES (NEW FEATURE) -->
+        <section class="page" id="page-minutes">
+          <div class="page-header">
+            <div>
+              <h1>Module Meeting Minutes &amp; Records</h1>
+              <p class="subtitle">
+                Track agendas, discussions, team decisions, and pending action
+                items for CS204
+              </p>
+            </div>
+            <button class="primary" onclick="openNewMinutesModal()">
+              + Add Meeting Minutes
+            </button>
+          </div>
+
+          <div class="stat-grid">
+            <div class="stat-card">
+              <div class="stat-value" id="stat-total-meetings">3</div>
+              <div class="stat-label">Meetings Logged</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="stat-open-actions">4</div>
+              <div class="stat-label">Open Action Items</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">92%</div>
+              <div class="stat-label">Avg Team Attendance</div>
+            </div>
+          </div>
+
+          <div class="toolbar">
+            <input
+              type="text"
+              id="minutes-search"
+              placeholder="Search meeting title, agenda or action..."
+              onkeyup="filterMinutes()"
+            />
+            <select id="minutes-filter-status" onchange="filterMinutes()">
+              <option value="ALL">All Meeting Types</option>
+              <option value="Weekly Sync">Weekly Sync</option>
+              <option value="Moderation">Moderation</option>
+              <option value="Exam Prep">Exam Prep</option>
+              <option value="Emergency">Emergency</option>
+            </select>
+          </div>
+
+          <div id="minutes-cards-container">
+            <!-- Populated dynamically / preloaded via JavaScript -->
+          </div>
+        </section>
+
+        <!-- PAGE 4: RUBRICS & TEMPLATES -->
+        <section class="page" id="page-rubrics">
+          <div class="page-header">
+            <div>
+              <h1>Rubric &amp; Marking Template Builder</h1>
+              <p class="subtitle">
+                Standardized grading schemes shared with all module evaluators
+              </p>
+            </div>
+            <button class="primary" onclick="openNewRubric()">
+              + New rubric
+            </button>
+          </div>
+          <div id="rubrics-list">
+            <div class="card">
+              <div class="card-header" onclick="toggleCard(this)">
+                <div>
+                  <div class="title-row">
+                    <span class="card-title">ER Diagram Design Rubric</span>
+                    <span class="badge filled">Published</span>
+                  </div>
+                  <p class="meta">
+                    Applies to Assignment 2 — 5 criteria — updated 2 weeks ago
+                  </p>
+                </div>
+                <span class="chev">▸</span>
+              </div>
+              <div class="detail">
+                <p class="detail-label">Criteria</p>
+                <ul class="outcomes">
+                  <li>Entity identification (20%)</li>
+                  <li>Relationship correctness (25%)</li>
+                  <li>Normalization applied (25%)</li>
+                  <li>Notation accuracy (15%)</li>
+                  <li>Clarity and labeling (15%)</li>
+                </ul>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header" onclick="toggleCard(this)">
+                <div>
+                  <div class="title-row">
+                    <span class="card-title">Midterm Exam Marking Scheme</span>
+                    <span class="badge filled">Published</span>
+                  </div>
+                  <p class="meta">
+                    Applies to Midterm — 8 criteria — updated 1 month ago
+                  </p>
+                </div>
+                <span class="chev">▸</span>
+              </div>
+              <div class="detail">
+                <p class="detail-label">Criteria</p>
+                <p>
+                  Full scheme covers SQL correctness, normalization theory,
+                  transaction handling, and written justification across 8
+                  weighted sections.
+                </p>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header" onclick="toggleCard(this)">
+                <div>
+                  <div class="title-row">
+                    <span class="card-title">Final Project Rubric</span>
+                    <span class="badge outline">Draft</span>
+                  </div>
+                  <p class="meta">
+                    Applies to Final Project — 6 criteria — updated 3 days ago
+                  </p>
+                </div>
+                <span class="chev">▸</span>
+              </div>
+              <div class="detail">
+                <p class="detail-label">Criteria</p>
+                <p>
+                  Draft covering system design, implementation quality, testing,
+                  documentation, and presentation. Pending review before
+                  publishing.
+                </p>
+              </div>
+            </div>
+          </div>
+          <h1 style="font-size: 15px; margin: 26px 0 12px">
+            Feedback templates
+          </h1>
+          <div class="list" id="feedback-templates-list">
+            <div class="list-row">
+              <div>
+                <div class="primary-text">
+                  Strong normalization justification
+                </div>
+                <div class="secondary-text">
+                  Reusable comment for well-argued schema design
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge filled">Positive</span>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">
+                  Query lacks proper error handling
+                </div>
+                <div class="secondary-text">
+                  Reusable comment for incomplete SQL submissions
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge outline">Constructive</span>
+              </div>
+            </div>
+          </div>
+          <button
+            class="link-btn"
+            style="margin-top: 10px"
+            onclick="openNewTemplate()"
+          >
+            + New feedback template
+          </button>
+        </section>
+
+        <!-- PAGE 5: SECOND MARKING -->
+        <section class="page" id="page-secondmarking">
+          <div class="page-header">
+            <div>
+              <h1>Second Marking &amp; Moderation Workflow</h1>
+              <p class="subtitle">Assignment 2 — ER Diagram Design</p>
+            </div>
+          </div>
+          <div class="config-card">
+            <div>
+              <div class="primary-text" style="font-size: 13px">
+                Second marking coverage
+              </div>
+              <div class="secondary-text" id="sm-config-label">
+                Currently routing 30% of marked papers to second marking.
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px">
+              <input type="number" id="sm-config-pct" value="30" />%
+              <button class="secondary" onclick="saveMarkingConfig()">
+                Save
+              </button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table id="secondmarking-table">
+              <thead>
+                <tr>
+                  <th>Student</th>
+                  <th>First marker</th>
+                  <th>First mark</th>
+                  <th>Second marker</th>
+                  <th>Second mark</th>
+                  <th>Variance</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Aisha Karki</td>
+                  <td>Rohan Adhikari</td>
+                  <td class="num">88</td>
+                  <td>Meera Joshi</td>
+                  <td class="num">86</td>
+                  <td class="num">2</td>
+                  <td><span class="badge filled">Reconciled: 87</span></td>
+                </tr>
+                <tr>
+                  <td>Bibek Rai</td>
+                  <td>Sarita Koirala</td>
+                  <td class="num">65</td>
+                  <td>—</td>
+                  <td class="num">—</td>
+                  <td class="num">—</td>
+                  <td>
+                    <button class="link-btn" onclick="assignSecondMarker(this)">
+                      Assign second marker
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Sunita Gurung</td>
+                  <td>Meera Joshi</td>
+                  <td class="num">94</td>
+                  <td>Anita Bhandari</td>
+                  <td class="num">91</td>
+                  <td class="num">3</td>
+                  <td><span class="badge filled">Reconciled: 93</span></td>
+                </tr>
+                <tr>
+                  <td>Prakash Thapa</td>
+                  <td>Rohan Adhikari</td>
+                  <td class="num">72</td>
+                  <td>Sarita Koirala</td>
+                  <td class="num">58</td>
+                  <td class="num">14</td>
+                  <td>
+                    <span class="badge outline">Flagged</span>
+                    <button class="link-btn" onclick="openReconcile(this)">
+                      Reconcile
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- PAGE 6: ANOMALY DETECTOR -->
+        <section class="page" id="page-anomaly">
+          <div class="page-header">
+            <div>
+              <h1>Marking Anomaly &amp; Variance Detector</h1>
+              <p class="subtitle">
+                Assignment 2 — ER Diagram Design, module average 83%
+              </p>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Marker</th>
+                  <th>Papers marked</th>
+                  <th>Avg mark</th>
+                  <th>Variance vs module</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Dr. Meera Joshi</td>
+                  <td class="num">15</td>
+                  <td class="num">84%</td>
+                  <td class="num">+1%</td>
+                  <td><span class="badge filled">Normal</span></td>
+                </tr>
+                <tr>
+                  <td>Ms. Sarita Koirala</td>
+                  <td class="num">10</td>
+                  <td class="num">54%</td>
+                  <td class="num">-29%</td>
+                  <td>
+                    <span class="badge outline">Flagged</span>
+                    <button class="link-btn" onclick="reviewSample(this)">
+                      Review sample
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- PAGE 7: EXAMINER VAULT -->
+        <section class="page" id="page-vault">
+          <div class="page-header">
+            <div>
+              <h1>External Examiner Moderation Vault</h1>
+              <p class="subtitle">Secure workspace for external verification</p>
+            </div>
+            <button class="primary" onclick="openUploadVault()">
+              + Upload to vault
+            </button>
+          </div>
+          <div class="list" style="margin-bottom: 20px">
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Prof. David Whitfield</div>
+                <div class="secondary-text">
+                  University of Leeds — access expires Oct 15, 2026
+                </div>
+              </div>
+              <div class="right">
+                <button class="secondary" onclick="sendAccessLink()">
+                  Send access link
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="list" id="vault-list">
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Assignment 2 — Marking Guide</div>
+                <div class="secondary-text">
+                  Marking guide, uploaded by Dr. Anil Sharma — Sep 2
+                </div>
+              </div>
+              <div class="right"><span class="badge filled">Shared</span></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- PAGE 8: PERFORMANCE REPORT -->
+        <section class="page" id="page-performance">
+          <div class="page-header">
+            <div>
+              <h1>Module Performance &amp; Feedback Analyzer</h1>
+              <p class="subtitle">End-of-term summary, CS204</p>
+            </div>
+            <button class="primary" onclick="generateReport()">
+              Generate report
+            </button>
+          </div>
+          <div class="stat-grid">
+            <div class="stat-card">
+              <div class="stat-value">4.2/5</div>
+              <div class="stat-label">Avg student feedback</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">0.71</div>
+              <div class="stat-label">Attendance–grade correlation</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">42</div>
+              <div class="stat-label">Students assessed</div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div
+      class="modal-overlay"
+      id="modal-overlay"
+      onclick="if (event.target === this) closeModal();"
+    >
+      <div class="modal">
+        <div class="modal-header">
+          <h3 id="modal-title"></h3>
+          <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body" id="modal-body"></div>
+        <div class="modal-footer" id="modal-footer"></div>
+      </div>
+    </div>
+
+    <script>
+      var modalContext = null;
+
+      // Module Team Members
+      var TEAM = [
+        "Dr. Anil Sharma (Leader)",
+        "Dr. Meera Joshi",
+        "Mr. Rohan Adhikari",
+        "Ms. Sarita Koirala",
+        "Mr. Bikash Shrestha",
+        "Ms. Anita Bhandari",
+      ];
+
+      // Initial Seed Data for Meeting Minutes
+      var meetingMinutesData = [
+        {
+          id: 1,
+          title: "Semester Kickoff & Curriculum Mapping",
+          type: "Weekly Sync",
+          datetime: "2026-09-02T10:00",
+          formattedDate: "Sep 2, 2026 at 10:00 AM",
+          attendees: [
+            "Dr. Anil Sharma (Leader)",
+            "Dr. Meera Joshi",
+            "Mr. Rohan Adhikari",
+            "Mr. Bikash Shrestha",
+          ],
+          agenda:
+            "Review database syllabus, align on SQL lab schedule, and assign initial assessment design duties.",
+          notes:
+            "Dr. Anil opened with module learning outcomes. Dr. Meera confirmed lecture slots on Mon/Wed. Bikash confirmed MySQL and SQL Server configurations are ready in Labs 3 & 5. Rohan raised concerns regarding student prerequisites for normalization.",
+          decisions:
+            "Assignment 1 will focus on ER Diagrams, scheduled for release in Week 3. Marking rubrics will be standardized across all tutors.",
+          actionItems: [
+            {
+              id: "a1",
+              text: "Bikash to complete Lab 5 SQL server setup",
+              done: true,
+              assignee: "Mr. Bikash Shrestha",
+            },
+            {
+              id: "a2",
+              text: "Meera to finalize ER Diagram Rubric draft",
+              done: true,
+              assignee: "Dr. Meera Joshi",
+            },
+          ],
+        },
+        {
+          id: 2,
+          title: "Second Marking & Moderation Sync",
+          type: "Moderation",
+          datetime: "2026-09-18T14:30",
+          formattedDate: "Sep 18, 2026 at 02:30 PM",
+          attendees: [
+            "Dr. Anil Sharma (Leader)",
+            "Dr. Meera Joshi",
+            "Ms. Sarita Koirala",
+            "Ms. Anita Bhandari",
+          ],
+          agenda:
+            "Address marking variance detected in Assignment 2 draft batch and configure second marking sample rules.",
+          notes:
+            "Evaluated 10 sample papers from Sarita's batch. Noted a 29% lower average compared to the module norm due to strict formatting penalties. Anita's batch showed slight high variance (+8%). Agreed to calibrate strictness based on the new Rubric guidelines.",
+          decisions:
+            "Set second marking coverage threshold to 30%. Re-align Sarita's batch on normalization grading rules.",
+          actionItems: [
+            {
+              id: "a3",
+              text: "Sarita to review sample paper comments with Dr. Anil",
+              done: false,
+              assignee: "Ms. Sarita Koirala",
+            },
+            {
+              id: "a4",
+              text: "Upload moderation log to External Examiner Vault",
+              done: true,
+              assignee: "Dr. Anil Sharma (Leader)",
+            },
+          ],
+        },
+        {
+          id: 3,
+          title: "Midterm Exam Preparation & External Vault Access",
+          type: "Exam Prep",
+          datetime: "2026-09-25T11:00",
+          formattedDate: "Sep 25, 2026 at 11:00 AM",
+          attendees: [
+            "Dr. Anil Sharma (Leader)",
+            "Dr. Meera Joshi",
+            "Mr. Rohan Adhikari",
+            "Ms. Anita Bhandari",
+            "Mr. Bikash Shrestha",
+          ],
+          agenda:
+            "Review draft midterm exam questions, solution keys, and dispatch access token to Prof. Whitfield.",
+          notes:
+            "Midterm paper consists of 8 sections spanning ERDs, Normalization, and SQL queries. Dr. Meera completed section 1-4 validation. Rohan reviewed query efficiency questions.",
+          decisions:
+            "Approved paper draft v2. External examiner link will be dispatched via automated vault system with 14-day expiry.",
+          actionItems: [
+            {
+              id: "a5",
+              text: "Send secure vault link to Prof. David Whitfield",
+              done: false,
+              assignee: "Dr. Anil Sharma (Leader)",
+            },
+            {
+              id: "a6",
+              text: "Prepare printed exam packets for Group B & C",
+              done: false,
+              assignee: "Mr. Rohan Adhikari",
+            },
+            {
+              id: "a7",
+              text: "Verify lab machine locks for midterm online section",
+              done: false,
+              assignee: "Mr. Bikash Shrestha",
+            },
+          ],
+        },
+      ];
+
+      // Page Navigation Engine
+      function showPage(id, el) {
+        document.querySelectorAll(".page").forEach(function (p) {
+          p.classList.remove("active");
+        });
+        document.getElementById("page-" + id).classList.add("active");
+        document.querySelectorAll(".nav-item").forEach(function (n) {
+          n.classList.remove("active");
+        });
+        if (el) {
+          el.classList.add("active");
+        } else {
+          var targetNav = document.querySelector(
+            '.nav-item[data-page="' + id + '"]',
+          );
+          if (targetNav) targetNav.classList.add("active");
+        }
+      }
+
+      function goTo(id) {
+        showPage(id);
+      }
+
+      function toggleCard(header) {
+        var card = header.parentElement;
+        var detail = card.querySelector(".detail");
+        var chev = header.querySelector(".chev");
+        var isOpen = detail.classList.contains("open");
+
+        detail.classList.toggle("open", !isOpen);
+        if (chev) {
+          chev.textContent = isOpen ? "▸" : "▾";
+        }
+      }
+
+      /* ---------- Modal System ---------- */
+      function openModal(title, bodyHtml, footerHtml) {
+        document.getElementById("modal-title").textContent = title;
+        document.getElementById("modal-body").innerHTML = bodyHtml;
+        document.getElementById("modal-footer").innerHTML =
+          footerHtml ||
+          '<button class="secondary" onclick="closeModal()">Close</button>';
+        document.getElementById("modal-overlay").classList.add("open");
+      }
+
+      function closeModal() {
+        document.getElementById("modal-overlay").classList.remove("open");
+        modalContext = null;
+      }
+
+      function formInput(label, id, val, type) {
+        type = type || "text";
+        return (
+          '<div class="form-group"><label>' +
+          label +
+          '</label><input type="' +
+          type +
+          '" id="' +
+          id +
+          '" value="' +
+          (val === undefined ? "" : val) +
+          '"></div>'
+        );
+      }
+
+      function formTextarea(label, id, placeholder) {
+        placeholder = placeholder || "";
+        return (
+          '<div class="form-group"><label>' +
+          label +
+          '</label><textarea id="' +
+          id +
+          '" placeholder="' +
+          placeholder +
+          '"></textarea></div>'
+        );
+      }
+
+      function formSelect(label, id, opts) {
+        var o = opts
+          .map(function (x) {
+            return "<option value='" + x + "'>" + x + "</option>";
+          })
+          .join("");
+        return (
+          '<div class="form-group"><label>' +
+          label +
+          '</label><select id="' +
+          id +
+          '">' +
+          o +
+          "</select></div>"
+        );
+      }
+
+      /* ---------- MEETING MINUTES FUNCTIONS ---------- */
+      function renderMeetingMinutes() {
+        var container = document.getElementById("minutes-cards-container");
+        if (!container) return;
+
+        container.innerHTML = "";
+
+        if (meetingMinutesData.length === 0) {
+          container.innerHTML =
+            '<div class="card" style="padding: 24px; text-align: center; color: var(--text-muted);">No meeting minutes found. Click "+ Add Meeting Minutes" to record one.</div>';
+          return;
+        }
+
+        meetingMinutesData.forEach(function (item) {
+          var openActions = item.actionItems.filter(function (a) {
+            return !a.done;
+          }).length;
+
+          var attendeesTags = item.attendees
+            .map(function (att) {
+              return '<span class="attendee-tag">' + att + "</span>";
+            })
+            .join("");
+
+          var actionItemsHtml = item.actionItems
+            .map(function (act) {
+              return (
+                '<div class="action-item-box">' +
+                "<div>" +
+                '<input type="checkbox" ' +
+                (act.done ? "checked" : "") +
+                ' onchange="toggleActionDone(' +
+                item.id +
+                ", '" +
+                act.id +
+                "')\"> " +
+                '<span style="' +
+                (act.done
+                  ? "text-decoration: line-through; color: var(--text-muted);"
+                  : "font-weight: 500;") +
+                '">' +
+                act.text +
+                "</span>" +
+                "</div>" +
+                '<span class="secondary-text" style="margin:0;">' +
+                (act.assignee ? act.assignee : "") +
+                "</span>" +
+                "</div>"
+              );
+            })
+            .join("");
+
+          var card = document.createElement("div");
+          card.className = "card";
+          card.setAttribute("data-title", item.title.toLowerCase());
+          card.setAttribute("data-type", item.type);
+          card.setAttribute("data-notes", item.notes.toLowerCase());
+
+          card.innerHTML =
+            '<div class="card-header" onclick="toggleCard(this)">' +
+            "<div>" +
+            '<div class="title-row">' +
+            '<span class="card-title">' +
+            item.title +
+            "</span>" +
+            '<span class="badge filled">' +
+            item.type +
+            "</span>" +
+            (openActions > 0
+              ? '<span class="badge amber">' +
+                openActions +
+                " action" +
+                (openActions > 1 ? "s" : "") +
+                " pending</span>"
+              : '<span class="badge green">Actions complete</span>') +
+            "</div>" +
+            '<p class="meta">' +
+            "📅 " +
+            item.formattedDate +
+            " &nbsp;•&nbsp; 👥 " +
+            item.attendees.length +
+            " Attendees" +
+            "</p>" +
+            "</div>" +
+            '<span class="chev">▸</span>' +
+            "</div>" +
+            '<div class="detail">' +
+            '<div class="detail-label">Attendees</div>' +
+            '<div style="margin-bottom: 12px;">' +
+            attendeesTags +
+            "</div>" +
+            '<div class="detail-label">Meeting Agenda</div>' +
+            "<p>" +
+            item.agenda +
+            "</p>" +
+            '<div class="detail-label">Discussion &amp; Minutes</div>' +
+            "<p>" +
+            item.notes +
+            "</p>" +
+            (item.decisions
+              ? '<div class="detail-label">Key Decisions</div><p><strong>' +
+                item.decisions +
+                "</strong></p>"
+              : "") +
+            '<div class="detail-label">Action Items &amp; Tasks</div>' +
+            "<div>" +
+            (actionItemsHtml ||
+              '<p style="color:var(--text-muted); font-size:12px;">No specific action items listed.</p>') +
+            "</div>" +
+            "</div>";
+
+          container.appendChild(card);
+        });
+
+        updateMinutesStats();
+      }
+
+      function updateMinutesStats() {
+        document.getElementById("stat-total-meetings").textContent =
+          meetingMinutesData.length;
+
+        var openCount = 0;
+        meetingMinutesData.forEach(function (m) {
+          openCount += m.actionItems.filter(function (a) {
+            return !a.done;
+          }).length;
+        });
+        document.getElementById("stat-open-actions").textContent = openCount;
+        document.getElementById("minutes-count-badge").textContent =
+          meetingMinutesData.length;
+      }
+
+      function toggleActionDone(meetingId, actionId) {
+        var meeting = meetingMinutesData.find(function (m) {
+          return m.id === meetingId;
+        });
+        if (meeting) {
+          var action = meeting.actionItems.find(function (a) {
+            return a.id === actionId;
+          });
+          if (action) {
+            action.done = !action.done;
+            renderMeetingMinutes();
+          }
+        }
+      }
+
+      function filterMinutes() {
+        var query = document
+          .getElementById("minutes-search")
+          .value.toLowerCase();
+        var filterType = document.getElementById("minutes-filter-status").value;
+
+        var cards = document.querySelectorAll("#minutes-cards-container .card");
+        cards.forEach(function (card) {
+          var title = card.getAttribute("data-title") || "";
+          var notes = card.getAttribute("data-notes") || "";
+          var type = card.getAttribute("data-type") || "";
+
+          var matchesSearch = title.includes(query) || notes.includes(query);
+          var matchesType = filterType === "ALL" || type === filterType;
+
+          if (matchesSearch && matchesType) {
+            card.style.display = "block";
+          } else {
+            card.style.display = "none";
+          }
+        });
+      }
+
+      /* Modal for Adding New Minutes */
+      function openNewMinutesModal() {
+        var nowStr = new Date().toISOString().slice(0, 16);
+
+        var attendeesCheckPills = TEAM.map(function (member, idx) {
+          return (
+            '<label class="attendee-pill selected" onclick="togglePill(this)">' +
+            '<input type="checkbox" value="' +
+            member +
+            '" checked>' +
+            member +
+            "</label>"
+          );
+        }).join("");
+
+        var bodyHtml =
+          formInput("Meeting Title", "nm-title", "", "text") +
+          '<div class="form-row-2">' +
+          formSelect("Meeting Category", "nm-type", [
+            "Weekly Sync",
+            "Moderation",
+            "Exam Prep",
+            "Emergency",
+            "General",
+          ]) +
+          formInput("Date & Time", "nm-datetime", nowStr, "datetime-local") +
+          "</div>" +
+          '<div class="form-group">' +
+          "<label>Attendees Present</label>" +
+          '<div class="attendees-selector" id="nm-attendees-wrap">' +
+          attendeesCheckPills +
+          "</div>" +
+          "</div>" +
+          formTextarea(
+            "Agenda / Purpose",
+            "nm-agenda",
+            "What was the main purpose of this meeting?",
+          ) +
+          formTextarea(
+            "Discussion / Notes / Minutes",
+            "nm-notes",
+            "Key points discussed during the session...",
+          ) +
+          formTextarea(
+            "Key Decisions Made",
+            "nm-decisions",
+            "Decisions agreed upon by the team...",
+          ) +
+          formTextarea(
+            "Action Items (One per line)",
+            "nm-actions",
+            "e.g. Sarita to regrade Batch 2\nBikash to test SQL script",
+          );
+
+        openModal(
+          "Log Meeting Minutes",
+          bodyHtml,
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveNewMinutes()">Save &amp; Publish Minutes</button>',
+        );
+      }
+
+      function togglePill(pill) {
+        var checkbox = pill.querySelector('input[type="checkbox"]');
+        checkbox.checked = !checkbox.checked;
+        pill.classList.toggle("selected", checkbox.checked);
+      }
+
+      function saveNewMinutes() {
+        var title = document.getElementById("nm-title").value.trim();
+        var type = document.getElementById("nm-type").value;
+        var datetimeVal = document.getElementById("nm-datetime").value;
+        var agenda = document.getElementById("nm-agenda").value.trim();
+        var notes = document.getElementById("nm-notes").value.trim();
+        var decisions = document.getElementById("nm-decisions").value.trim();
+        var rawActions = document.getElementById("nm-actions").value.trim();
+
+        if (!title) {
+          alert("Please enter a meeting title.");
+          return;
+        }
+
+        // Selected Attendees
+        var selectedAttendees = [];
+        document
+          .querySelectorAll("#nm-attendees-wrap .attendee-pill.selected input")
+          .forEach(function (chk) {
+            selectedAttendees.push(chk.value);
+          });
+
+        if (selectedAttendees.length === 0) {
+          selectedAttendees.push("Dr. Anil Sharma (Leader)");
+        }
+
+        // Format Date
+        var dtObj = datetimeVal ? new Date(datetimeVal) : new Date();
+        var formattedDate =
+          dtObj.toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          }) +
+          " at " +
+          dtObj.toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+
+        // Parse Action Items
+        var actionItems = [];
+        if (rawActions) {
+          var lines = rawActions.split("\n");
+          lines.forEach(function (line, index) {
+            var trimmed = line.trim();
+            if (trimmed) {
+              actionItems.push({
+                id: "act_" + Date.now() + "_" + index,
+                text: trimmed,
+                done: false,
+                assignee: "",
+              });
+            }
+          });
+        }
+
+        var newEntry = {
+          id: Date.now(),
+          title: title,
+          type: type,
+          datetime: datetimeVal,
+          formattedDate: formattedDate,
+          attendees: selectedAttendees,
+          agenda: agenda || "General module sync and status review.",
+          notes: notes || "No specific detailed notes provided.",
+          decisions: decisions,
+          actionItems: actionItems,
+        };
+
+        meetingMinutesData.unshift(newEntry);
+        renderMeetingMinutes();
+        closeModal();
+        goTo("minutes");
+      }
+
+      /* ---------- TEAM COORDINATOR ---------- */
+      function openAssignDuty(btnOrNothing) {
+        openModal(
+          "Assign duty",
+          formSelect("Team member", "ad-member", TEAM) +
+            formSelect("Duty type", "ad-type", [
+              "Seminar topic",
+              "Lab instruction",
+              "Marking batch",
+              "Other",
+            ]) +
+            formTextarea("Description", "ad-desc") +
+            formInput("Due date", "ad-due", "", "date"),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveDuty()">Assign</button>',
+        );
+        if (btnOrNothing && btnOrNothing.closest) {
+          var name = btnOrNothing
+            .closest(".list-row")
+            .querySelector(".primary-text").textContent;
+          var el = document.getElementById("ad-member");
+          if (el) el.value = name;
+        }
+      }
+
+      function saveDuty() {
+        var member = document.getElementById("ad-member").value;
+        var type = document.getElementById("ad-type").value;
+        var desc = document.getElementById("ad-desc").value || type;
+        document
+          .querySelectorAll("#team-list .list-row")
+          .forEach(function (row) {
+            if (row.querySelector(".primary-text").textContent === member) {
+              row.querySelector(".secondary-text").textContent =
+                "Assigned: " + desc;
+              var badge = row.querySelector(".badge");
+              badge.className = "badge filled";
+              badge.textContent = "On track";
+            }
+          });
+        closeModal();
+      }
+
+      /* ---------- RUBRICS & TEMPLATES ---------- */
+      function openNewRubric() {
+        openModal(
+          "New rubric",
+          formInput("Rubric name", "nr-name", "") +
+            formSelect("Applies to", "nr-applies", [
+              "Assignment",
+              "Midterm",
+              "Final Project",
+            ]) +
+            '<div id="nr-criteria">' +
+            criteriaRow("Criterion 1", 20) +
+            criteriaRow("Criterion 2", 20) +
+            "</div>" +
+            '<button class="link-btn" onclick="addCriteriaRow()">+ Add criterion</button>',
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveRubric()">Save rubric</button>',
+        );
+      }
+
+      function criteriaRow(name, weight) {
+        return (
+          '<div class="form-row-2"><input type="text" value="' +
+          name +
+          '"><input type="number" value="' +
+          weight +
+          '"></div>'
+        );
+      }
+
+      function addCriteriaRow() {
+        var wrap = document.getElementById("nr-criteria");
+        var div = document.createElement("div");
+        div.className = "form-row-2";
+        div.innerHTML =
+          '<input type="text" placeholder="Criterion name"><input type="number" placeholder="Weight %">';
+        wrap.appendChild(div);
+      }
+
+      function saveRubric() {
+        var name =
+          document.getElementById("nr-name").value || "Untitled rubric";
+        var applies = document.getElementById("nr-applies").value;
+        var count = document.querySelectorAll(
+          "#nr-criteria .form-row-2",
+        ).length;
+        var list = document.getElementById("rubrics-list");
+        var div = document.createElement("div");
+        div.className = "card";
+        div.innerHTML =
+          '<div class="card-header" onclick="toggleCard(this)"><div><div class="title-row"><span class="card-title">' +
+          name +
+          '</span><span class="badge outline">Draft</span></div><p class="meta">Applies to ' +
+          applies +
+          " — " +
+          count +
+          ' criteria — just created</p></div><span class="chev">▸</span></div><div class="detail"><p class="detail-label">Criteria</p><p>Criteria as defined at creation.</p></div>';
+        list.appendChild(div);
+        closeModal();
+      }
+
+      function openNewTemplate() {
+        openModal(
+          "New feedback template",
+          formTextarea("Comment text", "ft-text") +
+            formSelect("Category", "ft-cat", ["Positive", "Constructive"]),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveTemplate()">Save</button>',
+        );
+      }
+
+      function saveTemplate() {
+        var text =
+          document.getElementById("ft-text").value || "Untitled template";
+        var cat = document.getElementById("ft-cat").value;
+        var list = document.getElementById("feedback-templates-list");
+        var row = document.createElement("div");
+        row.className = "list-row";
+        row.innerHTML =
+          '<div><div class="primary-text">' +
+          text +
+          '</div><div class="secondary-text">Reusable comment, added just now</div></div><div class="right"><span class="badge ' +
+          (cat === "Positive" ? "filled" : "outline") +
+          '">' +
+          cat +
+          "</span></div>";
+        list.appendChild(row);
+        closeModal();
+      }
+
+      /* ---------- SECOND MARKING ---------- */
+      function saveMarkingConfig() {
+        var pct = document.getElementById("sm-config-pct").value || 30;
+        document.getElementById("sm-config-label").textContent =
+          "Currently routing " + pct + "% of marked papers to second marking.";
+      }
+
+      function assignSecondMarker(btn) {
+        var tr = btn.closest("tr");
+        modalContext = { tr: tr };
+        openModal(
+          "Assign second marker",
+          formSelect("Second marker", "sm-marker", TEAM),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveSecondMarker()">Assign</button>',
+        );
+      }
+
+      function saveSecondMarker() {
+        var marker = document.getElementById("sm-marker").value;
+        var tr = modalContext.tr;
+        tr.children[3].textContent = marker;
+        tr.children[4].textContent = "—";
+        tr.children[6].innerHTML =
+          '<button class="link-btn" onclick="enterSecondMark(this)">Enter mark</button>';
+        closeModal();
+      }
+
+      function enterSecondMark(btn) {
+        var tr = btn.closest("tr");
+        modalContext = { tr: tr };
+        openModal(
+          "Enter second mark",
+          formInput("Mark (out of 100)", "sm2-mark", ""),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveSecondMark()">Save</button>',
+        );
+      }
+
+      function saveSecondMark() {
+        var mark = parseInt(document.getElementById("sm2-mark").value) || 0;
+        var tr = modalContext.tr;
+        var firstMark = parseInt(tr.children[2].textContent);
+        tr.children[4].textContent = mark;
+        var variance = Math.abs(firstMark - mark);
+        tr.children[5].textContent = variance;
+        if (variance > 10) {
+          tr.children[6].innerHTML =
+            '<span class="badge outline">Flagged</span> <button class="link-btn" onclick="openReconcile(this)">Reconcile</button>';
+        } else {
+          var final = Math.round((firstMark + mark) / 2);
+          tr.children[6].innerHTML =
+            '<span class="badge filled">Reconciled: ' + final + "</span>";
+        }
+        closeModal();
+      }
+
+      function openReconcile(btn) {
+        var tr = btn.closest("tr");
+        modalContext = { tr: tr };
+        var first = tr.children[2].textContent,
+          second = tr.children[4].textContent;
+        openModal(
+          "Reconcile grade",
+          '<p style="font-size:13px;color:var(--text-secondary);margin:0 0 12px;">First mark: ' +
+            first +
+            " — Second mark: " +
+            second +
+            "</p>" +
+            formInput(
+              "Final mark",
+              "rc-final",
+              Math.round((parseInt(first) + parseInt(second)) / 2),
+            ),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveReconcile()">Confirm final mark</button>',
+        );
+      }
+
+      function saveReconcile() {
+        var final = document.getElementById("rc-final").value;
+        modalContext.tr.children[6].innerHTML =
+          '<span class="badge filled">Reconciled: ' + final + "</span>";
+        closeModal();
+      }
+
+      /* ---------- ANOMALY DETECTOR ---------- */
+      function reviewSample(btn) {
+        var marker = btn.closest("tr").children[0].textContent;
+        modalContext = { marker: marker };
+        openModal(
+          "Sample papers — " + marker,
+          '<div class="rubric-row"><span>Manisha Shrestha</span><strong>60</strong></div><div class="rubric-row"><span>Bibek Rai</span><strong>65</strong></div>' +
+            formTextarea("Note for marker", "rs-note"),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="requestRemarking()">Request remarking</button>',
+        );
+      }
+
+      function requestRemarking() {
+        var marker = modalContext.marker;
+        openModal(
+          "Remarking requested",
+          '<p style="font-size:13px;">' +
+            marker +
+            " has been notified to review and resubmit marks for the flagged sample.</p>",
+          '<button class="primary" onclick="closeModal()">Done</button>',
+        );
+      }
+
+      /* ---------- EXAMINER VAULT ---------- */
+      function openUploadVault() {
+        openModal(
+          "Upload to vault",
+          formInput("Document title", "vt-title", "") +
+            formSelect("Type", "vt-type", [
+              "Draft paper",
+              "Marking guide",
+              "Sample work",
+              "Moderation log",
+            ]),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveVaultItem()">Upload</button>',
+        );
+      }
+
+      function saveVaultItem() {
+        var title =
+          document.getElementById("vt-title").value || "Untitled document";
+        var type = document.getElementById("vt-type").value;
+        var list = document.getElementById("vault-list");
+        var row = document.createElement("div");
+        row.className = "list-row";
+        row.innerHTML =
+          '<div><div class="primary-text">' +
+          title +
+          '</div><div class="secondary-text">' +
+          type +
+          ', uploaded by Dr. Anil Sharma — just now</div></div><div class="right"><span class="badge dashed">Pending share</span></div>';
+        list.appendChild(row);
+        closeModal();
+      }
+
+      function sendAccessLink() {
+        openModal(
+          "Access link sent",
+          '<p style="font-size:13px;">A secure, time-limited link to the moderation vault has been emailed to Prof. David Whitfield.</p>',
+          '<button class="primary" onclick="closeModal()">Done</button>',
+        );
+      }
+
+      /* ---------- PERFORMANCE ANALYZER ---------- */
+      function generateReport() {
+        openModal(
+          "Generating report",
+          '<p style="font-size:13px;">Compiling grade distributions, feedback themes, and attendance correlation into the End-of-Module Reflection Report.</p>',
+          '<button class="primary" onclick="finishReport()">Continue</button>',
+        );
+      }
+
+      function finishReport() {
+        openModal(
+          "Report sent",
+          '<p style="font-size:13px;">The End-of-Module Reflection Report for CS204 has been generated and sent to your Course Leader for review.</p>',
+          '<button class="primary" onclick="closeModal()">Done</button>',
+        );
+      }
+
+      // Initial startup execution
+      window.onload = function () {
+        renderMeetingMinutes();
+      };
+    </script>
+  </body>
+</html>

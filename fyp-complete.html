@@ -1,0 +1,1726 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ING ERP — FYP Evaluation & Tracking System</title>
+    <style>
+      :root {
+        --surface-1: #fafafa;
+        --surface-2: #f2f2f2;
+        --border: #e6e6e6;
+        --border-strong: #cfcfcf;
+        --text-primary: #111111;
+        --text-secondary: #5a5a5e;
+        --text-muted: #9a9a9e;
+        --fill-primary: #000000;
+        --on-primary: #ffffff;
+        --radius: 10px;
+        --warning-bg: #fffbe6;
+        --warning-border: #ffe58f;
+        --warning-text: #873800;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+          Arial, sans-serif;
+        background: var(--surface-2);
+        color: var(--text-primary);
+      }
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 24px;
+        background: #fff;
+        border-bottom: 1px solid var(--border);
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .topbar .who {
+        font-size: 12px;
+        color: var(--text-secondary);
+      }
+      .topbar .who strong {
+        color: var(--text-primary);
+        font-weight: 600;
+      }
+      .role-switcher {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+      }
+      .app {
+        display: flex;
+        min-height: 100vh;
+      }
+      .sidebar {
+        width: 220px;
+        flex-shrink: 0;
+        background: var(--surface-1);
+        border-right: 1px solid var(--border);
+        padding: 20px 12px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0 8px 16px;
+      }
+      .brand .mark {
+        width: 24px;
+        height: 24px;
+        border-radius: 6px;
+        background: var(--fill-primary);
+        flex-shrink: 0;
+      }
+      .brand .name {
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 1.3;
+      }
+      .brand .role {
+        font-size: 11px;
+        color: var(--text-muted);
+        line-height: 1.3;
+      }
+      .nav-item {
+        display: block;
+        padding: 8px 10px;
+        border-radius: 7px;
+        font-size: 13px;
+        color: var(--text-secondary);
+        cursor: pointer;
+        margin-bottom: 2px;
+      }
+      .nav-item:hover {
+        background: var(--surface-2);
+      }
+      .nav-item.active {
+        background: var(--fill-primary);
+        color: var(--on-primary);
+      }
+      .nav-divider {
+        border-top: 1px solid var(--border);
+        margin: 12px 4px;
+      }
+      .group {
+        margin-bottom: 16px;
+      }
+      .group-label {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-muted);
+        margin: 0 0 6px 10px;
+      }
+      .main {
+        flex: 1;
+        padding: 32px 36px;
+        min-width: 0;
+      }
+      .page {
+        display: none;
+      }
+      .page.active {
+        display: block;
+      }
+      .page-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: 22px;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      h1 {
+        font-size: 22px;
+        margin: 0;
+        font-weight: 600;
+      }
+      .subtitle {
+        font-size: 13px;
+        color: var(--text-secondary);
+        margin: 5px 0 0;
+      }
+      button.primary {
+        background: var(--fill-primary);
+        color: var(--on-primary);
+        border: none;
+        border-radius: 8px;
+        padding: 10px 16px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      button.secondary {
+        background: #fff;
+        color: var(--text-primary);
+        border: 1px solid var(--border-strong);
+        border-radius: 8px;
+        padding: 10px 16px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      .link-btn {
+        background: none;
+        border: none;
+        color: var(--text-primary);
+        font-size: 12px;
+        font-weight: 600;
+        text-decoration: underline;
+        cursor: pointer;
+        padding: 0;
+        white-space: nowrap;
+      }
+      .toolbar {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 18px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      input[type="text"],
+      input[type="number"],
+      input[type="date"],
+      select,
+      textarea {
+        border: 1px solid var(--border-strong);
+        border-radius: 8px;
+        padding: 10px 12px;
+        font-size: 13px;
+        background: #fff;
+        color: var(--text-primary);
+        font-family: inherit;
+      }
+      input[type="text"] {
+        flex: 1;
+        min-width: 160px;
+      }
+      select {
+        width: 170px;
+      }
+      .badge {
+        font-size: 11px;
+        padding: 2px 9px;
+        border-radius: 999px;
+        white-space: nowrap;
+        display: inline-block;
+      }
+      .badge.filled {
+        background: var(--fill-primary);
+        color: var(--on-primary);
+      }
+      .badge.outline {
+        border: 1px solid var(--border-strong);
+        color: var(--text-secondary);
+      }
+      .badge.dashed {
+        border: 1px dashed var(--border-strong);
+        color: var(--text-secondary);
+      }
+      .badge.warning {
+        background: var(--warning-bg);
+        border: 1px solid var(--warning-border);
+        color: var(--warning-text);
+      }
+      .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+      .stat-card {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: #fff;
+        padding: 16px 18px;
+      }
+      .stat-value {
+        font-size: 24px;
+        font-weight: 700;
+      }
+      .stat-label {
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-top: 4px;
+      }
+      .list {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+        background: #fff;
+      }
+      .list-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 18px;
+        gap: 14px;
+        border-bottom: 1px solid var(--border);
+      }
+      .list-row:last-child {
+        border-bottom: none;
+      }
+      .list-row .primary-text {
+        font-size: 14px;
+        font-weight: 600;
+      }
+      .list-row .secondary-text {
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-top: 3px;
+      }
+      .list-row .right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-shrink: 0;
+      }
+      .table-wrap {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+        background: #fff;
+        margin-bottom: 20px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        padding: 12px 14px;
+        font-size: 13px;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+      }
+      th {
+        font-weight: 600;
+        color: var(--text-secondary);
+        background: var(--surface-1);
+        font-size: 12px;
+      }
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+      td.num {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+      .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        z-index: 50;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      .modal-overlay.open {
+        display: flex;
+      }
+      .modal {
+        background: #fff;
+        border-radius: 12px;
+        max-width: 560px;
+        width: 100%;
+        max-height: 88vh;
+        overflow-y: auto;
+        border: 1px solid var(--border-strong);
+      }
+      .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border);
+      }
+      .modal-header h3 {
+        margin: 0;
+        font-size: 16px;
+      }
+      .modal-close {
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        color: var(--text-secondary);
+        line-height: 1;
+        padding: 4px;
+      }
+      .modal-body {
+        padding: 18px 20px;
+      }
+      .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        padding: 14px 20px;
+        border-top: 1px solid var(--border);
+      }
+      .form-group {
+        margin-bottom: 14px;
+      }
+      .form-group label {
+        display: block;
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-bottom: 5px;
+        font-weight: 600;
+      }
+      .form-group input,
+      .form-group select,
+      .form-group textarea {
+        width: 100%;
+      }
+      .form-group textarea {
+        resize: vertical;
+        min-height: 70px;
+      }
+      .form-row-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 10px;
+      }
+      .form-row-2 input,
+      .form-row-2 select {
+        width: 100%;
+      }
+      .rubric-card {
+        background: var(--surface-1);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 12px;
+        margin-bottom: 12px;
+      }
+      .rubric-title {
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: var(--text-primary);
+      }
+      .info-box {
+        background: var(--surface-1);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 12px 14px;
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-bottom: 16px;
+        line-height: 1.4;
+      }
+      @media (max-width: 640px) {
+        .sidebar {
+          display: none;
+        }
+        .main {
+          padding: 22px;
+        }
+        .stat-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="topbar">
+      <div class="who">
+        Logged in as <strong id="current-user-name">Dr. Sunil Rana</strong> —
+        <span id="current-user-role">FYP Internal Evaluator & Supervisor</span>
+      </div>
+      <div class="role-switcher">
+        <span>Simulate Role:</span>
+        <select
+          id="role-select"
+          onchange="switchActor(this.value)"
+          style="width: auto; padding: 4px 8px"
+        >
+          <option value="internal">Internal Evaluator / Supervisor</option>
+          <option value="external">External Evaluator (Prof. Whitfield)</option>
+          <option value="head">FYP Coordinator / Head View</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="mark"></div>
+          <div>
+            <div class="name">ING ERP</div>
+            <div class="role" id="sidebar-role">FYP Supervisor</div>
+          </div>
+        </div>
+        <div
+          class="nav-item active"
+          data-page="dashboard"
+          onclick="showPage('dashboard', this)"
+        >
+          Dashboard
+        </div>
+        <div class="nav-divider"></div>
+        <nav>
+          <div class="group">
+            <p class="group-label">Teams</p>
+            <div
+              class="nav-item"
+              data-page="teams"
+              onclick="showPage('teams', this)"
+            >
+              Team allocator
+            </div>
+          </div>
+          <div class="group">
+            <p class="group-label">Progress</p>
+            <div
+              class="nav-item"
+              data-page="milestones"
+              onclick="showPage('milestones', this)"
+            >
+              Milestone ledger
+            </div>
+          </div>
+          <div class="group">
+            <p class="group-label">Evaluation & Marks</p>
+            <div
+              class="nav-item"
+              data-page="eval-internal"
+              onclick="showPage('eval-internal', this)"
+            >
+              Internal Marking
+            </div>
+            <div
+              class="nav-item"
+              data-page="eval-external"
+              onclick="showPage('eval-external', this)"
+            >
+              External Marking
+            </div>
+            <div
+              class="nav-item"
+              data-page="eval-consolidated"
+              onclick="showPage('eval-consolidated', this)"
+            >
+              Consolidated Scores
+            </div>
+            <div
+              class="nav-item"
+              data-page="viva"
+              onclick="showPage('viva', this)"
+            >
+              Viva board
+            </div>
+          </div>
+          <div class="group">
+            <p class="group-label">Repository</p>
+            <div
+              class="nav-item"
+              data-page="assets"
+              onclick="showPage('assets', this)"
+            >
+              Project assets
+            </div>
+          </div>
+          <div class="group">
+            <p class="group-label">Opportunities</p>
+            <div
+              class="nav-item"
+              data-page="marketplace"
+              onclick="showPage('marketplace', this)"
+            >
+              Capstone marketplace
+            </div>
+            <div
+              class="nav-item"
+              data-page="commercialization"
+              onclick="showPage('commercialization', this)"
+            >
+              Commercialization
+            </div>
+          </div>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <!-- DASHBOARD -->
+        <section class="page active" id="page-dashboard">
+          <div class="page-header">
+            <div>
+              <h1>FYP Overview</h1>
+              <p class="subtitle">
+                5 active capstone teams, BSc Computer Science
+              </p>
+            </div>
+          </div>
+          <div class="stat-grid">
+            <div class="stat-card">
+              <div class="stat-value">5</div>
+              <div class="stat-label">Active teams</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="stat-internal-pending">2</div>
+              <div class="stat-label">Internal evals pending</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="stat-external-pending">3</div>
+              <div class="stat-label">External evals pending</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">1</div>
+              <div class="stat-label">Mark Variance Flags</div>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>Independent Double-Blind Evaluation Policy:</strong>
+            Internal and external marks are strictly blinded during evaluation
+            entry. Marks entered by internal supervisors cannot be viewed by
+            external evaluators and vice-versa until final consolidation.
+          </div>
+          <div class="list" style="margin-bottom: 20px">
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Submit Internal Evaluation</div>
+                <div class="secondary-text">
+                  Perform independent internal assessment across rubrics
+                </div>
+              </div>
+              <div class="right">
+                <button class="link-btn" onclick="goTo('eval-internal')">
+                  Open Internal Portal
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">External Evaluator Marking</div>
+                <div class="secondary-text">
+                  External markers can access blinded portal independently
+                </div>
+              </div>
+              <div class="right">
+                <button class="link-btn" onclick="goTo('eval-external')">
+                  Open External Portal
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Review Consolidated Final Grades</div>
+                <div class="secondary-text">
+                  Check combined weights (50% Internal / 50% External) and
+                  resolve variances
+                </div>
+              </div>
+              <div class="right">
+                <button class="link-btn" onclick="goTo('eval-consolidated')">
+                  View Final Marks
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- TEAMS -->
+        <section class="page" id="page-teams">
+          <div class="page-header">
+            <div>
+              <h1>FYP Team Allocator</h1>
+              <p class="subtitle">
+                Matching student teams to topics and expert guides
+              </p>
+            </div>
+            <button class="primary" onclick="openNewTeam()">
+              + Form new team
+            </button>
+          </div>
+          <div class="list" id="teams-list"></div>
+        </section>
+
+        <!-- MILESTONES -->
+        <section class="page" id="page-milestones">
+          <div class="page-header">
+            <div>
+              <h1>Milestone Review Ledger</h1>
+              <p class="subtitle">
+                Supervisor sign-offs across design, code, and testing
+              </p>
+            </div>
+            <button class="primary" onclick="openLogMilestone()">
+              + Log milestone
+            </button>
+          </div>
+          <div class="list" id="milestones-list"></div>
+        </section>
+
+        <!-- INTERNAL EVALUATION PAGE -->
+        <section class="page" id="page-eval-internal">
+          <div class="page-header">
+            <div>
+              <h1>Internal Marking Ledger</h1>
+              <p class="subtitle">
+                Supervisor & Internal Assessor Grading Portal (Blinded from
+                External)
+              </p>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>Blind Marking Protocol:</strong> External evaluators cannot
+            see these scores. Enter honest evaluation metrics based on
+            continuous internal guidance and viva defense.
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Team / Project</th>
+                  <th>Report / Doc (30)</th>
+                  <th>Implementation (40)</th>
+                  <th>Presentation / Viva (30)</th>
+                  <th>Internal Total</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="internal-marks-table"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- EXTERNAL EVALUATION PAGE -->
+        <section class="page" id="page-eval-external">
+          <div class="page-header">
+            <div>
+              <h1>External Evaluation Registry</h1>
+              <p class="subtitle">
+                Independent Assessment by External Examiners (Blinded from
+                Internal)
+              </p>
+            </div>
+            <button class="primary" onclick="openAssignEvaluator()">
+              + Assign External Examiner
+            </button>
+          </div>
+          <div class="info-box">
+            <strong>Blind Evaluation Protocol:</strong> Internal supervisor
+            marks are hidden from external examiners to ensure unbiased academic
+            auditing.
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Team / Project</th>
+                  <th>Assigned External Assessor</th>
+                  <th>Report / Doc (30)</th>
+                  <th>Implementation (40)</th>
+                  <th>Presentation / Viva (30)</th>
+                  <th>External Total</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="external-marks-table"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- CONSOLIDATED SCORES PAGE -->
+        <section class="page" id="page-eval-consolidated">
+          <div class="page-header">
+            <div>
+              <h1>Consolidated Final Marks Ledger</h1>
+              <p class="subtitle">
+                Aggregated Scores & Automated Discrepancy Moderation
+              </p>
+            </div>
+          </div>
+          <div class="info-box">
+            <strong>Grade Calculation Standard:</strong> Final Mark = (Internal
+            Total × 50%) + (External Total × 50%). Any score variance exceeding
+            15 marks between Internal and External automatically triggers a
+            moderation review.
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Team</th>
+                  <th>Internal Score (50%)</th>
+                  <th>External Score (50%)</th>
+                  <th>Final Weighted Score</th>
+                  <th>Variance</th>
+                  <th>Moderation Status</th>
+                </tr>
+              </thead>
+              <tbody id="consolidated-table"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- VIVA BOARD -->
+        <section class="page" id="page-viva">
+          <div class="page-header">
+            <div>
+              <h1>Viva Board Coordinator</h1>
+              <p class="subtitle">
+                Rooms and timetables for final viva presentations
+              </p>
+            </div>
+            <button class="primary" onclick="openScheduleViva()">
+              + Schedule viva
+            </button>
+          </div>
+          <div class="list" id="viva-list"></div>
+        </section>
+
+        <!-- ASSETS -->
+        <section class="page" id="page-assets">
+          <div class="page-header">
+            <div>
+              <h1>Project Asset Repository</h1>
+              <p class="subtitle">
+                Codebase links, architecture maps, and thesis drafts
+              </p>
+            </div>
+            <button class="primary" onclick="openUploadAsset()">
+              + Upload asset
+            </button>
+          </div>
+          <div class="list" id="assets-list"></div>
+        </section>
+
+        <!-- MARKETPLACE -->
+        <section class="page" id="page-marketplace">
+          <div class="page-header">
+            <div>
+              <h1>Industry-Sponsored Capstone Marketplace</h1>
+              <p class="subtitle">
+                Real-world challenges from corporate partners and R&amp;D
+              </p>
+            </div>
+            <button class="primary" onclick="openPostChallenge()">
+              + Post challenge
+            </button>
+          </div>
+          <div class="list" id="marketplace-list"></div>
+        </section>
+
+        <!-- COMMERCIALIZATION -->
+        <section class="page" id="page-commercialization">
+          <div class="page-header">
+            <div>
+              <h1>Commercialization &amp; Investor Pitch Pipeline</h1>
+              <p class="subtitle">Flagged for IQAC / R&amp;D Wing review</p>
+            </div>
+            <button class="primary" onclick="openFlagProject()">
+              + Flag project
+            </button>
+          </div>
+          <div class="list" id="commercialization-list"></div>
+          <p class="secondary-text" style="margin-top: 10px">
+            The Query Router project is already listed in the R&amp;D Wing's IP
+            &amp; Patent Tracker as filed by Dr. Anil Sharma and Dr. Meera Joshi
+            — this is where it started, as Sunita Gurung and Nisha Adhikari's
+            capstone.
+          </p>
+        </section>
+      </main>
+    </div>
+
+    <!-- MODAL CONTAINER -->
+    <div
+      class="modal-overlay"
+      id="modal-overlay"
+      onclick="if (event.target === this) closeModal();"
+    >
+      <div class="modal">
+        <div class="modal-header">
+          <h3 id="modal-title"></h3>
+          <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body" id="modal-body"></div>
+        <div class="modal-footer" id="modal-footer"></div>
+      </div>
+    </div>
+
+    <script>
+      // --- GLOBAL DATA STRUCTURES ---
+      var currentActor = "internal"; // 'internal', 'external', or 'head'
+
+      var STUDENTS = [
+        "Sunita Gurung",
+        "Nisha Adhikari",
+        "Aisha Karki",
+        "Rajesh Karki",
+        "Anita Poudel",
+        "Bibek Rai",
+        "Prakash Thapa",
+        "Manisha Shrestha",
+        "Suman Basnet",
+        "Kiran Magar",
+      ];
+      var GUIDES = [
+        "Dr. Meera Joshi",
+        "Dr. Anil Sharma",
+        "Dr. Sita Poudel",
+        "Prof. Ram Bahadur Thapa",
+        "Dr. Priya Basnet",
+      ];
+
+      var TEAMS_DATA = [
+        {
+          id: "t1",
+          topic: "Automated Multi-Tenant Query Router",
+          members: "Sunita Gurung, Nisha Adhikari",
+          guide: "Dr. Anil Sharma",
+          externalEvaluator: "Prof. David Whitfield (Univ. of Leeds)",
+        },
+        {
+          id: "t2",
+          topic: "AI-Assisted Curriculum Dashboard",
+          members: "Aisha Karki, Rajesh Karki",
+          guide: "Dr. Meera Joshi",
+          externalEvaluator: "Dr. Rita Malla (Kathmandu Univ.)",
+        },
+        {
+          id: "t3",
+          topic: "Campus Energy Monitoring System",
+          members: "Prakash Thapa, Anita Poudel",
+          guide: "Prof. Ram Bahadur Thapa",
+          externalEvaluator: "Not assigned",
+        },
+        {
+          id: "t4",
+          topic: "Low-Cost Health Sensor Kit",
+          members: "Bibek Rai, Suman Basnet",
+          guide: "Dr. Sita Poudel",
+          externalEvaluator: "Dr. Rita Malla (Kathmandu Univ.)",
+        },
+        {
+          id: "t5",
+          topic: "Retail Demand Forecasting Tool",
+          members: "Manisha Shrestha, Kiran Magar",
+          guide: "Dr. Priya Basnet",
+          externalEvaluator: "Not assigned",
+        },
+      ];
+
+      // Independent Evaluation Storage
+      var MARKS_DATA = {
+        t1: {
+          internal: {
+            doc: 27,
+            impl: 36,
+            viva: 26,
+            submitted: true,
+            comments: "Exceptional database optimization architecture.",
+          },
+          external: {
+            doc: 26,
+            impl: 35,
+            viva: 27,
+            submitted: true,
+            comments: "Solid methodology and strong viva defense.",
+          },
+        },
+        t2: {
+          internal: {
+            doc: 24,
+            impl: 31,
+            viva: 22,
+            submitted: true,
+            comments: "Good UI/UX, needs deeper model validation.",
+          },
+          external: {
+            doc: 15,
+            impl: 20,
+            viva: 15,
+            submitted: true,
+            comments: "Major gaps in machine learning rigor.",
+          }, // Artificial high variance for demo
+        },
+        t3: {
+          internal: {
+            doc: null,
+            impl: null,
+            viva: null,
+            submitted: false,
+            comments: "",
+          },
+          external: {
+            doc: null,
+            impl: null,
+            viva: null,
+            submitted: false,
+            comments: "",
+          },
+        },
+        t4: {
+          internal: {
+            doc: 22,
+            impl: 30,
+            viva: 24,
+            submitted: true,
+            comments: "Functional hardware setup.",
+          },
+          external: {
+            doc: null,
+            impl: null,
+            viva: null,
+            submitted: false,
+            comments: "",
+          },
+        },
+        t5: {
+          internal: {
+            doc: null,
+            impl: null,
+            viva: null,
+            submitted: false,
+            comments: "",
+          },
+          external: {
+            doc: null,
+            impl: null,
+            viva: null,
+            submitted: false,
+            comments: "",
+          },
+        },
+      };
+
+      // --- INITIALIZATION ---
+      window.onload = function () {
+        renderTeams();
+        renderMilestones();
+        renderInternalMarks();
+        renderExternalMarks();
+        renderConsolidated();
+        renderViva();
+        renderAssets();
+        renderMarketplace();
+        renderCommercialization();
+      };
+
+      function switchActor(role) {
+        currentActor = role;
+        var nameEl = document.getElementById("current-user-name");
+        var roleEl = document.getElementById("current-user-role");
+        var sidebarRole = document.getElementById("sidebar-role");
+
+        if (role === "internal") {
+          nameEl.textContent = "Dr. Sunil Rana";
+          roleEl.textContent = "FYP Internal Evaluator & Supervisor";
+          sidebarRole.textContent = "FYP Supervisor";
+        } else if (role === "external") {
+          nameEl.textContent = "Prof. David Whitfield";
+          roleEl.textContent = "External Assessor (Univ. of Leeds)";
+          sidebarRole.textContent = "External Marker";
+        } else {
+          nameEl.textContent = "Dr. Academic Head";
+          roleEl.textContent = "FYP Committee Chair / Head View";
+          sidebarRole.textContent = "FYP Coordinator";
+        }
+
+        // Re-render UI views with updated visibility rules
+        renderInternalMarks();
+        renderExternalMarks();
+        renderConsolidated();
+      }
+
+      function showPage(id, el) {
+        document.querySelectorAll(".page").forEach(function (p) {
+          p.classList.remove("active");
+        });
+        document.getElementById("page-" + id).classList.add("active");
+        document.querySelectorAll(".nav-item").forEach(function (n) {
+          n.classList.remove("active");
+        });
+        if (el) el.classList.add("active");
+      }
+      function goTo(id) {
+        showPage(
+          id,
+          document.querySelector('.nav-item[data-page="' + id + '"]'),
+        );
+      }
+
+      /* ---------- RENDER FUNCTIONS ---------- */
+      function renderTeams() {
+        var list = document.getElementById("teams-list");
+        list.innerHTML = TEAMS_DATA.map(function (t) {
+          return (
+            '<div class="list-row">' +
+            '<div><div class="primary-text">' +
+            t.topic +
+            '</div><div class="secondary-text">' +
+            t.members +
+            " — guide: " +
+            t.guide +
+            "</div></div>" +
+            '<div class="right"><span class="badge filled">Active</span></div>' +
+            "</div>"
+          );
+        }).join("");
+      }
+
+      function renderInternalMarks() {
+        var tbody = document.getElementById("internal-marks-table");
+        var html = "";
+        var pendingCount = 0;
+
+        TEAMS_DATA.forEach(function (t) {
+          var mark = MARKS_DATA[t.id].internal;
+          var isSubmitted = mark && mark.submitted;
+          if (!isSubmitted) pendingCount++;
+
+          // Double blind protection rule: External cannot view or edit Internal directly unless Head
+          var canEdit = currentActor === "internal" || currentActor === "head";
+          var total = isSubmitted ? mark.doc + mark.impl + mark.viva : "-";
+
+          html +=
+            "<tr>" +
+            "<td><strong>" +
+            t.topic +
+            '</strong><br><span class="secondary-text">' +
+            t.members +
+            "</span></td>" +
+            '<td class="num">' +
+            (isSubmitted ? mark.doc : "-") +
+            "</td>" +
+            '<td class="num">' +
+            (isSubmitted ? mark.impl : "-") +
+            "</td>" +
+            '<td class="num">' +
+            (isSubmitted ? mark.viva : "-") +
+            "</td>" +
+            '<td class="num"><strong>' +
+            total +
+            "</strong> / 100</td>" +
+            "<td>" +
+            (isSubmitted
+              ? '<span class="badge filled">Submitted</span>'
+              : '<span class="badge dashed">Pending</span>') +
+            "</td>" +
+            "<td>" +
+            (canEdit
+              ? '<button class="link-btn" onclick="openEvaluateModal(\'' +
+                t.id +
+                "', 'internal')\">" +
+                (isSubmitted ? "Edit Marks" : "Evaluate") +
+                "</button>"
+              : '<span class="secondary-text">Hidden (Blinded)</span>') +
+            "</td>" +
+            "</tr>";
+        });
+
+        tbody.innerHTML = html;
+        document.getElementById("stat-internal-pending").textContent =
+          pendingCount;
+      }
+
+      function renderExternalMarks() {
+        var tbody = document.getElementById("external-marks-table");
+        var html = "";
+        var pendingCount = 0;
+
+        TEAMS_DATA.forEach(function (t) {
+          var mark = MARKS_DATA[t.id].external;
+          var isSubmitted = mark && mark.submitted;
+          if (!isSubmitted) pendingCount++;
+
+          // Double blind protection rule: Internal cannot edit External directly unless Head/External
+          var canEdit = currentActor === "external" || currentActor === "head";
+          var total = isSubmitted ? mark.doc + mark.impl + mark.viva : "-";
+
+          html +=
+            "<tr>" +
+            "<td><strong>" +
+            t.topic +
+            '</strong><br><span class="secondary-text">' +
+            t.members +
+            "</span></td>" +
+            "<td>" +
+            t.externalEvaluator +
+            "</td>" +
+            '<td class="num">' +
+            (isSubmitted ? mark.doc : "-") +
+            "</td>" +
+            '<td class="num">' +
+            (isSubmitted ? mark.impl : "-") +
+            "</td>" +
+            '<td class="num">' +
+            (isSubmitted ? mark.viva : "-") +
+            "</td>" +
+            '<td class="num"><strong>' +
+            total +
+            "</strong> / 100</td>" +
+            "<td>" +
+            (isSubmitted
+              ? '<span class="badge filled">Submitted</span>'
+              : '<span class="badge dashed">Pending</span>') +
+            "</td>" +
+            "<td>" +
+            (canEdit
+              ? '<button class="link-btn" onclick="openEvaluateModal(\'' +
+                t.id +
+                "', 'external')\">" +
+                (isSubmitted ? "Edit Marks" : "Evaluate") +
+                "</button>"
+              : '<span class="secondary-text">Hidden (Blinded)</span>') +
+            "</td>" +
+            "</tr>";
+        });
+
+        tbody.innerHTML = html;
+        document.getElementById("stat-external-pending").textContent =
+          pendingCount;
+      }
+
+      function renderConsolidated() {
+        var tbody = document.getElementById("consolidated-table");
+        var html = "";
+
+        TEAMS_DATA.forEach(function (t) {
+          var intMark = MARKS_DATA[t.id].internal;
+          var extMark = MARKS_DATA[t.id].external;
+
+          var intTotal =
+            intMark && intMark.submitted
+              ? intMark.doc + intMark.impl + intMark.viva
+              : null;
+          var extTotal =
+            extMark && extMark.submitted
+              ? extMark.doc + extMark.impl + extMark.viva
+              : null;
+
+          var weightedScore = "-";
+          var varianceText = "-";
+          var statusBadge =
+            '<span class="badge outline">Awaiting Both Entry</span>';
+
+          if (intTotal !== null && extTotal !== null) {
+            var finalScore = intTotal * 0.5 + extTotal * 0.5;
+            weightedScore = finalScore.toFixed(1) + " / 100";
+
+            var diff = Math.abs(intTotal - extTotal);
+            varianceText = diff + " pts";
+
+            if (diff > 15) {
+              statusBadge =
+                '<span class="badge warning">Discrepancy Warning (>15pt)</span>';
+            } else {
+              statusBadge =
+                '<span class="badge filled">Approved / Verified</span>';
+            }
+          } else if (intTotal !== null || extTotal !== null) {
+            statusBadge = '<span class="badge dashed">Partial Data</span>';
+          }
+
+          // Role-based masking logic for consolidated overview
+          var displayInt =
+            currentActor === "external"
+              ? "***"
+              : intTotal !== null
+                ? intTotal
+                : "Pending";
+          var displayExt =
+            currentActor === "internal"
+              ? "***"
+              : extTotal !== null
+                ? extTotal
+                : "Pending";
+
+          html +=
+            "<tr>" +
+            "<td><strong>" +
+            t.topic +
+            "</strong></td>" +
+            '<td class="num">' +
+            displayInt +
+            "</td>" +
+            '<td class="num">' +
+            displayExt +
+            "</td>" +
+            '<td class="num"><strong>' +
+            (currentActor === "head" || (intTotal !== null && extTotal !== null)
+              ? weightedScore
+              : "Blinded") +
+            "</strong></td>" +
+            '<td class="num">' +
+            varianceText +
+            "</td>" +
+            "<td>" +
+            statusBadge +
+            "</td>" +
+            "</tr>";
+        });
+
+        tbody.innerHTML = html;
+      }
+
+      /* ---------- EVALUATION MODAL ---------- */
+      function openEvaluateModal(teamId, type) {
+        var team = TEAMS_DATA.find(function (x) {
+          return x.id === teamId;
+        });
+        var currentMarks = MARKS_DATA[teamId][type] || {
+          doc: 0,
+          impl: 0,
+          viva: 0,
+          comments: "",
+        };
+
+        var title =
+          (type === "internal"
+            ? "Internal Evaluation"
+            : "External Evaluation") +
+          " — " +
+          team.topic;
+
+        var body =
+          '<div class="info-box">Independent Score Card. Evaluation scale: Document (30), Implementation (40), Presentation/Viva (30). Total: 100 Marks.</div>' +
+          '<div class="rubric-card">' +
+          '<div class="rubric-title">1. Thesis / Documentation (Max 30)</div>' +
+          formInput("Score", "ev-doc", currentMarks.doc || "", "number") +
+          "</div>" +
+          '<div class="rubric-card">' +
+          '<div class="rubric-title">2. System Implementation & Code (Max 40)</div>' +
+          formInput("Score", "ev-impl", currentMarks.impl || "", "number") +
+          "</div>" +
+          '<div class="rubric-card">' +
+          '<div class="rubric-title">3. Oral Presentation & Viva (Max 30)</div>' +
+          formInput("Score", "ev-viva", currentMarks.viva || "", "number") +
+          "</div>" +
+          formTextarea(
+            "Evaluator Comments & Feedback",
+            "ev-comments",
+            currentMarks.comments || "",
+          );
+
+        openModal(
+          title,
+          body,
+          '<button class="secondary" onclick="closeModal()">Cancel</button>' +
+            '<button class="primary" onclick="saveEvaluation(\'' +
+            teamId +
+            "', '" +
+            type +
+            "')\">Submit Final Score</button>",
+        );
+      }
+
+      function saveEvaluation(teamId, type) {
+        var doc = parseInt(document.getElementById("ev-doc").value) || 0;
+        var impl = parseInt(document.getElementById("ev-impl").value) || 0;
+        var viva = parseInt(document.getElementById("ev-viva").value) || 0;
+        var comments = document.getElementById("ev-comments").value;
+
+        if (doc > 30 || impl > 40 || viva > 30) {
+          alert(
+            "Please enter scores within valid rubric bounds: Doc (30), Impl (40), Viva (30).",
+          );
+          return;
+        }
+
+        MARKS_DATA[teamId][type] = {
+          doc: doc,
+          impl: impl,
+          viva: viva,
+          submitted: true,
+          comments: comments,
+        };
+
+        closeModal();
+        renderInternalMarks();
+        renderExternalMarks();
+        renderConsolidated();
+      }
+
+      /* ---------- OTHER MODULE RENDERS ---------- */
+      function renderMilestones() {
+        var list = document.getElementById("milestones-list");
+        list.innerHTML =
+          '<div class="list-row"><div><div class="primary-text">Query Router team — Design</div><div class="secondary-text">Aug 15</div></div><div class="right"><span class="badge filled">Signed off</span></div></div>' +
+          '<div class="list-row"><div><div class="primary-text">Query Router team — Code</div><div class="secondary-text">Sep 1</div></div><div class="right"><span class="badge filled">Signed off</span></div></div>' +
+          '<div class="list-row"><div><div class="primary-text">Query Router team — Testing</div><div class="secondary-text">Sep 8</div></div><div class="right"><span class="badge dashed">Pending</span><button class="link-btn" onclick="signOff(this)">Sign off</button></div></div>' +
+          '<div class="list-row"><div><div class="primary-text">Curriculum Dashboard team — Design</div><div class="secondary-text">Aug 20</div></div><div class="right"><span class="badge filled">Signed off</span></div></div>' +
+          '<div class="list-row"><div><div class="primary-text">Curriculum Dashboard team — Code</div><div class="secondary-text">Sep 5</div></div><div class="right"><span class="badge dashed">Pending</span><button class="link-btn" onclick="signOff(this)">Sign off</button></div></div>';
+      }
+
+      function renderViva() {
+        var list = document.getElementById("viva-list");
+        list.innerHTML =
+          '<div class="list-row"><div><div class="primary-text">Query Router team</div><div class="secondary-text">Panel: Dr. Anil Sharma, Dr. Meera Joshi, Prof. David Whitfield — Room B204</div></div><div class="right"><span class="badge filled">Nov 20, 10:00</span></div></div>' +
+          '<div class="list-row"><div><div class="primary-text">Curriculum Dashboard team</div><div class="secondary-text">Not yet scheduled</div></div><div class="right"><span class="badge outline">Unscheduled</span><button class="link-btn" onclick="scheduleVivaRow(this)">Schedule now</button></div></div>';
+      }
+
+      function renderAssets() {
+        var list = document.getElementById("assets-list");
+        list.innerHTML =
+          '<div class="list-row"><div><div class="primary-text">Query Router team</div><div class="secondary-text">Codebase linked, architecture uploaded — thesis draft v2</div></div><div class="right"><span class="badge filled">Up to date</span></div></div>' +
+          '<div class="list-row"><div><div class="primary-text">Curriculum Dashboard team</div><div class="secondary-text">Codebase linked — architecture missing</div></div><div class="right"><span class="badge outline">Incomplete</span></div></div>';
+      }
+
+      function renderMarketplace() {
+        var list = document.getElementById("marketplace-list");
+        list.innerHTML =
+          '<div class="list-row"><div><div class="primary-text">Real-time Fraud Detection Engine</div><div class="secondary-text">Posted by Himalayan Bank Ltd — internship + NPR 20,000</div></div><div class="right"><span class="secondary-text">3 teams interested</span><button class="link-btn" onclick="assignToChallenge(this)">Assign team</button></div></div>';
+      }
+
+      function renderCommercialization() {
+        var list = document.getElementById("commercialization-list");
+        list.innerHTML =
+          '<div class="list-row"><div><div class="primary-text">Automated Multi-Tenant Query Router</div><div class="secondary-text">Query Router team — novel routing algorithm</div></div><div class="right"><span class="badge filled">Patent filing recommended</span></div></div>';
+      }
+
+      /* ---------- MODAL UTILITIES ---------- */
+      var modalContext = null;
+      function openModal(title, bodyHtml, footerHtml) {
+        document.getElementById("modal-title").textContent = title;
+        document.getElementById("modal-body").innerHTML = bodyHtml;
+        document.getElementById("modal-footer").innerHTML =
+          footerHtml ||
+          '<button class="secondary" onclick="closeModal()">Close</button>';
+        document.getElementById("modal-overlay").classList.add("open");
+      }
+      function closeModal() {
+        document.getElementById("modal-overlay").classList.remove("open");
+        modalContext = null;
+      }
+      function formInput(label, id, val, type) {
+        type = type || "text";
+        return (
+          '<div class="form-group"><label>' +
+          label +
+          '</label><input type="' +
+          type +
+          '" id="' +
+          id +
+          '" value="' +
+          (val === undefined ? "" : val) +
+          '"></div>'
+        );
+      }
+      function formTextarea(label, id, val) {
+        return (
+          '<div class="form-group"><label>' +
+          label +
+          '</label><textarea id="' +
+          id +
+          '">' +
+          (val || "") +
+          "</textarea></div>"
+        );
+      }
+      function formSelect(label, id, opts) {
+        var o = opts
+          .map(function (x) {
+            return "<option>" + x + "</option>";
+          })
+          .join("");
+        return (
+          '<div class="form-group"><label>' +
+          label +
+          '</label><select id="' +
+          id +
+          '">' +
+          o +
+          "</select></div>"
+        );
+      }
+
+      /* ---------- TEAM & MILESTONE ACTIONS ---------- */
+      function openNewTeam() {
+        openModal(
+          "Form new team",
+          formInput("Project topic", "nt-topic", "") +
+            '<div class="form-row-2">' +
+            formSelect("Student 1", "nt-s1", STUDENTS) +
+            formSelect("Student 2", "nt-s2", STUDENTS) +
+            "</div>" +
+            formSelect("Expert guide", "nt-guide", GUIDES),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveTeam()">Create team</button>',
+        );
+      }
+      function saveTeam() {
+        var topic =
+          document.getElementById("nt-topic").value || "Untitled project";
+        var s1 = document.getElementById("nt-s1").value;
+        var s2 = document.getElementById("nt-s2").value;
+        var guide = document.getElementById("nt-guide").value;
+
+        var newId = "t" + (TEAMS_DATA.length + 1);
+        TEAMS_DATA.push({
+          id: newId,
+          topic: topic,
+          members: s1 + ", " + s2,
+          guide: guide,
+          externalEvaluator: "Not assigned",
+        });
+
+        MARKS_DATA[newId] = {
+          internal: { doc: null, impl: null, viva: null, submitted: false },
+          external: { doc: null, impl: null, viva: null, submitted: false },
+        };
+
+        renderTeams();
+        renderInternalMarks();
+        renderExternalMarks();
+        renderConsolidated();
+        closeModal();
+      }
+
+      function openLogMilestone() {
+        var teamsList = TEAMS_DATA.map(function (t) {
+          return t.topic;
+        });
+        openModal(
+          "Log milestone",
+          formSelect("Team", "lm-team", teamsList) +
+            formSelect("Phase", "lm-phase", [
+              "Design",
+              "Code",
+              "Testing",
+              "Final",
+            ]) +
+            formTextarea("Notes", "lm-notes"),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveMilestone()">Log as pending</button>',
+        );
+      }
+      function saveMilestone() {
+        var team = document.getElementById("lm-team").value;
+        var phase = document.getElementById("lm-phase").value;
+        var list = document.getElementById("milestones-list");
+        var row = document.createElement("div");
+        row.className = "list-row";
+        row.innerHTML =
+          '<div><div class="primary-text">' +
+          team +
+          " — " +
+          phase +
+          '</div><div class="secondary-text">Logged just now</div></div><div class="right"><span class="badge dashed">Pending</span><button class="link-btn" onclick="signOff(this)">Sign off</button></div>';
+        list.appendChild(row);
+        closeModal();
+      }
+      function signOff(btn) {
+        var row = btn.closest(".list-row");
+        var badge = row.querySelector(".badge");
+        badge.textContent = "Signed off";
+        badge.className = "badge filled";
+        btn.remove();
+      }
+
+      function openAssignEvaluator() {
+        var teamsList = TEAMS_DATA.map(function (t) {
+          return t.topic;
+        });
+        openModal(
+          "Assign external evaluator",
+          formSelect("Team", "ae-team", teamsList) +
+            formInput("Evaluator name", "ae-name", "") +
+            formInput("Institution", "ae-institution", ""),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveEvaluator()">Assign</button>',
+        );
+      }
+      function saveEvaluator() {
+        var teamTopic = document.getElementById("ae-team").value;
+        var name =
+          document.getElementById("ae-name").value || "Unnamed evaluator";
+        var inst =
+          document.getElementById("ae-institution").value ||
+          "Unspecified institution";
+
+        var team = TEAMS_DATA.find(function (t) {
+          return t.topic === teamTopic;
+        });
+        if (team) {
+          team.externalEvaluator = name + " (" + inst + ")";
+        }
+
+        renderExternalMarks();
+        closeModal();
+      }
+
+      function openScheduleViva() {
+        var teamsList = TEAMS_DATA.map(function (t) {
+          return t.topic;
+        });
+        openModal(
+          "Schedule viva",
+          formSelect("Team", "sv-team", teamsList) +
+            '<div class="form-row-2">' +
+            formInput("Room", "sv-room", "") +
+            formInput("Date & time", "sv-datetime", "e.g. Nov 22, 14:00") +
+            "</div>" +
+            formInput("Panel members", "sv-panel", "e.g. Dr. X, Dr. Y"),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveViva()">Schedule</button>',
+        );
+      }
+      function saveViva() {
+        var team = document.getElementById("sv-team").value;
+        var room = document.getElementById("sv-room").value || "Room TBC";
+        var when = document.getElementById("sv-datetime").value || "TBC";
+        var panel = document.getElementById("sv-panel").value || "Panel TBC";
+        var list = document.getElementById("viva-list");
+        var row = document.createElement("div");
+        row.className = "list-row";
+        row.innerHTML =
+          '<div><div class="primary-text">' +
+          team +
+          '</div><div class="secondary-text">Panel: ' +
+          panel +
+          " — " +
+          room +
+          '</div></div><div class="right"><span class="badge filled">' +
+          when +
+          "</span></div>";
+        list.appendChild(row);
+        closeModal();
+      }
+      function scheduleVivaRow(btn) {
+        var row = btn.closest(".list-row");
+        modalContext = { row: row };
+        openModal(
+          "Schedule viva — " + row.querySelector(".primary-text").textContent,
+          '<div class="form-row-2">' +
+            formInput("Room", "sv2-room", "") +
+            formInput("Date & time", "sv2-datetime", "") +
+            "</div>",
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveVivaRow()">Schedule</button>',
+        );
+      }
+      function saveVivaRow() {
+        var room = document.getElementById("sv2-room").value || "Room TBC";
+        var when = document.getElementById("sv2-datetime").value || "TBC";
+        var row = modalContext.row;
+        row.querySelector(".secondary-text").textContent =
+          "Panel to be confirmed — " + room;
+        var right = row.querySelector(".right");
+        right.innerHTML = '<span class="badge filled">' + when + "</span>";
+        closeModal();
+      }
+
+      function openUploadAsset() {
+        var teamsList = TEAMS_DATA.map(function (t) {
+          return t.topic;
+        });
+        openModal(
+          "Upload asset",
+          formSelect("Team", "ua-team", teamsList) +
+            formSelect("Asset type", "ua-type", [
+              "Codebase link",
+              "Architecture diagram",
+              "Thesis draft",
+            ]) +
+            formInput("Link or filename", "ua-link", ""),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveAsset()">Upload</button>',
+        );
+      }
+      function saveAsset() {
+        var team = document.getElementById("ua-team").value;
+        var type = document.getElementById("ua-type").value;
+        var list = document.getElementById("assets-list");
+        var row = document.createElement("div");
+        row.className = "list-row";
+        row.innerHTML =
+          '<div><div class="primary-text">' +
+          team +
+          '</div><div class="secondary-text">' +
+          type +
+          ' added just now</div></div><div class="right"><span class="badge filled">Up to date</span></div>';
+        list.appendChild(row);
+        closeModal();
+      }
+
+      function openPostChallenge() {
+        openModal(
+          "Post challenge",
+          formInput("Challenge title", "pc-title", "") +
+            formInput("Posted by", "pc-by", "e.g. company or R&D Wing") +
+            formInput("Reward", "pc-reward", "e.g. internship, cash prize"),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveChallenge()">Post</button>',
+        );
+      }
+      function saveChallenge() {
+        var title =
+          document.getElementById("pc-title").value || "Untitled challenge";
+        var by =
+          document.getElementById("pc-by").value || "Unspecified partner";
+        var reward =
+          document.getElementById("pc-reward").value || "unspecified reward";
+        var list = document.getElementById("marketplace-list");
+        var row = document.createElement("div");
+        row.className = "list-row";
+        row.innerHTML =
+          '<div><div class="primary-text">' +
+          title +
+          '</div><div class="secondary-text">Posted by ' +
+          by +
+          " — " +
+          reward +
+          '</div></div><div class="right"><span class="secondary-text">0 teams interested</span><button class="link-btn" onclick="assignToChallenge(this)">Assign team</button></div>';
+        list.appendChild(row);
+        closeModal();
+      }
+      function assignToChallenge(btn) {
+        var row = btn.closest(".list-row");
+        modalContext = { row: row };
+        var teamsList = TEAMS_DATA.map(function (t) {
+          return t.topic;
+        });
+        openModal(
+          "Assign team — " + row.querySelector(".primary-text").textContent,
+          formSelect("Team", "ac-team", teamsList),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveChallengeAssignment()">Assign</button>',
+        );
+      }
+      function saveChallengeAssignment() {
+        var team = document.getElementById("ac-team").value;
+        var row = modalContext.row;
+        row.querySelector(".right").innerHTML =
+          '<span class="badge filled">Assigned to ' + team + "</span>";
+        closeModal();
+      }
+
+      function openFlagProject() {
+        var teamsList = TEAMS_DATA.map(function (t) {
+          return t.topic;
+        });
+        openModal(
+          "Flag project for commercialization review",
+          formSelect("Team / project", "fp-team", teamsList) +
+            formTextarea("Reason for flagging", "fp-reason"),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveFlag()">Flag for review</button>',
+        );
+      }
+      function saveFlag() {
+        var team = document.getElementById("fp-team").value;
+        var reason =
+          document.getElementById("fp-reason").value ||
+          "High potential noted by supervisor";
+        var list = document.getElementById("commercialization-list");
+        var row = document.createElement("div");
+        row.className = "list-row";
+        row.innerHTML =
+          '<div><div class="primary-text">' +
+          team +
+          '</div><div class="secondary-text">' +
+          reason +
+          '</div></div><div class="right"><span class="badge dashed">Under IQAC review</span></div>';
+        list.appendChild(row);
+        closeModal();
+      }
+    </script>
+  </body>
+</html>

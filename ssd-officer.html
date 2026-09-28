@@ -1,0 +1,3195 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ING ERP — Student Support Department (Officer Workstation)</title>
+    <style>
+      :root {
+        --surface-1: #fafafa;
+        --surface-2: #f2f2f2;
+        --border: #e6e6e6;
+        --border-strong: #cfcfcf;
+        --text-primary: #111111;
+        --text-secondary: #5a5a5e;
+        --text-muted: #9a9a9e;
+        --fill-primary: #000000;
+        --on-primary: #ffffff;
+        --danger: #d9381e;
+        --radius: 10px;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+          Arial, sans-serif;
+        background: var(--surface-2);
+        color: var(--text-primary);
+      }
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 24px;
+        background: #fff;
+        border-bottom: 1px solid var(--border);
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .topbar .who {
+        font-size: 12px;
+        color: var(--text-secondary);
+      }
+      .topbar .who strong {
+        color: var(--text-primary);
+        font-weight: 600;
+      }
+      .app {
+        display: flex;
+        min-height: calc(100vh - 45px);
+      }
+      .sidebar {
+        width: 235px;
+        flex-shrink: 0;
+        background: var(--surface-1);
+        border-right: 1px solid var(--border);
+        padding: 18px 12px;
+        overflow-y: auto;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0 8px 14px;
+      }
+      .brand .mark {
+        width: 24px;
+        height: 24px;
+        border-radius: 6px;
+        background: var(--fill-primary);
+        flex-shrink: 0;
+      }
+      .brand .name {
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 1.3;
+      }
+      .brand .role {
+        font-size: 11px;
+        color: var(--text-muted);
+        line-height: 1.3;
+      }
+      .nav-item {
+        display: block;
+        padding: 7px 10px;
+        border-radius: 7px;
+        font-size: 13px;
+        color: var(--text-secondary);
+        cursor: pointer;
+        margin-bottom: 2px;
+      }
+      .nav-item:hover {
+        background: var(--surface-2);
+      }
+      .nav-item.active {
+        background: var(--fill-primary);
+        color: var(--on-primary);
+      }
+      .nav-divider {
+        border-top: 1px solid var(--border);
+        margin: 10px 4px;
+      }
+      .group {
+        margin-bottom: 12px;
+      }
+      .group-label {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-muted);
+        margin: 0 0 4px 10px;
+      }
+      .main {
+        flex: 1;
+        padding: 32px 36px;
+        min-width: 0;
+      }
+      .page {
+        display: none;
+      }
+      .page.active {
+        display: block;
+      }
+      .page-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: 18px;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      h1 {
+        font-size: 22px;
+        margin: 0;
+        font-weight: 600;
+      }
+      .subtitle {
+        font-size: 13px;
+        color: var(--text-secondary);
+        margin: 5px 0 0;
+      }
+      button.primary {
+        background: var(--fill-primary);
+        color: var(--on-primary);
+        border: none;
+        border-radius: 8px;
+        padding: 9px 15px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      button.secondary {
+        background: #fff;
+        color: var(--text-primary);
+        border: 1px solid var(--border-strong);
+        border-radius: 8px;
+        padding: 9px 15px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      button.danger-btn {
+        background: #fff;
+        color: var(--danger);
+        border: 1px solid var(--danger);
+        border-radius: 8px;
+        padding: 5px 10px;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+      }
+      .link-btn {
+        background: none;
+        border: none;
+        color: var(--text-primary);
+        font-size: 12px;
+        font-weight: 600;
+        text-decoration: underline;
+        cursor: pointer;
+        padding: 0;
+        white-space: nowrap;
+      }
+      .toolbar {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      input[type="text"],
+      input[type="number"],
+      input[type="date"],
+      select,
+      textarea {
+        border: 1px solid var(--border-strong);
+        border-radius: 8px;
+        padding: 9px 12px;
+        font-size: 13px;
+        background: #fff;
+        color: var(--text-primary);
+        font-family: inherit;
+      }
+      .filter-input {
+        flex: 1;
+        min-width: 200px;
+      }
+      .card {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        margin-bottom: 12px;
+        overflow: hidden;
+        background: #fff;
+      }
+      .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 18px;
+        cursor: pointer;
+        gap: 12px;
+      }
+      .chev {
+        color: var(--text-muted);
+        font-size: 14px;
+        flex-shrink: 0;
+      }
+      .detail {
+        border-top: 1px solid var(--border);
+        padding: 14px 18px;
+        background: var(--surface-1);
+        display: none;
+      }
+      .detail.open {
+        display: block;
+      }
+      .detail-label {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-muted);
+        margin: 0 0 6px;
+      }
+      .flag-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 7px 0;
+        border-bottom: 1px solid var(--border);
+        font-size: 13px;
+      }
+      .flag-row:last-child {
+        border-bottom: none;
+      }
+      .flag-row .dept {
+        font-weight: 600;
+        color: var(--text-muted);
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        min-width: 80px;
+      }
+      .badge {
+        font-size: 11px;
+        padding: 3px 10px;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+      .badge.filled {
+        background: var(--fill-primary);
+        color: var(--on-primary);
+      }
+      .badge.outline {
+        border: 1px solid var(--border-strong);
+        color: var(--text-secondary);
+      }
+      .badge.dashed {
+        border: 1px dashed var(--border-strong);
+        color: var(--text-secondary);
+      }
+      .list {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+        background: #fff;
+      }
+      .list-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 18px;
+        gap: 14px;
+        border-bottom: 1px solid var(--border);
+      }
+      .list-row:last-child {
+        border-bottom: none;
+      }
+      .list-row .primary-text {
+        font-size: 14px;
+        font-weight: 600;
+      }
+      .list-row .secondary-text {
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-top: 3px;
+      }
+      .list-row .right {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+      .empty-state {
+        padding: 24px;
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 13px;
+      }
+      .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        z-index: 50;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      .modal-overlay.open {
+        display: flex;
+      }
+      .modal {
+        background: #fff;
+        border-radius: 12px;
+        max-width: 480px;
+        width: 100%;
+        max-height: 86vh;
+        overflow-y: auto;
+        border: 1px solid var(--border-strong);
+      }
+      .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border);
+      }
+      .modal-header h3 {
+        margin: 0;
+        font-size: 16px;
+      }
+      .modal-close {
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        color: var(--text-secondary);
+        line-height: 1;
+        padding: 4px;
+      }
+      .modal-body {
+        padding: 18px 20px;
+      }
+      .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        padding: 14px 20px;
+        border-top: 1px solid var(--border);
+      }
+      .form-group {
+        margin-bottom: 14px;
+      }
+      .form-group label {
+        display: block;
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-bottom: 5px;
+        font-weight: 600;
+      }
+      .form-group input,
+      .form-group select,
+      .form-group textarea {
+        width: 100%;
+      }
+      .form-group textarea {
+        resize: vertical;
+        min-height: 70px;
+      }
+      .form-row-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+      @media (max-width: 640px) {
+        .sidebar {
+          display: none;
+        }
+        .main {
+          padding: 22px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="topbar">
+      <div class="who">
+        Signed in as <strong>Ms. Nirmala Adhikari</strong> — SSD Officer
+      </div>
+      <div class="who">Operational Record Management &amp; CRUD Console</div>
+    </div>
+
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="mark"></div>
+          <div>
+            <div class="name">ING ERP</div>
+            <div class="role">SSD Operations</div>
+          </div>
+        </div>
+
+        <nav>
+          <div class="group">
+            <p class="group-label">Wellness &amp; crisis</p>
+            <div
+              class="nav-item active"
+              data-page="counseling"
+              onclick="showPage('counseling', this)"
+            >
+              Counseling log
+            </div>
+            <div
+              class="nav-item"
+              data-page="crisis"
+              onclick="showPage('crisis', this)"
+            >
+              Crisis intervention
+            </div>
+            <div
+              class="nav-item"
+              data-page="wellnessmaterial"
+              onclick="showPage('wellnessmaterial', this)"
+            >
+              Wellness material
+            </div>
+            <div
+              class="nav-item"
+              data-page="welfaredispatch"
+              onclick="showPage('welfaredispatch', this)"
+            >
+              Welfare dispatch
+            </div>
+          </div>
+          <div class="group">
+            <p class="group-label">STAR &amp; escalation</p>
+            <div
+              class="nav-item"
+              data-page="starmeeting"
+              onclick="showPage('starmeeting', this)"
+            >
+              STAR meetings
+            </div>
+            <div
+              class="nav-item"
+              data-page="incidents"
+              onclick="showPage('incidents', this)"
+            >
+              Incident complaints
+            </div>
+            <div
+              class="nav-item"
+              data-page="misbehavior"
+              onclick="showPage('misbehavior', this)"
+            >
+              Misbehavior section
+            </div>
+          </div>
+          <div class="group">
+            <p class="group-label">Financial &amp; access</p>
+            <div
+              class="nav-item"
+              data-page="disability"
+              onclick="showPage('disability', this)"
+            >
+              Disability accommodations
+            </div>
+            <div
+              class="nav-item"
+              data-page="hardshipfund"
+              onclick="showPage('hardshipfund', this)"
+            >
+              Hardship fund
+            </div>
+            <div
+              class="nav-item"
+              data-page="scholarshipcalc"
+              onclick="showPage('scholarshipcalc', this)"
+            >
+              Scholarship calculator
+            </div>
+          </div>
+          <div class="group">
+            <p class="group-label">Student life</p>
+            <div
+              class="nav-item"
+              data-page="clubs"
+              onclick="showPage('clubs', this)"
+            >
+              Club hub
+            </div>
+            <div
+              class="nav-item"
+              data-page="contenthub"
+              onclick="showPage('contenthub', this)"
+            >
+              Surveys &amp; polls
+            </div>
+            <div
+              class="nav-item"
+              data-page="voting"
+              onclick="showPage('voting', this)"
+            >
+              Voting gateway
+            </div>
+          </div>
+          <div class="group">
+            <p class="group-label">Integration</p>
+            <div
+              class="nav-item"
+              data-page="newstudent"
+              onclick="showPage('newstudent', this)"
+            >
+              New student hub
+            </div>
+            <div
+              class="nav-item"
+              data-page="international"
+              onclick="showPage('international', this)"
+            >
+              International students
+            </div>
+            <div
+              class="nav-item"
+              data-page="peermentor"
+              onclick="showPage('peermentor', this)"
+            >
+              Peer mentorship
+            </div>
+          </div>
+          <div class="group">
+            <p class="group-label">Career &amp; alumni</p>
+            <div
+              class="nav-item"
+              data-page="career"
+              onclick="showPage('career', this)"
+            >
+              Career counseling
+            </div>
+            <div
+              class="nav-item"
+              data-page="alumniservice"
+              onclick="showPage('alumniservice', this)"
+            >
+              Alumni services
+            </div>
+          </div>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <!-- PAGE: Counseling Log -->
+        <section class="page active" id="page-counseling">
+          <div class="page-header">
+            <div>
+              <h1>Student Wellness Counseling Log</h1>
+              <p class="subtitle">
+                Record and manage encrypted student appointments
+              </p>
+            </div>
+            <button class="primary" onclick="openLogCounseling()">
+              + Log session
+            </button>
+          </div>
+          <div class="toolbar">
+            <input
+              type="text"
+              class="filter-input"
+              id="counseling-search"
+              placeholder="Search by student or counselor..."
+              oninput="renderCounseling()"
+            />
+          </div>
+          <div class="list" id="counseling-list"></div>
+        </section>
+
+        <!-- PAGE: Crisis Intervention -->
+        <section class="page" id="page-crisis">
+          <div class="page-header">
+            <div>
+              <h1>Crisis Intervention Network</h1>
+              <p class="subtitle">
+                Direct routing and case management for acute emergencies
+              </p>
+            </div>
+            <button class="primary" onclick="openLogCrisis()">
+              + Log crisis alert
+            </button>
+          </div>
+          <div class="toolbar">
+            <input
+              type="text"
+              class="filter-input"
+              id="crisis-search"
+              placeholder="Search crisis logs..."
+              oninput="renderCrisis()"
+            />
+          </div>
+          <div class="list" id="crisis-list"></div>
+        </section>
+
+        <!-- PAGE: Wellness Material -->
+        <section class="page" id="page-wellnessmaterial">
+          <div class="page-header">
+            <div>
+              <h1>Wellness Material Distribution</h1>
+              <p class="subtitle">
+                Manage mental health articles and stress material
+              </p>
+            </div>
+            <button class="primary" onclick="openDistributeMaterial()">
+              + Add material
+            </button>
+          </div>
+          <div class="toolbar">
+            <input
+              type="text"
+              class="filter-input"
+              id="wellnessmaterial-search"
+              placeholder="Search materials..."
+              oninput="renderWellnessMaterial()"
+            />
+          </div>
+          <div class="list" id="wellnessmaterial-list"></div>
+        </section>
+
+        <!-- PAGE: Welfare Dispatch -->
+        <section class="page" id="page-welfaredispatch">
+          <div class="page-header">
+            <div>
+              <h1>Welfare Call Dispatch Engine</h1>
+              <p class="subtitle">
+                Dispatch follow-up requests and tasks to inter-department teams
+              </p>
+            </div>
+            <button class="primary" onclick="openNewDispatch()">
+              + New dispatch
+            </button>
+          </div>
+          <div class="toolbar">
+            <input
+              type="text"
+              class="filter-input"
+              id="welfaredispatch-search"
+              placeholder="Search dispatches..."
+              oninput="renderWelfareDispatch()"
+            />
+          </div>
+          <div class="list" id="welfaredispatch-list"></div>
+        </section>
+
+        <!-- PAGE: STAR Meetings -->
+        <section class="page" id="page-starmeeting">
+          <div class="page-header">
+            <div>
+              <h1>STAR Meeting Records</h1>
+              <p class="subtitle">
+                Multi-department compiled history and action plans
+              </p>
+            </div>
+            <button class="primary" onclick="openNewStar()">
+              + New STAR case
+            </button>
+          </div>
+          <div class="toolbar">
+            <input
+              type="text"
+              class="filter-input"
+              id="starmeeting-search"
+              placeholder="Search STAR cases..."
+              oninput="renderStarMeeting()"
+            />
+          </div>
+          <div id="starmeeting-list"></div>
+        </section>
+
+        <!-- PAGE: Incidents -->
+        <section class="page" id="page-incidents">
+          <div class="page-header">
+            <div>
+              <h1>Incident Complaint Log</h1>
+              <p class="subtitle">
+                Dispute tracking, harassment allegations, and non-academic
+                issues
+              </p>
+            </div>
+            <button class="primary" onclick="openLogIncident()">
+              + Log incident
+            </button>
+          </div>
+          <div class="toolbar">
+            <input
+              type="text"
+              class="filter-input"
+              id="incidents-search"
+              placeholder="Search incident logs..."
+              oninput="renderIncidents()"
+            />
+          </div>
+          <div class="list" id="incidents-list"></div>
+        </section>
+
+        <!-- PAGE: Misbehavior -->
+        <section class="page" id="page-misbehavior">
+          <div class="page-header">
+            <div>
+              <h1>Student Misbehavior Section</h1>
+              <p class="subtitle">
+                General misconduct and behavioral infractions log
+              </p>
+            </div>
+            <button class="primary" onclick="openLogMisbehavior()">
+              + Log violation
+            </button>
+          </div>
+          <div class="toolbar">
+            <input
+              type="text"
+              class="filter-input"
+              id="misbehavior-search"
+              placeholder="Search misbehaviors..."
+              oninput="renderMisbehavior()"
+            />
+          </div>
+          <div class="list" id="misbehavior-list"></div>
+        </section>
+
+        <!-- PAGE: Disability Accommodations -->
+        <section class="page" id="page-disability">
+          <div class="page-header">
+            <div>
+              <h1>Disability Accommodations Registry</h1>
+              <p class="subtitle">
+                Manage individual learning needs and examination adjustments
+              </p>
+            </div>
+            <button class="primary" onclick="openNewAccommodation()">
+              + New accommodation
+            </button>
+          </div>
+          <div class="toolbar">
+            <input
+              type="text"
+              class="filter-input"
+              id="disability-search"
+              placeholder="Search accommodation entries..."
+              oninput="renderDisability()"
+            />
+          </div>
+          <div class="list" id="disability-list"></div>
+        </section>
+
+        <!-- PAGE: Hardship Fund -->
+        <section class="page" id="page-hardshipfund">
+          <div class="page-header">
+            <div>
+              <h1>Student Hardship Fund Manager</h1>
+              <p class="subtitle">Process emergency financial grant requests</p>
+            </div>
+            <button class="primary" onclick="openNewHardship()">
+              + New application
+            </button>
+          </div>
+          <div class="toolbar">
+            <input
+              type="text"
+              class="filter-input"
+              id="hardshipfund-search"
+              placeholder="Search applications..."
+              oninput="renderHardshipFund()"
+            />
+          </div>
+          <div class="list" id="hardshipfund-list"></div>
+        </section>
+
+        <!-- PAGE: Scholarship Calculator -->
+        <section class="page" id="page-scholarshipcalc">
+          <div class="page-header">
+            <div>
+              <h1>Scholarship Allocation Registry</h1>
+              <p class="subtitle">
+                Process merit scores and compute tuition grants
+              </p>
+            </div>
+            <button class="primary" onclick="openNewCalculation()">
+              + New calculation
+            </button>
+          </div>
+          <div class="toolbar">
+            <input
+              type="text"
+              class="filter-input"
+              id="scholarshipcalc-search"
+              placeholder="Search calculations..."
+              oninput="renderScholarshipCalc()"
+            />
+          </div>
+          <div class="list" id="scholarshipcalc-list"></div>
+        </section>
+
+        <!-- PAGE: Club Hub -->
+        <section class="page" id="page-clubs">
+          <div class="page-header">
+            <div>
+              <h1>Extra-Curricular Club Hub</h1>
+              <p class="subtitle">
+                Manage student club profiles, memberships, and budgets
+              </p>
+            </div>
+            <button class="primary" onclick="openNewClub()">+ New club</button>
+          </div>
+          <div class="toolbar">
+            <input
+              type="text"
+              class="filter-input"
+              id="clubs-search"
+              placeholder="Search clubs..."
+              oninput="renderClubs()"
+            />
+          </div>
+          <div class="list" id="clubs-list"></div>
+        </section>
+
+        <!-- PAGE: Surveys & Polls -->
+        <section class="page" id="page-contenthub">
+          <div class="page-header">
+            <div>
+              <h1>Student Surveys &amp; Polls</h1>
+              <p class="subtitle">
+                Maintain campus life surveys and collect feedback data
+              </p>
+            </div>
+            <button class="primary" onclick="openNewSurvey()">
+              + New survey
+            </button>
+          </div>
+          <div class="toolbar">
+            <input
+              type="text"
+              class="filter-input"
+              id="contenthub-search"
+              placeholder="Search surveys..."
+              oninput="renderContentHub()"
+            />
+          </div>
+          <div class="list" id="contenthub-list"></div>
+        </section>
+
+        <!-- PAGE: Voting Gateway -->
+        <section class="page" id="page-voting">
+          <div class="page-header">
+            <div>
+              <h1>Voting Gateway</h1>
+              <p class="subtitle">Elections setup and voter tracking portal</p>
+            </div>
+            <button class="primary" onclick="openNewElection()">
+              + New election
+            </button>
+          </div>
+          <div class="toolbar">
+            <input
+              type="text"
+              class="filter-input"
+              id="voting-search"
+              placeholder="Search elections..."
+              oninput="renderVoting()"
+            />
+          </div>
+          <div class="list" id="voting-list"></div>
+        </section>
+
+        <!-- PAGE: New Student Hub -->
+        <section class="page" id="page-newstudent">
+          <div class="page-header">
+            <div>
+              <h1>New Student Integration Hub</h1>
+              <p class="subtitle">
+                Manage orientation schedules and onboarding programs
+              </p>
+            </div>
+            <button class="primary" onclick="openNewOrientation()">
+              + New event
+            </button>
+          </div>
+          <div class="toolbar">
+            <input
+              type="text"
+              class="filter-input"
+              id="newstudent-search"
+              placeholder="Search events..."
+              oninput="renderNewStudent()"
+            />
+          </div>
+          <div class="list" id="newstudent-list"></div>
+        </section>
+
+        <!-- PAGE: International Students -->
+        <section class="page" id="page-international">
+          <div class="page-header">
+            <div>
+              <h1>International Student Integration</h1>
+              <p class="subtitle">
+                Manage visa clearance, arrival, and orientation statuses
+              </p>
+            </div>
+            <button class="primary" onclick="openNewInternational()">
+              + New student record
+            </button>
+          </div>
+          <div class="toolbar">
+            <input
+              type="text"
+              class="filter-input"
+              id="international-search"
+              placeholder="Search international records..."
+              oninput="renderInternational()"
+            />
+          </div>
+          <div class="list" id="international-list"></div>
+        </section>
+
+        <!-- PAGE: Peer Mentorship -->
+        <section class="page" id="page-peermentor">
+          <div class="page-header">
+            <div>
+              <h1>Peer Mentorship Bridges</h1>
+              <p class="subtitle">
+                Manage 1st year to senior student mentor pairings
+              </p>
+            </div>
+            <button class="primary" onclick="openNewPeerPairing()">
+              + New pairing
+            </button>
+          </div>
+          <div class="toolbar">
+            <input
+              type="text"
+              class="filter-input"
+              id="peermentor-search"
+              placeholder="Search pairings..."
+              oninput="renderPeerMentor()"
+            />
+          </div>
+          <div class="list" id="peermentor-list"></div>
+        </section>
+
+        <!-- PAGE: Career Counseling -->
+        <section class="page" id="page-career">
+          <div class="page-header">
+            <div>
+              <h1>Career Counseling Portal</h1>
+              <p class="subtitle">
+                Schedule and record interview practice and workshops
+              </p>
+            </div>
+            <button class="primary" onclick="openBookCareerSession()">
+              + Book session
+            </button>
+          </div>
+          <div class="toolbar">
+            <input
+              type="text"
+              class="filter-input"
+              id="career-search"
+              placeholder="Search career sessions..."
+              oninput="renderCareer()"
+            />
+          </div>
+          <div class="list" id="career-list"></div>
+        </section>
+
+        <!-- PAGE: Alumni Services -->
+        <section class="page" id="page-alumniservice">
+          <div class="page-header">
+            <div>
+              <h1>Alumni Service Connector</h1>
+              <p class="subtitle">
+                Manage ongoing alumni networking and mentorship logs
+              </p>
+            </div>
+            <button class="primary" onclick="openNewAlumni()">
+              + New alumni record
+            </button>
+          </div>
+          <div class="toolbar">
+            <input
+              type="text"
+              class="filter-input"
+              id="alumniservice-search"
+              placeholder="Search alumni contacts..."
+              oninput="renderAlumniService()"
+            />
+          </div>
+          <div class="list" id="alumniservice-list"></div>
+        </section>
+      </main>
+    </div>
+
+    <!-- Modal Shell -->
+    <div
+      class="modal-overlay"
+      id="modal-overlay"
+      onclick="if (event.target === this) closeModal();"
+    >
+      <div class="modal">
+        <div class="modal-header">
+          <h3 id="modal-title"></h3>
+          <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body" id="modal-body"></div>
+        <div class="modal-footer" id="modal-footer"></div>
+      </div>
+    </div>
+
+    <script>
+      // Master Datasets for Full CRUD Operations
+      var STUDENTS = [
+        "Aisha Karki",
+        "Bibek Rai",
+        "Sunita Gurung",
+        "Prakash Thapa",
+        "Manisha Shrestha",
+        "Rajesh Karki",
+        "Nisha Adhikari",
+        "Suman Basnet",
+        "Anita Poudel",
+        "Kiran Magar",
+      ];
+
+      var db = {
+        counseling: [
+          {
+            id: 1,
+            student: "Manisha Shrestha",
+            counselor: "Ms. Nirmala Adhikari",
+            next: "2026-09-15",
+            notes: "Discussed academic stress and financial situation.",
+            status: "Notes on file",
+          },
+          {
+            id: 2,
+            student: "Bibek Rai",
+            counselor: "Mr. Prem Thapa",
+            next: "2026-09-18",
+            notes: "Career pathway clarity session.",
+            status: "Notes on file",
+          },
+        ],
+        crisis: [
+          {
+            id: 1,
+            title: "Housing emergency",
+            detail: "Aug 22 — resolved with temporary accommodation",
+            status: "Resolved",
+          },
+          {
+            id: 2,
+            title: "Acute financial emergency",
+            detail: "Sep 1 — routed to Hardship Fund",
+            status: "Resolved",
+          },
+        ],
+        wellnessmaterial: [
+          {
+            id: 1,
+            title: "Managing Exam Stress",
+            type: "Article",
+            target: "All students",
+            status: "Sent",
+          },
+          {
+            id: 2,
+            title: "Sleep and Academic Performance",
+            type: "Video",
+            target: "All students",
+            status: "Sent",
+          },
+        ],
+        welfaredispatch: [
+          {
+            id: 1,
+            student: "Manisha Shrestha",
+            issue: "Attendance concern",
+            route: "PAT",
+            status: "Acknowledged",
+          },
+          {
+            id: 2,
+            student: "Kiran Magar",
+            issue: "Fee and attendance",
+            route: "Finance and RTE",
+            status: "Acknowledged",
+          },
+        ],
+        starmeeting: [
+          {
+            id: 1,
+            student: "Manisha Shrestha",
+            status: "Meeting scheduled",
+            summary: "Flags from Academics, Finance, DMU, and RTE",
+            flags: [
+              {
+                dept: "Academics",
+                note: "On Academic Probation — GPA below threshold",
+              },
+              { dept: "Finance", note: "NPR 360,000 overdue — 65 days" },
+              { dept: "DMU", note: "Churn risk score 82/100" },
+              { dept: "RTE", note: "Graduation clearance blocked" },
+            ],
+            actions: [
+              "PAT check-in",
+              "Review hardship application",
+              "Staged payment plan",
+            ],
+          },
+          {
+            id: 2,
+            student: "Kiran Magar",
+            status: "Meeting scheduled",
+            summary: "Flags from Academics, Finance, IT Support",
+            flags: [
+              { dept: "Academics", note: "On Academic Probation" },
+              { dept: "Finance", note: "NPR 384,000 overdue" },
+              { dept: "IT Support", note: "Unauthorized lab login" },
+            ],
+            actions: ["SSD welfare check-in", "Joint IT review"],
+          },
+        ],
+        incidents: [
+          {
+            id: 1,
+            summary: "Roommate dispute, Hostel Block B",
+            detail: "Noise complaints during exam season.",
+            status: "Under mediation",
+          },
+          {
+            id: 2,
+            summary: "Bullying allegation — social media",
+            detail: "Reported by class representative.",
+            status: "Investigating",
+          },
+        ],
+        misbehavior: [
+          {
+            id: 1,
+            student: "Kiran Magar",
+            desc: "Unauthorized lab access — escalated from IT Support",
+            status: "Under review",
+          },
+          {
+            id: 2,
+            student: "Code-of-conduct breach",
+            desc: "Reported by hostel warden — Sep 4",
+            status: "Pending",
+          },
+        ],
+        disability: [
+          {
+            id: 1,
+            name: "Priya Manandhar",
+            details:
+              "Visual impairment — extended exam time 25%, screen reader access",
+            status: "Active",
+          },
+        ],
+        hardshipfund: [
+          {
+            id: 1,
+            student: "Manisha Shrestha",
+            reason: "Family financial crisis",
+            amount: "50000",
+            status: "Pending review",
+          },
+        ],
+        scholarshipcalc: [
+          {
+            id: 1,
+            name: "Sneha Tamang",
+            score: 62,
+            discount: "15% discount calculated",
+          },
+          {
+            id: 2,
+            name: "Bishal Gurung",
+            score: 58,
+            discount: "10% discount calculated",
+          },
+        ],
+        clubs: [
+          {
+            id: 1,
+            name: "Coding Club",
+            members: 45,
+            budget: "30000",
+            used: "15000",
+            status: "Active",
+          },
+          {
+            id: 2,
+            name: "Debate Society",
+            members: 28,
+            budget: "20000",
+            used: "8000",
+            status: "Active",
+          },
+        ],
+        contenthub: [
+          {
+            id: 1,
+            title: "Campus Catering Satisfaction",
+            responses: "420",
+            result: "72% satisfied",
+            status: "Live",
+          },
+          {
+            id: 2,
+            title: "Support Resources Awareness",
+            responses: "310",
+            result: "58% aware of counseling",
+            status: "Live",
+          },
+        ],
+        voting: [
+          {
+            id: 1,
+            name: "Student Council President 2026",
+            details: "340 of 1,240 eligible voters — 27% turnout",
+            status: "Voting open",
+          },
+        ],
+        newstudent: [
+          {
+            id: 1,
+            name: "Fall Orientation Week",
+            date: "2026-07-10",
+            status: "Completed",
+          },
+        ],
+        international: [
+          {
+            id: 1,
+            student: "Li Wei",
+            details: "Arrival planning complete — housing assigned",
+            status: "Integrated",
+          },
+          {
+            id: 2,
+            student: "Ahmed Hassan",
+            details: "Arrival planning complete — orientation not yet attended",
+            status: "In progress",
+          },
+        ],
+        peermentor: [
+          {
+            id: 1,
+            student: "Kritika Sharma",
+            mentor: "Sunita Gurung",
+            status: "Active",
+          },
+          {
+            id: 2,
+            student: "Bimal Thapa",
+            mentor: "Nisha Adhikari",
+            status: "Active",
+          },
+        ],
+        career: [
+          {
+            id: 1,
+            student: "Nisha Adhikari",
+            type: "Resume workshop",
+            date: "2026-09-10",
+            status: "Completed",
+          },
+          {
+            id: 2,
+            student: "Rajesh Karki",
+            type: "Interview practice",
+            date: "2026-09-20",
+            status: "Scheduled",
+          },
+        ],
+        alumniservice: [
+          {
+            id: 1,
+            name: "Sabina Thapa",
+            details:
+              "Offering career mentorship — Software Engineer at TechNova",
+            status: "Active",
+          },
+          {
+            id: 2,
+            name: "Nabin Koirala",
+            details: "Offering networking events — Data Analyst at Everest",
+            status: "Active",
+          },
+        ],
+      };
+
+      // Page Navigation Engine
+      function showPage(id, el) {
+        document.querySelectorAll(".page").forEach(function (p) {
+          p.classList.remove("active");
+        });
+        document.getElementById("page-" + id).classList.add("active");
+        document.querySelectorAll(".nav-item").forEach(function (n) {
+          n.classList.remove("active");
+        });
+        if (el) el.classList.add("active");
+      }
+
+      function toggleCard(header) {
+        var card = header.parentElement;
+        var detail = card.querySelector(".detail");
+        var chev = header.querySelector(".chev");
+        var open = detail.classList.contains("open");
+        detail.classList.toggle("open", !open);
+        chev.textContent = open ? "▸" : "▾";
+      }
+
+      // Modal Helper Utilities
+      function openModal(title, bodyHtml, footerHtml) {
+        document.getElementById("modal-title").textContent = title;
+        document.getElementById("modal-body").innerHTML = bodyHtml;
+        document.getElementById("modal-footer").innerHTML =
+          footerHtml ||
+          '<button class="secondary" onclick="closeModal()">Close</button>';
+        document.getElementById("modal-overlay").classList.add("open");
+      }
+
+      function closeModal() {
+        document.getElementById("modal-overlay").classList.remove("open");
+      }
+
+      function formInput(label, id, val, type) {
+        type = type || "text";
+        return (
+          '<div class="form-group"><label>' +
+          label +
+          '</label><input type="' +
+          type +
+          '" id="' +
+          id +
+          '" value="' +
+          (val === undefined || val === null ? "" : val) +
+          '"></div>'
+        );
+      }
+
+      function formTextarea(label, id, val) {
+        return (
+          '<div class="form-group"><label>' +
+          label +
+          '</label><textarea id="' +
+          id +
+          '">' +
+          (val === undefined || val === null ? "" : val) +
+          "</textarea></div>"
+        );
+      }
+
+      function formSelect(label, id, opts, selectedVal) {
+        var o = opts
+          .map(function (x) {
+            var sel = x === selectedVal ? " selected" : "";
+            return "<option" + sel + ">" + x + "</option>";
+          })
+          .join("");
+        return (
+          '<div class="form-group"><label>' +
+          label +
+          '</label><select id="' +
+          id +
+          '">' +
+          o +
+          "</select></div>"
+        );
+      }
+
+      function emptyView() {
+        return '<div class="empty-state">No operational records found.</div>';
+      }
+
+      // ----------------------------------------------------
+      // CRUD RENDERING ENGINES & EVENT HANDLERS
+      // ----------------------------------------------------
+
+      // 1. Counseling Log
+      function renderCounseling() {
+        var query = (
+          document.getElementById("counseling-search").value || ""
+        ).toLowerCase();
+        var list = document.getElementById("counseling-list");
+        var items = db.counseling.filter(function (x) {
+          return (
+            x.student.toLowerCase().includes(query) ||
+            x.counselor.toLowerCase().includes(query)
+          );
+        });
+        if (!items.length) {
+          list.innerHTML = emptyView();
+          return;
+        }
+        list.innerHTML = items
+          .map(function (x) {
+            return (
+              '<div class="list-row">' +
+              '<div><div class="primary-text">' +
+              x.student +
+              "</div>" +
+              '<div class="secondary-text">Counselor: ' +
+              x.counselor +
+              " — Next Appt: " +
+              (x.next || "TBC") +
+              "</div></div>" +
+              '<div class="right">' +
+              '<span class="badge filled">' +
+              x.status +
+              "</span>" +
+              '<button class="secondary" onclick="editCounseling(' +
+              x.id +
+              ')">Edit</button>' +
+              '<button class="danger-btn" onclick="deleteRecord(\'counseling\', ' +
+              x.id +
+              ', renderCounseling)">Delete</button>' +
+              "</div></div>"
+            );
+          })
+          .join("");
+      }
+
+      function openLogCounseling() {
+        openModal(
+          "Log Counseling Session",
+          formSelect("Student", "lc-student", STUDENTS) +
+            formInput(
+              "Counselor Name",
+              "lc-counselor",
+              "Ms. Nirmala Adhikari",
+            ) +
+            formInput("Next Appointment", "lc-next", "", "date") +
+            formTextarea("Confidential Notes", "lc-notes"),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveCounseling()">Save Session</button>',
+        );
+      }
+
+      function saveCounseling(id) {
+        var student = document.getElementById("lc-student").value;
+        var counselor = document.getElementById("lc-counselor").value;
+        var next = document.getElementById("lc-next").value;
+        var notes = document.getElementById("lc-notes").value;
+        if (id) {
+          var rec = db.counseling.find(function (x) {
+            return x.id === id;
+          });
+          if (rec) {
+            rec.student = student;
+            rec.counselor = counselor;
+            rec.next = next;
+            rec.notes = notes;
+          }
+        } else {
+          db.counseling.push({
+            id: Date.now(),
+            student: student,
+            counselor: counselor,
+            next: next,
+            notes: notes,
+            status: "Notes on file",
+          });
+        }
+        closeModal();
+        renderCounseling();
+      }
+
+      function editCounseling(id) {
+        var rec = db.counseling.find(function (x) {
+          return x.id === id;
+        });
+        if (!rec) return;
+        openModal(
+          "Edit Counseling Session",
+          formSelect("Student", "lc-student", STUDENTS, rec.student) +
+            formInput("Counselor Name", "lc-counselor", rec.counselor) +
+            formInput("Next Appointment", "lc-next", rec.next, "date") +
+            formTextarea("Confidential Notes", "lc-notes", rec.notes),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveCounseling(' +
+            id +
+            ')">Update Session</button>',
+        );
+      }
+
+      // 2. Crisis Intervention
+      function renderCrisis() {
+        var query = (
+          document.getElementById("crisis-search").value || ""
+        ).toLowerCase();
+        var list = document.getElementById("crisis-list");
+        var items = db.crisis.filter(function (x) {
+          return (
+            x.title.toLowerCase().includes(query) ||
+            x.detail.toLowerCase().includes(query)
+          );
+        });
+        if (!items.length) {
+          list.innerHTML = emptyView();
+          return;
+        }
+        list.innerHTML = items
+          .map(function (x) {
+            return (
+              '<div class="list-row">' +
+              '<div><div class="primary-text">' +
+              x.title +
+              '</div><div class="secondary-text">' +
+              x.detail +
+              "</div></div>" +
+              '<div class="right">' +
+              '<span class="badge filled">' +
+              x.status +
+              "</span>" +
+              '<button class="secondary" onclick="editCrisis(' +
+              x.id +
+              ')">Edit</button>' +
+              '<button class="danger-btn" onclick="deleteRecord(\'crisis\', ' +
+              x.id +
+              ', renderCrisis)">Delete</button>' +
+              "</div></div>"
+            );
+          })
+          .join("");
+      }
+
+      function openLogCrisis() {
+        openModal(
+          "Log Crisis Alert",
+          formInput("Title / Type", "lcr-title") +
+            formTextarea("Details & Direct Steps", "lcr-details"),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveCrisis()">Route Alert</button>',
+        );
+      }
+
+      function saveCrisis(id) {
+        var title = document.getElementById("lcr-title").value || "Emergency";
+        var detail =
+          document.getElementById("lcr-details").value || "Details logged";
+        if (id) {
+          var rec = db.crisis.find(function (x) {
+            return x.id === id;
+          });
+          if (rec) {
+            rec.title = title;
+            rec.detail = detail;
+          }
+        } else {
+          db.crisis.unshift({
+            id: Date.now(),
+            title: title,
+            detail: detail,
+            status: "In progress",
+          });
+        }
+        closeModal();
+        renderCrisis();
+      }
+
+      function editCrisis(id) {
+        var rec = db.crisis.find(function (x) {
+          return x.id === id;
+        });
+        if (!rec) return;
+        openModal(
+          "Edit Crisis Record",
+          formInput("Title / Type", "lcr-title", rec.title) +
+            formTextarea("Details & Direct Steps", "lcr-details", rec.detail),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveCrisis(' +
+            id +
+            ')">Update</button>',
+        );
+      }
+
+      // 3. Wellness Material
+      function renderWellnessMaterial() {
+        var query = (
+          document.getElementById("wellnessmaterial-search").value || ""
+        ).toLowerCase();
+        var list = document.getElementById("wellnessmaterial-list");
+        var items = db.wellnessmaterial.filter(function (x) {
+          return (
+            x.title.toLowerCase().includes(query) ||
+            x.type.toLowerCase().includes(query)
+          );
+        });
+        if (!items.length) {
+          list.innerHTML = emptyView();
+          return;
+        }
+        list.innerHTML = items
+          .map(function (x) {
+            return (
+              '<div class="list-row">' +
+              '<div><div class="primary-text">' +
+              x.title +
+              '</div><div class="secondary-text">' +
+              x.type +
+              " — Target: " +
+              x.target +
+              "</div></div>" +
+              '<div class="right">' +
+              '<span class="badge filled">' +
+              x.status +
+              "</span>" +
+              '<button class="secondary" onclick="editWellnessMaterial(' +
+              x.id +
+              ')">Edit</button>' +
+              '<button class="danger-btn" onclick="deleteRecord(\'wellnessmaterial\', ' +
+              x.id +
+              ', renderWellnessMaterial)">Delete</button>' +
+              "</div></div>"
+            );
+          })
+          .join("");
+      }
+
+      function openDistributeMaterial() {
+        openModal(
+          "Add Wellness Material",
+          formInput("Title", "dm-title") +
+            formSelect("Format Type", "dm-type", [
+              "Article",
+              "Video",
+              "Guide",
+              "PDF Brochure",
+            ]) +
+            formInput("Target Audience", "dm-target", "All students"),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveMaterial()">Publish Material</button>',
+        );
+      }
+
+      function saveMaterial(id) {
+        var title = document.getElementById("dm-title").value || "Untitled";
+        var type = document.getElementById("dm-type").value;
+        var target =
+          document.getElementById("dm-target").value || "All students";
+        if (id) {
+          var rec = db.wellnessmaterial.find(function (x) {
+            return x.id === id;
+          });
+          if (rec) {
+            rec.title = title;
+            rec.type = type;
+            rec.target = target;
+          }
+        } else {
+          db.wellnessmaterial.push({
+            id: Date.now(),
+            title: title,
+            type: type,
+            target: target,
+            status: "Sent",
+          });
+        }
+        closeModal();
+        renderWellnessMaterial();
+      }
+
+      function editWellnessMaterial(id) {
+        var rec = db.wellnessmaterial.find(function (x) {
+          return x.id === id;
+        });
+        if (!rec) return;
+        openModal(
+          "Edit Wellness Material",
+          formInput("Title", "dm-title", rec.title) +
+            formSelect(
+              "Format Type",
+              "dm-type",
+              ["Article", "Video", "Guide", "PDF Brochure"],
+              rec.type,
+            ) +
+            formInput("Target Audience", "dm-target", rec.target),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveMaterial(' +
+            id +
+            ')">Update</button>',
+        );
+      }
+
+      // 4. Welfare Dispatch
+      function renderWelfareDispatch() {
+        var query = (
+          document.getElementById("welfaredispatch-search").value || ""
+        ).toLowerCase();
+        var list = document.getElementById("welfaredispatch-list");
+        var items = db.welfaredispatch.filter(function (x) {
+          return (
+            x.student.toLowerCase().includes(query) ||
+            x.route.toLowerCase().includes(query)
+          );
+        });
+        if (!items.length) {
+          list.innerHTML = emptyView();
+          return;
+        }
+        list.innerHTML = items
+          .map(function (x) {
+            return (
+              '<div class="list-row">' +
+              '<div><div class="primary-text">' +
+              x.student +
+              '</div><div class="secondary-text">' +
+              x.issue +
+              " — Routed to: " +
+              x.route +
+              "</div></div>" +
+              '<div class="right">' +
+              '<span class="badge filled">' +
+              x.status +
+              "</span>" +
+              '<button class="secondary" onclick="editWelfareDispatch(' +
+              x.id +
+              ')">Edit</button>' +
+              '<button class="danger-btn" onclick="deleteRecord(\'welfaredispatch\', ' +
+              x.id +
+              ', renderWelfareDispatch)">Delete</button>' +
+              "</div></div>"
+            );
+          })
+          .join("");
+      }
+
+      function openNewDispatch() {
+        openModal(
+          "New Welfare Dispatch",
+          formSelect("Student", "nd-student", STUDENTS) +
+            formInput("Issue Description", "nd-issue") +
+            formSelect("Route To Department", "nd-route", [
+              "PAT",
+              "Finance",
+              "RTE",
+              "IT Support",
+              "Hostel Warden",
+            ]),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveDispatch()">Dispatch Task</button>',
+        );
+      }
+
+      function saveDispatch(id) {
+        var student = document.getElementById("nd-student").value;
+        var issue =
+          document.getElementById("nd-issue").value || "General welfare check";
+        var route = document.getElementById("nd-route").value;
+        if (id) {
+          var rec = db.welfaredispatch.find(function (x) {
+            return x.id === id;
+          });
+          if (rec) {
+            rec.student = student;
+            rec.issue = issue;
+            rec.route = route;
+          }
+        } else {
+          db.welfaredispatch.push({
+            id: Date.now(),
+            student: student,
+            issue: issue,
+            route: route,
+            status: "Dispatched",
+          });
+        }
+        closeModal();
+        renderWelfareDispatch();
+      }
+
+      function editWelfareDispatch(id) {
+        var rec = db.welfaredispatch.find(function (x) {
+          return x.id === id;
+        });
+        if (!rec) return;
+        openModal(
+          "Edit Welfare Dispatch",
+          formSelect("Student", "nd-student", STUDENTS, rec.student) +
+            formInput("Issue Description", "nd-issue", rec.issue) +
+            formSelect(
+              "Route To Department",
+              "nd-route",
+              ["PAT", "Finance", "RTE", "IT Support", "Hostel Warden"],
+              rec.route,
+            ),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveDispatch(' +
+            id +
+            ')">Update</button>',
+        );
+      }
+
+      // 5. STAR Meetings
+      function renderStarMeeting() {
+        var query = (
+          document.getElementById("starmeeting-search").value || ""
+        ).toLowerCase();
+        var list = document.getElementById("starmeeting-list");
+        var items = db.starmeeting.filter(function (x) {
+          return (
+            x.student.toLowerCase().includes(query) ||
+            x.summary.toLowerCase().includes(query)
+          );
+        });
+        if (!items.length) {
+          list.innerHTML = emptyView();
+          return;
+        }
+        list.innerHTML = items
+          .map(function (x) {
+            var flagsHtml = (x.flags || [])
+              .map(function (f) {
+                return (
+                  '<div class="flag-row"><span class="dept">' +
+                  f.dept +
+                  "</span><span>" +
+                  f.note +
+                  "</span></div>"
+                );
+              })
+              .join("");
+            var actionsHtml = (x.actions || [])
+              .map(function (a) {
+                return "<li>" + a + "</li>";
+              })
+              .join("");
+
+            return (
+              '<div class="card">' +
+              '<div class="card-header" onclick="toggleCard(this)">' +
+              '<div><div class="primary-text">' +
+              x.student +
+              '</div><div class="secondary-text">' +
+              x.summary +
+              "</div></div>" +
+              '<div class="right"><span class="badge dashed">' +
+              x.status +
+              '</span><span class="chev">▸</span></div>' +
+              "</div>" +
+              '<div class="detail">' +
+              '<p class="detail-label">Compiled Cross-Department History</p>' +
+              flagsHtml +
+              '<p class="detail-label" style="margin-top:12px">Action Steps</p><ul style="margin:0;padding-left:18px;font-size:13px;">' +
+              actionsHtml +
+              "</ul>" +
+              '<div style="margin-top:14px; display:flex; gap:10px;">' +
+              '<button class="link-btn" onclick="generateAgenda(\'' +
+              x.student +
+              "')\">Generate Agenda</button>" +
+              '<button class="secondary" onclick="editStarCase(' +
+              x.id +
+              ')">Edit Case</button>' +
+              '<button class="danger-btn" onclick="deleteRecord(\'starmeeting\', ' +
+              x.id +
+              ', renderStarMeeting)">Delete Case</button>' +
+              "</div>" +
+              "</div>" +
+              "</div>"
+            );
+          })
+          .join("");
+      }
+
+      function openNewStar() {
+        openModal(
+          "New STAR Case",
+          formSelect("Student", "ns-student", STUDENTS) +
+            formInput("Summary", "ns-summary") +
+            formTextarea("Action Steps (1 per line)", "ns-actions"),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveStarCase()">Create Case</button>',
+        );
+      }
+
+      function saveStarCase(id) {
+        var student = document.getElementById("ns-student").value;
+        var summary =
+          document.getElementById("ns-summary").value ||
+          "Multi-department flags compiling";
+        var actionsRaw = document.getElementById("ns-actions").value || "";
+        var actions = actionsRaw.split("\n").filter(Boolean);
+        if (id) {
+          var rec = db.starmeeting.find(function (x) {
+            return x.id === id;
+          });
+          if (rec) {
+            rec.student = student;
+            rec.summary = summary;
+            rec.actions = actions;
+          }
+        } else {
+          db.starmeeting.push({
+            id: Date.now(),
+            student: student,
+            status: "Case Active",
+            summary: summary,
+            flags: [{ dept: "SSD", note: "Case registered by officer" }],
+            actions: actions,
+          });
+        }
+        closeModal();
+        renderStarMeeting();
+      }
+
+      function editStarCase(id) {
+        var rec = db.starmeeting.find(function (x) {
+          return x.id === id;
+        });
+        if (!rec) return;
+        openModal(
+          "Edit STAR Case",
+          formSelect("Student", "ns-student", STUDENTS, rec.student) +
+            formInput("Summary", "ns-summary", rec.summary) +
+            formTextarea(
+              "Action Steps (1 per line)",
+              "ns-actions",
+              (rec.actions || []).join("\n"),
+            ),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveStarCase(' +
+            id +
+            ')">Update Case</button>',
+        );
+      }
+
+      function generateAgenda(name) {
+        openModal(
+          "STAR Meeting Agenda Generated",
+          '<p style="font-size:13px;">Official meeting agenda for <strong>' +
+            name +
+            "</strong> compiled and transmitted to PAT, Finance, and Academic heads.</p>",
+          '<button class="primary" onclick="closeModal()">Done</button>',
+        );
+      }
+
+      // 6. Incidents
+      function renderIncidents() {
+        var query = (
+          document.getElementById("incidents-search").value || ""
+        ).toLowerCase();
+        var list = document.getElementById("incidents-list");
+        var items = db.incidents.filter(function (x) {
+          return (
+            x.summary.toLowerCase().includes(query) ||
+            x.detail.toLowerCase().includes(query)
+          );
+        });
+        if (!items.length) {
+          list.innerHTML = emptyView();
+          return;
+        }
+        list.innerHTML = items
+          .map(function (x) {
+            return (
+              '<div class="list-row">' +
+              '<div><div class="primary-text">' +
+              x.summary +
+              '</div><div class="secondary-text">' +
+              x.detail +
+              "</div></div>" +
+              '<div class="right">' +
+              '<span class="badge outline">' +
+              x.status +
+              "</span>" +
+              '<button class="secondary" onclick="editIncident(' +
+              x.id +
+              ')">Edit</button>' +
+              '<button class="danger-btn" onclick="deleteRecord(\'incidents\', ' +
+              x.id +
+              ', renderIncidents)">Delete</button>' +
+              "</div></div>"
+            );
+          })
+          .join("");
+      }
+
+      function openLogIncident() {
+        openModal(
+          "Log Incident Complaint",
+          formInput("Incident Summary", "li-summary") +
+            formTextarea("Detailed Record", "li-details"),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveIncident()">Log Record</button>',
+        );
+      }
+
+      function saveIncident(id) {
+        var summary =
+          document.getElementById("li-summary").value || "Incident Logged";
+        var detail =
+          document.getElementById("li-details").value || "No details provided.";
+        if (id) {
+          var rec = db.incidents.find(function (x) {
+            return x.id === id;
+          });
+          if (rec) {
+            rec.summary = summary;
+            rec.detail = detail;
+          }
+        } else {
+          db.incidents.push({
+            id: Date.now(),
+            summary: summary,
+            detail: detail,
+            status: "Investigating",
+          });
+        }
+        closeModal();
+        renderIncidents();
+      }
+
+      function editIncident(id) {
+        var rec = db.incidents.find(function (x) {
+          return x.id === id;
+        });
+        if (!rec) return;
+        openModal(
+          "Edit Incident Record",
+          formInput("Incident Summary", "li-summary", rec.summary) +
+            formTextarea("Detailed Record", "li-details", rec.detail),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveIncident(' +
+            id +
+            ')">Update Record</button>',
+        );
+      }
+
+      // 7. Misbehavior
+      function renderMisbehavior() {
+        var query = (
+          document.getElementById("misbehavior-search").value || ""
+        ).toLowerCase();
+        var list = document.getElementById("misbehavior-list");
+        var items = db.misbehavior.filter(function (x) {
+          return (
+            x.student.toLowerCase().includes(query) ||
+            x.desc.toLowerCase().includes(query)
+          );
+        });
+        if (!items.length) {
+          list.innerHTML = emptyView();
+          return;
+        }
+        list.innerHTML = items
+          .map(function (x) {
+            return (
+              '<div class="list-row">' +
+              '<div><div class="primary-text">' +
+              x.student +
+              '</div><div class="secondary-text">' +
+              x.desc +
+              "</div></div>" +
+              '<div class="right">' +
+              '<span class="badge outline">' +
+              x.status +
+              "</span>" +
+              '<button class="secondary" onclick="editMisbehavior(' +
+              x.id +
+              ')">Edit</button>' +
+              '<button class="danger-btn" onclick="deleteRecord(\'misbehavior\', ' +
+              x.id +
+              ', renderMisbehavior)">Delete</button>' +
+              "</div></div>"
+            );
+          })
+          .join("");
+      }
+
+      function openLogMisbehavior() {
+        openModal(
+          "Log Misbehavior Record",
+          formInput("Student / Party Involved", "lm-student") +
+            formTextarea("Infraction Description", "lm-desc"),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveMisbehavior()">Save Violation</button>',
+        );
+      }
+
+      function saveMisbehavior(id) {
+        var student =
+          document.getElementById("lm-student").value || "Unknown Student";
+        var desc =
+          document.getElementById("lm-desc").value || "Infraction noted";
+        if (id) {
+          var rec = db.misbehavior.find(function (x) {
+            return x.id === id;
+          });
+          if (rec) {
+            rec.student = student;
+            rec.desc = desc;
+          }
+        } else {
+          db.misbehavior.push({
+            id: Date.now(),
+            student: student,
+            desc: desc,
+            status: "Under Review",
+          });
+        }
+        closeModal();
+        renderMisbehavior();
+      }
+
+      function editMisbehavior(id) {
+        var rec = db.misbehavior.find(function (x) {
+          return x.id === id;
+        });
+        if (!rec) return;
+        openModal(
+          "Edit Misbehavior Entry",
+          formInput("Student / Party Involved", "lm-student", rec.student) +
+            formTextarea("Infraction Description", "lm-desc", rec.desc),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveMisbehavior(' +
+            id +
+            ')">Update</button>',
+        );
+      }
+
+      // 8. Disability Accommodations
+      function renderDisability() {
+        var query = (
+          document.getElementById("disability-search").value || ""
+        ).toLowerCase();
+        var list = document.getElementById("disability-list");
+        var items = db.disability.filter(function (x) {
+          return (
+            x.name.toLowerCase().includes(query) ||
+            x.details.toLowerCase().includes(query)
+          );
+        });
+        if (!items.length) {
+          list.innerHTML = emptyView();
+          return;
+        }
+        list.innerHTML = items
+          .map(function (x) {
+            return (
+              '<div class="list-row">' +
+              '<div><div class="primary-text">' +
+              x.name +
+              '</div><div class="secondary-text">' +
+              x.details +
+              "</div></div>" +
+              '<div class="right">' +
+              '<span class="badge filled">' +
+              x.status +
+              "</span>" +
+              '<button class="secondary" onclick="editDisability(' +
+              x.id +
+              ')">Edit</button>' +
+              '<button class="danger-btn" onclick="deleteRecord(\'disability\', ' +
+              x.id +
+              ', renderDisability)">Delete</button>' +
+              "</div></div>"
+            );
+          })
+          .join("");
+      }
+
+      function openNewAccommodation() {
+        openModal(
+          "New Accommodation Record",
+          formInput("Student Name", "na-name") +
+            formTextarea("Accommodation Details", "na-details"),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveAccommodation()">Save Entry</button>',
+        );
+      }
+
+      function saveAccommodation(id) {
+        var name =
+          document.getElementById("na-name").value || "Unnamed Student";
+        var details =
+          document.getElementById("na-details").value || "General adjustment";
+        if (id) {
+          var rec = db.disability.find(function (x) {
+            return x.id === id;
+          });
+          if (rec) {
+            rec.name = name;
+            rec.details = details;
+          }
+        } else {
+          db.disability.push({
+            id: Date.now(),
+            name: name,
+            details: details,
+            status: "Active",
+          });
+        }
+        closeModal();
+        renderDisability();
+      }
+
+      function editDisability(id) {
+        var rec = db.disability.find(function (x) {
+          return x.id === id;
+        });
+        if (!rec) return;
+        openModal(
+          "Edit Accommodation Record",
+          formInput("Student Name", "na-name", rec.name) +
+            formTextarea("Accommodation Details", "na-details", rec.details),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveAccommodation(' +
+            id +
+            ')">Update Entry</button>',
+        );
+      }
+
+      // 9. Hardship Fund
+      function renderHardshipFund() {
+        var query = (
+          document.getElementById("hardshipfund-search").value || ""
+        ).toLowerCase();
+        var list = document.getElementById("hardshipfund-list");
+        var items = db.hardshipfund.filter(function (x) {
+          return (
+            x.student.toLowerCase().includes(query) ||
+            x.reason.toLowerCase().includes(query)
+          );
+        });
+        if (!items.length) {
+          list.innerHTML = emptyView();
+          return;
+        }
+        list.innerHTML = items
+          .map(function (x) {
+            return (
+              '<div class="list-row">' +
+              '<div><div class="primary-text">' +
+              x.student +
+              '</div><div class="secondary-text">' +
+              x.reason +
+              " — NPR " +
+              Number(x.amount).toLocaleString() +
+              " Requested</div></div>" +
+              '<div class="right">' +
+              '<span class="badge dashed">' +
+              x.status +
+              "</span>" +
+              '<button class="secondary" onclick="editHardshipFund(' +
+              x.id +
+              ')">Edit</button>' +
+              '<button class="danger-btn" onclick="deleteRecord(\'hardshipfund\', ' +
+              x.id +
+              ', renderHardshipFund)">Delete</button>' +
+              "</div></div>"
+            );
+          })
+          .join("");
+      }
+
+      function openNewHardship() {
+        openModal(
+          "New Hardship Application",
+          formSelect("Student", "nh-student", STUDENTS) +
+            '<div class="form-row-2">' +
+            formInput("Reason", "nh-reason") +
+            formInput("Amount (NPR)", "nh-amount", "0", "number") +
+            "</div>",
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveHardship()">Submit Request</button>',
+        );
+      }
+
+      function saveHardship(id) {
+        var student = document.getElementById("nh-student").value;
+        var reason =
+          document.getElementById("nh-reason").value || "Unspecified hardship";
+        var amount = document.getElementById("nh-amount").value || 0;
+        if (id) {
+          var rec = db.hardshipfund.find(function (x) {
+            return x.id === id;
+          });
+          if (rec) {
+            rec.student = student;
+            rec.reason = reason;
+            rec.amount = amount;
+          }
+        } else {
+          db.hardshipfund.push({
+            id: Date.now(),
+            student: student,
+            reason: reason,
+            amount: amount,
+            status: "Pending Review",
+          });
+        }
+        closeModal();
+        renderHardshipFund();
+      }
+
+      function editHardshipFund(id) {
+        var rec = db.hardshipfund.find(function (x) {
+          return x.id === id;
+        });
+        if (!rec) return;
+        openModal(
+          "Edit Hardship Application",
+          formSelect("Student", "nh-student", STUDENTS, rec.student) +
+            '<div class="form-row-2">' +
+            formInput("Reason", "nh-reason", rec.reason) +
+            formInput("Amount (NPR)", "nh-amount", rec.amount, "number") +
+            "</div>",
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveHardship(' +
+            id +
+            ')">Update Request</button>',
+        );
+      }
+
+      // 10. Scholarship Calculator
+      function renderScholarshipCalc() {
+        var query = (
+          document.getElementById("scholarshipcalc-search").value || ""
+        ).toLowerCase();
+        var list = document.getElementById("scholarshipcalc-list");
+        var items = db.scholarshipcalc.filter(function (x) {
+          return x.name.toLowerCase().includes(query);
+        });
+        if (!items.length) {
+          list.innerHTML = emptyView();
+          return;
+        }
+        list.innerHTML = items
+          .map(function (x) {
+            return (
+              '<div class="list-row">' +
+              '<div><div class="primary-text">' +
+              x.name +
+              '</div><div class="secondary-text">Foundation Score: ' +
+              x.score +
+              "%</div></div>" +
+              '<div class="right">' +
+              '<span class="secondary-text" style="font-weight:600;">' +
+              x.discount +
+              "</span>" +
+              '<button class="secondary" onclick="editScholarshipCalc(' +
+              x.id +
+              ')">Edit</button>' +
+              '<button class="danger-btn" onclick="deleteRecord(\'scholarshipcalc\', ' +
+              x.id +
+              ', renderScholarshipCalc)">Delete</button>' +
+              "</div></div>"
+            );
+          })
+          .join("");
+      }
+
+      function openNewCalculation() {
+        openModal(
+          "Compute Scholarship Entry",
+          formInput("Applicant Name", "nc-name") +
+            formInput("Foundation Score (%)", "nc-score", "", "number"),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveCalculation()">Calculate &amp; Save</button>',
+        );
+      }
+
+      function saveCalculation(id) {
+        var name =
+          document.getElementById("nc-name").value || "Unnamed Applicant";
+        var score = parseInt(document.getElementById("nc-score").value) || 0;
+        var discountPct = score >= 60 ? 15 : score >= 50 ? 10 : 5;
+        var discount = discountPct + "% discount calculated";
+        if (id) {
+          var rec = db.scholarshipcalc.find(function (x) {
+            return x.id === id;
+          });
+          if (rec) {
+            rec.name = name;
+            rec.score = score;
+            rec.discount = discount;
+          }
+        } else {
+          db.scholarshipcalc.push({
+            id: Date.now(),
+            name: name,
+            score: score,
+            discount: discount,
+          });
+        }
+        closeModal();
+        renderScholarshipCalc();
+      }
+
+      function editScholarshipCalc(id) {
+        var rec = db.scholarshipcalc.find(function (x) {
+          return x.id === id;
+        });
+        if (!rec) return;
+        openModal(
+          "Edit Scholarship Entry",
+          formInput("Applicant Name", "nc-name", rec.name) +
+            formInput("Foundation Score (%)", "nc-score", rec.score, "number"),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveCalculation(' +
+            id +
+            ')">Update Entry</button>',
+        );
+      }
+
+      // 11. Clubs
+      function renderClubs() {
+        var query = (
+          document.getElementById("clubs-search").value || ""
+        ).toLowerCase();
+        var list = document.getElementById("clubs-list");
+        var items = db.clubs.filter(function (x) {
+          return x.name.toLowerCase().includes(query);
+        });
+        if (!items.length) {
+          list.innerHTML = emptyView();
+          return;
+        }
+        list.innerHTML = items
+          .map(function (x) {
+            return (
+              '<div class="list-row">' +
+              '<div><div class="primary-text">' +
+              x.name +
+              '</div><div class="secondary-text">' +
+              x.members +
+              " Members — NPR " +
+              Number(x.used).toLocaleString() +
+              " of NPR " +
+              Number(x.budget).toLocaleString() +
+              " used</div></div>" +
+              '<div class="right">' +
+              '<span class="badge filled">' +
+              x.status +
+              "</span>" +
+              '<button class="secondary" onclick="editClub(' +
+              x.id +
+              ')">Edit</button>' +
+              '<button class="danger-btn" onclick="deleteRecord(\'clubs\', ' +
+              x.id +
+              ', renderClubs)">Delete</button>' +
+              "</div></div>"
+            );
+          })
+          .join("");
+      }
+
+      function openNewClub() {
+        openModal(
+          "Register New Club",
+          formInput("Club Name", "ncl-name") +
+            '<div class="form-row-2">' +
+            formInput("Active Members", "ncl-members", "0", "number") +
+            formInput("Allocated Budget (NPR)", "ncl-budget", "0", "number") +
+            "</div>",
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveClub()">Save Club</button>',
+        );
+      }
+
+      function saveClub(id) {
+        var name = document.getElementById("ncl-name").value || "Untitled Club";
+        var members = document.getElementById("ncl-members").value || 0;
+        var budget = document.getElementById("ncl-budget").value || 0;
+        if (id) {
+          var rec = db.clubs.find(function (x) {
+            return x.id === id;
+          });
+          if (rec) {
+            rec.name = name;
+            rec.members = members;
+            rec.budget = budget;
+          }
+        } else {
+          db.clubs.push({
+            id: Date.now(),
+            name: name,
+            members: members,
+            budget: budget,
+            used: 0,
+            status: "Active",
+          });
+        }
+        closeModal();
+        renderClubs();
+      }
+
+      function editClub(id) {
+        var rec = db.clubs.find(function (x) {
+          return x.id === id;
+        });
+        if (!rec) return;
+        openModal(
+          "Edit Club Record",
+          formInput("Club Name", "ncl-name", rec.name) +
+            '<div class="form-row-2">' +
+            formInput("Active Members", "ncl-members", rec.members, "number") +
+            formInput(
+              "Allocated Budget (NPR)",
+              "ncl-budget",
+              rec.budget,
+              "number",
+            ) +
+            "</div>",
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveClub(' +
+            id +
+            ')">Update Club</button>',
+        );
+      }
+
+      // 12. Surveys & Polls
+      function renderContentHub() {
+        var query = (
+          document.getElementById("contenthub-search").value || ""
+        ).toLowerCase();
+        var list = document.getElementById("contenthub-list");
+        var items = db.contenthub.filter(function (x) {
+          return x.title.toLowerCase().includes(query);
+        });
+        if (!items.length) {
+          list.innerHTML = emptyView();
+          return;
+        }
+        list.innerHTML = items
+          .map(function (x) {
+            return (
+              '<div class="list-row">' +
+              '<div><div class="primary-text">' +
+              x.title +
+              '</div><div class="secondary-text">' +
+              x.responses +
+              " Responses — Result: " +
+              (x.result || "Ongoing") +
+              "</div></div>" +
+              '<div class="right">' +
+              '<span class="badge filled">' +
+              x.status +
+              "</span>" +
+              '<button class="secondary" onclick="editContentHub(' +
+              x.id +
+              ')">Edit</button>' +
+              '<button class="danger-btn" onclick="deleteRecord(\'contenthub\', ' +
+              x.id +
+              ', renderContentHub)">Delete</button>' +
+              "</div></div>"
+            );
+          })
+          .join("");
+      }
+
+      function openNewSurvey() {
+        openModal(
+          "New Student Survey",
+          formInput("Survey Title", "nsv-title"),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveSurvey()">Publish Survey</button>',
+        );
+      }
+
+      function saveSurvey(id) {
+        var title =
+          document.getElementById("nsv-title").value || "Untitled Survey";
+        if (id) {
+          var rec = db.contenthub.find(function (x) {
+            return x.id === id;
+          });
+          if (rec) {
+            rec.title = title;
+          }
+        } else {
+          db.contenthub.push({
+            id: Date.now(),
+            title: title,
+            responses: "0",
+            result: "In progress",
+            status: "Live",
+          });
+        }
+        closeModal();
+        renderContentHub();
+      }
+
+      function editContentHub(id) {
+        var rec = db.contenthub.find(function (x) {
+          return x.id === id;
+        });
+        if (!rec) return;
+        openModal(
+          "Edit Survey Record",
+          formInput("Survey Title", "nsv-title", rec.title),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveSurvey(' +
+            id +
+            ')">Update</button>',
+        );
+      }
+
+      // 13. Voting Gateway
+      function renderVoting() {
+        var query = (
+          document.getElementById("voting-search").value || ""
+        ).toLowerCase();
+        var list = document.getElementById("voting-list");
+        var items = db.voting.filter(function (x) {
+          return x.name.toLowerCase().includes(query);
+        });
+        if (!items.length) {
+          list.innerHTML = emptyView();
+          return;
+        }
+        list.innerHTML = items
+          .map(function (x) {
+            return (
+              '<div class="list-row">' +
+              '<div><div class="primary-text">' +
+              x.name +
+              '</div><div class="secondary-text">' +
+              x.details +
+              "</div></div>" +
+              '<div class="right">' +
+              '<span class="badge dashed">' +
+              x.status +
+              "</span>" +
+              '<button class="secondary" onclick="editVoting(' +
+              x.id +
+              ')">Edit</button>' +
+              '<button class="danger-btn" onclick="deleteRecord(\'voting\', ' +
+              x.id +
+              ', renderVoting)">Delete</button>' +
+              "</div></div>"
+            );
+          })
+          .join("");
+      }
+
+      function openNewElection() {
+        openModal(
+          "Create Election Portal Entry",
+          formInput("Election Title", "nel-name"),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveElection()">Launch Election</button>',
+        );
+      }
+
+      function saveElection(id) {
+        var name =
+          document.getElementById("nel-name").value || "General Election";
+        if (id) {
+          var rec = db.voting.find(function (x) {
+            return x.id === id;
+          });
+          if (rec) {
+            rec.name = name;
+          }
+        } else {
+          db.voting.push({
+            id: Date.now(),
+            name: name,
+            details: "0 eligible votes logged",
+            status: "Voting Open",
+          });
+        }
+        closeModal();
+        renderVoting();
+      }
+
+      function editVoting(id) {
+        var rec = db.voting.find(function (x) {
+          return x.id === id;
+        });
+        if (!rec) return;
+        openModal(
+          "Edit Election Entry",
+          formInput("Election Title", "nel-name", rec.name),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveElection(' +
+            id +
+            ')">Update Entry</button>',
+        );
+      }
+
+      // 14. New Student Hub
+      function renderNewStudent() {
+        var query = (
+          document.getElementById("newstudent-search").value || ""
+        ).toLowerCase();
+        var list = document.getElementById("newstudent-list");
+        var items = db.newstudent.filter(function (x) {
+          return x.name.toLowerCase().includes(query);
+        });
+        if (!items.length) {
+          list.innerHTML = emptyView();
+          return;
+        }
+        list.innerHTML = items
+          .map(function (x) {
+            return (
+              '<div class="list-row">' +
+              '<div><div class="primary-text">' +
+              x.name +
+              '</div><div class="secondary-text">Date: ' +
+              x.date +
+              "</div></div>" +
+              '<div class="right">' +
+              '<span class="badge filled">' +
+              x.status +
+              "</span>" +
+              '<button class="secondary" onclick="editNewStudent(' +
+              x.id +
+              ')">Edit</button>' +
+              '<button class="danger-btn" onclick="deleteRecord(\'newstudent\', ' +
+              x.id +
+              ', renderNewStudent)">Delete</button>' +
+              "</div></div>"
+            );
+          })
+          .join("");
+      }
+
+      function openNewOrientation() {
+        openModal(
+          "New Orientation Event",
+          formInput("Event Name", "no-name") +
+            formInput("Scheduled Date", "no-date", "", "date"),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveOrientation()">Save Event</button>',
+        );
+      }
+
+      function saveOrientation(id) {
+        var name =
+          document.getElementById("no-name").value || "Orientation Session";
+        var date = document.getElementById("no-date").value || "TBC";
+        if (id) {
+          var rec = db.newstudent.find(function (x) {
+            return x.id === id;
+          });
+          if (rec) {
+            rec.name = name;
+            rec.date = date;
+          }
+        } else {
+          db.newstudent.push({
+            id: Date.now(),
+            name: name,
+            date: date,
+            status: "Planned",
+          });
+        }
+        closeModal();
+        renderNewStudent();
+      }
+
+      function editNewStudent(id) {
+        var rec = db.newstudent.find(function (x) {
+          return x.id === id;
+        });
+        if (!rec) return;
+        openModal(
+          "Edit Orientation Event",
+          formInput("Event Name", "no-name", rec.name) +
+            formInput("Scheduled Date", "no-date", rec.date, "date"),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveOrientation(' +
+            id +
+            ')">Update Event</button>',
+        );
+      }
+
+      // 15. International Students
+      function renderInternational() {
+        var query = (
+          document.getElementById("international-search").value || ""
+        ).toLowerCase();
+        var list = document.getElementById("international-list");
+        var items = db.international.filter(function (x) {
+          return (
+            x.student.toLowerCase().includes(query) ||
+            x.details.toLowerCase().includes(query)
+          );
+        });
+        if (!items.length) {
+          list.innerHTML = emptyView();
+          return;
+        }
+        list.innerHTML = items
+          .map(function (x) {
+            return (
+              '<div class="list-row">' +
+              '<div><div class="primary-text">' +
+              x.student +
+              '</div><div class="secondary-text">' +
+              x.details +
+              "</div></div>" +
+              '<div class="right">' +
+              '<span class="badge filled">' +
+              x.status +
+              "</span>" +
+              '<button class="secondary" onclick="editInternational(' +
+              x.id +
+              ')">Edit</button>' +
+              '<button class="danger-btn" onclick="deleteRecord(\'international\', ' +
+              x.id +
+              ', renderInternational)">Delete</button>' +
+              "</div></div>"
+            );
+          })
+          .join("");
+      }
+
+      function openNewInternational() {
+        openModal(
+          "Add International Student Record",
+          formInput("Student Name", "is-student") +
+            formTextarea("Clearance & Housing Status", "is-details"),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveInternational()">Save Record</button>',
+        );
+      }
+
+      function saveInternational(id) {
+        var student =
+          document.getElementById("is-student").value || "Unnamed Student";
+        var details =
+          document.getElementById("is-details").value || "Arrival pending";
+        if (id) {
+          var rec = db.international.find(function (x) {
+            return x.id === id;
+          });
+          if (rec) {
+            rec.student = student;
+            rec.details = details;
+          }
+        } else {
+          db.international.push({
+            id: Date.now(),
+            student: student,
+            details: details,
+            status: "In progress",
+          });
+        }
+        closeModal();
+        renderInternational();
+      }
+
+      function editInternational(id) {
+        var rec = db.international.find(function (x) {
+          return x.id === id;
+        });
+        if (!rec) return;
+        openModal(
+          "Edit International Student Record",
+          formInput("Student Name", "is-student", rec.student) +
+            formTextarea(
+              "Clearance & Housing Status",
+              "is-details",
+              rec.details,
+            ),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveInternational(' +
+            id +
+            ')">Update Record</button>',
+        );
+      }
+
+      // 16. Peer Mentorship
+      function renderPeerMentor() {
+        var query = (
+          document.getElementById("peermentor-search").value || ""
+        ).toLowerCase();
+        var list = document.getElementById("peermentor-list");
+        var items = db.peermentor.filter(function (x) {
+          return (
+            x.student.toLowerCase().includes(query) ||
+            x.mentor.toLowerCase().includes(query)
+          );
+        });
+        if (!items.length) {
+          list.innerHTML = emptyView();
+          return;
+        }
+        list.innerHTML = items
+          .map(function (x) {
+            return (
+              '<div class="list-row">' +
+              '<div><div class="primary-text">' +
+              x.student +
+              ' (1st Year)</div><div class="secondary-text">Assigned Mentor: ' +
+              x.mentor +
+              "</div></div>" +
+              '<div class="right">' +
+              '<span class="badge filled">' +
+              x.status +
+              "</span>" +
+              '<button class="secondary" onclick="editPeerMentor(' +
+              x.id +
+              ')">Edit</button>' +
+              '<button class="danger-btn" onclick="deleteRecord(\'peermentor\', ' +
+              x.id +
+              ', renderPeerMentor)">Delete</button>' +
+              "</div></div>"
+            );
+          })
+          .join("");
+      }
+
+      function openNewPeerPairing() {
+        openModal(
+          "New Mentorship Pairing",
+          formInput("1st-Year Student Name", "npp-student") +
+            formSelect("Assigned Senior Mentor", "npp-mentor", STUDENTS),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="savePeerPairing()">Establish Pairing</button>',
+        );
+      }
+
+      function savePeerPairing(id) {
+        var student =
+          document.getElementById("npp-student").value || "1st Year Student";
+        var mentor = document.getElementById("npp-mentor").value;
+        if (id) {
+          var rec = db.peermentor.find(function (x) {
+            return x.id === id;
+          });
+          if (rec) {
+            rec.student = student;
+            rec.mentor = mentor;
+          }
+        } else {
+          db.peermentor.push({
+            id: Date.now(),
+            student: student,
+            mentor: mentor,
+            status: "Active",
+          });
+        }
+        closeModal();
+        renderPeerMentor();
+      }
+
+      function editPeerMentor(id) {
+        var rec = db.peermentor.find(function (x) {
+          return x.id === id;
+        });
+        if (!rec) return;
+        openModal(
+          "Edit Mentorship Pairing",
+          formInput("1st-Year Student Name", "npp-student", rec.student) +
+            formSelect(
+              "Assigned Senior Mentor",
+              "npp-mentor",
+              STUDENTS,
+              rec.mentor,
+            ),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="savePeerPairing(' +
+            id +
+            ')">Update Pairing</button>',
+        );
+      }
+
+      // 17. Career Counseling
+      function renderCareer() {
+        var query = (
+          document.getElementById("career-search").value || ""
+        ).toLowerCase();
+        var list = document.getElementById("career-list");
+        var items = db.career.filter(function (x) {
+          return (
+            x.student.toLowerCase().includes(query) ||
+            x.type.toLowerCase().includes(query)
+          );
+        });
+        if (!items.length) {
+          list.innerHTML = emptyView();
+          return;
+        }
+        list.innerHTML = items
+          .map(function (x) {
+            return (
+              '<div class="list-row">' +
+              '<div><div class="primary-text">' +
+              x.student +
+              '</div><div class="secondary-text">' +
+              x.type +
+              " — Date: " +
+              (x.date || "TBC") +
+              "</div></div>" +
+              '<div class="right">' +
+              '<span class="badge dashed">' +
+              x.status +
+              "</span>" +
+              '<button class="secondary" onclick="editCareer(' +
+              x.id +
+              ')">Edit</button>' +
+              '<button class="danger-btn" onclick="deleteRecord(\'career\', ' +
+              x.id +
+              ', renderCareer)">Delete</button>' +
+              "</div></div>"
+            );
+          })
+          .join("");
+      }
+
+      function openBookCareerSession() {
+        openModal(
+          "Book Career Session",
+          formSelect("Student", "bc-student", STUDENTS) +
+            formSelect("Session Type", "bc-type", [
+              "Resume workshop",
+              "Interview practice",
+              "Career advising",
+            ]) +
+            formInput("Date", "bc-date", "", "date"),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveCareerSession()">Book Session</button>',
+        );
+      }
+
+      function saveCareerSession(id) {
+        var student = document.getElementById("bc-student").value;
+        var type = document.getElementById("bc-type").value;
+        var date = document.getElementById("bc-date").value || "TBC";
+        if (id) {
+          var rec = db.career.find(function (x) {
+            return x.id === id;
+          });
+          if (rec) {
+            rec.student = student;
+            rec.type = type;
+            rec.date = date;
+          }
+        } else {
+          db.career.push({
+            id: Date.now(),
+            student: student,
+            type: type,
+            date: date,
+            status: "Scheduled",
+          });
+        }
+        closeModal();
+        renderCareer();
+      }
+
+      function editCareer(id) {
+        var rec = db.career.find(function (x) {
+          return x.id === id;
+        });
+        if (!rec) return;
+        openModal(
+          "Edit Career Session",
+          formSelect("Student", "bc-student", STUDENTS, rec.student) +
+            formSelect(
+              "Session Type",
+              "bc-type",
+              ["Resume workshop", "Interview practice", "Career advising"],
+              rec.type,
+            ) +
+            formInput("Date", "bc-date", rec.date, "date"),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveCareerSession(' +
+            id +
+            ')">Update Session</button>',
+        );
+      }
+
+      // 18. Alumni Services
+      function renderAlumniService() {
+        var query = (
+          document.getElementById("alumniservice-search").value || ""
+        ).toLowerCase();
+        var list = document.getElementById("alumniservice-list");
+        var items = db.alumniservice.filter(function (x) {
+          return (
+            x.name.toLowerCase().includes(query) ||
+            x.details.toLowerCase().includes(query)
+          );
+        });
+        if (!items.length) {
+          list.innerHTML = emptyView();
+          return;
+        }
+        list.innerHTML = items
+          .map(function (x) {
+            return (
+              '<div class="list-row">' +
+              '<div><div class="primary-text">' +
+              x.name +
+              '</div><div class="secondary-text">' +
+              x.details +
+              "</div></div>" +
+              '<div class="right">' +
+              '<span class="badge filled">' +
+              x.status +
+              "</span>" +
+              '<button class="secondary" onclick="editAlumniService(' +
+              x.id +
+              ')">Edit</button>' +
+              '<button class="danger-btn" onclick="deleteRecord(\'alumniservice\', ' +
+              x.id +
+              ', renderAlumniService)">Delete</button>' +
+              "</div></div>"
+            );
+          })
+          .join("");
+      }
+
+      function openNewAlumni() {
+        openModal(
+          "Add Alumni Contact",
+          formInput("Alumni Full Name", "al-name") +
+            formTextarea("Services Offered & Company", "al-details"),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveAlumni()">Save Record</button>',
+        );
+      }
+
+      function saveAlumni(id) {
+        var name = document.getElementById("al-name").value || "Unnamed Alumni";
+        var details =
+          document.getElementById("al-details").value || "Mentorship offered";
+        if (id) {
+          var rec = db.alumniservice.find(function (x) {
+            return x.id === id;
+          });
+          if (rec) {
+            rec.name = name;
+            rec.details = details;
+          }
+        } else {
+          db.alumniservice.push({
+            id: Date.now(),
+            name: name,
+            details: details,
+            status: "Active",
+          });
+        }
+        closeModal();
+        renderAlumniService();
+      }
+
+      function editAlumniService(id) {
+        var rec = db.alumniservice.find(function (x) {
+          return x.id === id;
+        });
+        if (!rec) return;
+        openModal(
+          "Edit Alumni Contact",
+          formInput("Alumni Full Name", "al-name", rec.name) +
+            formTextarea(
+              "Services Offered & Company",
+              "al-details",
+              rec.details,
+            ),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveAlumni(' +
+            id +
+            ')">Update Record</button>',
+        );
+      }
+
+      // Generic Delete Handler
+      function deleteRecord(key, id, rerenderFn) {
+        if (
+          !confirm("Are you sure you want to permanently delete this record?")
+        )
+          return;
+        db[key] = db[key].filter(function (x) {
+          return x.id !== id;
+        });
+        rerenderFn();
+      }
+
+      // Initialize all modules on load
+      window.addEventListener("DOMContentLoaded", function () {
+        renderCounseling();
+        renderCrisis();
+        renderWellnessMaterial();
+        renderWelfareDispatch();
+        renderStarMeeting();
+        renderIncidents();
+        renderMisbehavior();
+        renderDisability();
+        renderHardshipFund();
+        renderScholarshipCalc();
+        renderClubs();
+        renderContentHub();
+        renderVoting();
+        renderNewStudent();
+        renderInternational();
+        renderPeerMentor();
+        renderCareer();
+        renderAlumniService();
+      });
+    </script>
+  </body>
+</html>

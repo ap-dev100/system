@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ING Student Gateway — Cross-Campus Board</title>
+<style>
+:root{
+  --bg:#ffffff;
+  --ink:#111111;
+  --ink-soft:#5b5b5b;
+  --ink-faint:#9a9a9a;
+  --line:#dcdcdc;
+  --line-strong:#b7b7b7;
+  --fill:#f4f4f4;
+  --sidebar:#070707;
+  --sidebar-line:#242424;
+  --sidebar-ink:#cfcfcf;
+  --sidebar-ink-dim:#7a7a7a;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{font-family:var(--sans);color:var(--ink);background:var(--bg);font-size:14.5px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+button,input,select,textarea{font-family:inherit;}
+.app{display:flex;min-height:100vh;}
+
+.sidebar{width:264px;flex-shrink:0;background:var(--sidebar);color:var(--sidebar-ink);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.brand{padding:26px 24px 18px;border-bottom:1px solid var(--sidebar-line);}
+.brand-mark{font-family:var(--serif);font-size:19px;color:#fff;letter-spacing:.01em;}
+.brand-sub{font-size:11px;color:var(--sidebar-ink-dim);margin-top:5px;}
+.nav{flex:1;padding:12px 10px;overflow-y:auto;}
+.nav-item{display:flex;align-items:center;gap:11px;width:100%;padding:9px 12px;background:none;border:none;color:var(--sidebar-ink);font-size:13px;text-align:left;cursor:pointer;border-left:2px solid transparent;font-family:var(--sans);}
+.nav-item:hover{color:#fff;}
+.nav-item.active{color:#fff;border-left-color:#fff;background:rgba(255,255,255,.06);}
+.nav-mono{width:30px;height:20px;border:1px solid var(--sidebar-line);display:flex;align-items:center;justify-content:center;font-size:9.5px;letter-spacing:.02em;color:var(--sidebar-ink-dim);flex-shrink:0;}
+.nav-item.active .nav-mono{border-color:#fff;color:#fff;}
+.sidebar-foot{padding:16px 24px;border-top:1px solid var(--sidebar-line);font-size:11.5px;color:var(--sidebar-ink-dim);}
+.sidebar-foot .who{color:#e6e6e6;font-size:12.5px;margin-bottom:2px;}
+
+.main{flex:1;min-width:0;}
+.topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;padding:28px 40px 20px;border-bottom:1px solid var(--line);flex-wrap:wrap;}
+.topbar h1{font-family:var(--serif);font-weight:400;font-size:26px;margin:0;}
+.topbar .desc{font-size:13px;color:var(--ink-soft);margin-top:6px;max-width:660px;}
+.topbar .actions{display:flex;gap:10px;flex-shrink:0;padding-top:2px;flex-wrap:wrap;}
+.content{padding:32px 40px 90px;max-width:1180px;}
+
+.btn{font-family:var(--sans);font-size:13px;padding:9px 16px;border:1px solid var(--ink);background:var(--ink);color:#fff;cursor:pointer;white-space:nowrap;}
+.btn:hover{background:#000;}
+.btn-outline{background:transparent;color:var(--ink);border:1px solid var(--line-strong);}
+.btn-outline:hover{border-color:var(--ink);}
+.btn-small{padding:5px 11px;font-size:12px;}
+.btn-full{width:100%;}
+
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-bottom:38px;}
+.kpi{padding:20px 22px;border-left:1px solid var(--line);}
+.kpi:first-child{border-left:none;}
+.kpi .num{font-family:var(--serif);font-size:29px;font-variant-numeric:tabular-nums;}
+.kpi .label{font-size:11.8px;color:var(--ink-soft);margin-top:5px;}
+
+.section-head{display:flex;justify-content:space-between;align-items:baseline;margin:44px 0 14px;flex-wrap:wrap;gap:10px;}
+.section-head h2{font-family:var(--serif);font-weight:400;font-size:18px;margin:0;}
+.section-head .hint{font-size:11.8px;color:var(--ink-faint);}
+.filters{display:flex;gap:8px;flex-wrap:wrap;}
+.filters select{border:1px solid var(--line-strong);padding:7px 10px;font-size:12.5px;background:#fff;font-family:var(--sans);}
+
+.chart-wrap{border:1px solid var(--line);padding:22px 24px 16px;}
+
+.table-wrap{overflow-x:auto;border-bottom:1px solid var(--line);}
+table.ledger{width:100%;border-collapse:collapse;font-size:13px;min-width:560px;}
+table.ledger th{text-align:left;font-weight:500;color:var(--ink-soft);font-size:11.3px;padding:0 14px 10px;border-bottom:1px solid var(--ink);white-space:nowrap;}
+table.ledger td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top;}
+table.ledger tbody tr{cursor:pointer;}
+table.ledger tbody tr:hover{background:var(--fill);}
+.tag{display:inline-block;font-size:10.8px;padding:2.5px 8px;border:1px solid var(--ink);white-space:nowrap;}
+.tag.dim{border-color:var(--line-strong);color:var(--ink-soft);}
+
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);}
+.dash-card{background:#fff;padding:22px;cursor:pointer;}
+.dash-card:hover{background:var(--fill);}
+.dash-card .mono{width:34px;height:24px;border:1px solid var(--ink);display:flex;align-items:center;justify-content:center;font-size:10px;margin-bottom:16px;}
+.dash-card h4{font-family:var(--serif);font-weight:400;font-size:16px;margin:0 0 8px;}
+.dash-card p{font-size:12.3px;color:var(--ink-soft);margin:0 0 14px;min-height:50px;}
+.dash-card .metric{font-family:var(--serif);font-size:21px;}
+.dash-card .metric-label{font-size:11px;color:var(--ink-faint);}
+
+.board-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);}
+.opp-card{background:#fff;padding:22px;cursor:pointer;position:relative;}
+.opp-card:hover{background:var(--fill);}
+.opp-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;gap:8px;}
+.opp-title{font-family:var(--serif);font-size:17px;margin:0 0 6px;}
+.opp-college{font-size:11.8px;color:var(--ink-soft);margin-bottom:10px;}
+.opp-meta{font-size:11.8px;color:var(--ink-faint);margin-bottom:14px;}
+.save-btn{border:1px solid var(--line-strong);background:#fff;width:30px;height:30px;font-size:14px;cursor:pointer;flex-shrink:0;line-height:1;}
+.save-btn.saved{border-color:var(--ink);background:var(--ink);color:#fff;}
+.bar{height:6px;background:var(--fill);border:1px solid var(--line-strong);margin-bottom:6px;}
+.bar-fill{height:100%;background:#111;}
+.bar-label{display:flex;justify-content:space-between;font-size:11px;color:var(--ink-faint);}
+.card-foot{display:flex;justify-content:space-between;align-items:center;font-size:11.5px;color:var(--ink-soft);margin-top:14px;padding-top:12px;border-top:1px solid var(--line);}
+
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.32);display:flex;align-items:center;justify-content:center;z-index:80;padding:20px;}
+.modal{background:#fff;width:480px;max-width:100%;max-height:92vh;overflow-y:auto;padding:30px 32px;border:1px solid var(--ink);}
+.modal h3{font-family:var(--serif);font-weight:400;font-size:21px;margin:0 0 4px;}
+.modal .sub{font-size:12.5px;color:var(--ink-soft);margin-bottom:22px;}
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:11.8px;color:var(--ink-soft);margin-bottom:6px;}
+.field input, .field select, .field textarea{width:100%;padding:9px 10px;border:1px solid var(--line-strong);font-family:var(--sans);font-size:13.5px;background:#fff;color:var(--ink);}
+.field textarea{min-height:78px;resize:vertical;}
+.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:24px;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+
+.drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.25);z-index:70;display:flex;justify-content:flex-end;}
+.drawer{width:440px;max-width:94vw;background:#fff;height:100%;overflow-y:auto;padding:32px 34px;border-left:1px solid var(--ink);}
+.drawer .eyebrow{font-size:11.5px;color:var(--ink-faint);margin-bottom:6px;}
+.drawer h3{font-family:var(--serif);font-size:21px;font-weight:400;margin:0 0 18px;}
+.kv{display:flex;justify-content:space-between;gap:16px;padding:11px 0;border-bottom:1px solid var(--line);font-size:13px;}
+.kv .k{color:var(--ink-soft);flex-shrink:0;}
+.kv .v{text-align:right;}
+.drawer-actions{display:flex;gap:10px;margin-top:26px;flex-wrap:wrap;}
+.close-x{background:none;border:none;font-size:20px;color:var(--ink-soft);cursor:pointer;line-height:1;padding:0;}
+.drawer-top{display:flex;justify-content:space-between;align-items:flex-start;}
+.desc-block{font-size:13px;color:var(--ink-soft);margin:16px 0;padding:16px;border:1px solid var(--line);}
+
+.toast{position:fixed;bottom:26px;right:26px;background:#111;color:#fff;padding:13px 20px;font-size:13px;z-index:100;border:1px solid #000;}
+.empty{padding:40px 0;text-align:center;color:var(--ink-faint);font-size:13px;border:1px dashed var(--line-strong);}
+.menu-btn{display:none;border:1px solid var(--line-strong);background:#fff;padding:8px 10px;cursor:pointer;margin-right:12px;}
+.title-row{display:flex;align-items:center;}
+.lede{font-size:13px;color:var(--ink-soft);margin:-8px 0 26px;max-width:680px;}
+
+@media (max-width:820px){
+  .sidebar{position:fixed;z-index:60;transform:translateX(-100%);transition:transform .2s;}
+  .sidebar.open{transform:translateX(0);}
+  .topbar,.content{padding-left:20px;padding-right:20px;}
+  .menu-btn{display:inline-flex !important;}
+  .two-col{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <main class="main">
+    <div class="topbar" id="topbar"></div>
+    <div class="content" id="content"></div>
+  </main>
+</div>
+<div id="modal-root"></div>
+<div id="drawer-root"></div>
+<div id="toast-root"></div>
+
+<script>
+/* ============================= UTILITIES ============================= */
+const $ = sel => document.querySelector(sel);
+function toast(msg){
+  const root = $('#toast-root');
+  root.innerHTML = `<div class="toast">${msg}</div>`;
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(()=>{ root.innerHTML=''; }, 2600);
+}
+function closeModal(){ $('#modal-root').innerHTML=''; }
+function closeDrawer(){ $('#drawer-root').innerHTML=''; }
+
+/* ============================= CHART ============================= */
+function barChart(id, labels, series){
+  const w = Math.max(600, labels.length*Math.max(80, series.length*44));
+  const h = 200, padL=8, padB=30, padT=16, padR=8;
+  const max = Math.max(1, ...series.flatMap(s=>s.values)) * 1.18;
+  const groupW = (w-padL-padR)/labels.length;
+  const barW = Math.min(30, (groupW-16)/series.length);
+  let bars='';
+  labels.forEach((lab,li)=>{
+    const gx = padL + li*groupW + (groupW - (barW*series.length+(series.length-1)*6))/2;
+    series.forEach((s,si)=>{
+      const val = s.values[li];
+      const bh = (val/max)*(h-padT-padB);
+      const bx = gx + si*(barW+6);
+      const by = h-padB-bh;
+      const fillId = si===0? `url(#${id}-f0)` : `url(#${id}-f1)`;
+      bars += `<rect x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(bh,0).toFixed(1)}" fill="${fillId}" stroke="#111" stroke-width="0.6"/>`;
+      bars += `<text x="${(bx+barW/2).toFixed(1)}" y="${(by-5).toFixed(1)}" font-size="9.2" text-anchor="middle" fill="#5b5b5b" font-family="sans-serif">${val}</text>`;
+    });
+    bars += `<text x="${(gx + (barW*series.length+(series.length-1)*6)/2).toFixed(1)}" y="${h-10}" font-size="9.6" text-anchor="middle" fill="#5b5b5b" font-family="sans-serif">${lab}</text>`;
+  });
+  bars += `<line x1="${padL}" y1="${h-padB}" x2="${w-padR}" y2="${h-padB}" stroke="#111" stroke-width="1"/>`;
+  return `<svg viewBox="0 0 ${w} ${h}" style="width:100%;height:${h}px;display:block;">
+    <defs>
+      <pattern id="${id}-f1" width="6" height="6" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"><rect width="6" height="6" fill="#fff"/><line x1="0" y1="0" x2="0" y2="6" stroke="#111" stroke-width="2.6"/></pattern>
+      <pattern id="${id}-f0" width="2" height="2" patternUnits="userSpaceOnUse"><rect width="2" height="2" fill="#111"/></pattern>
+    </defs>
+    ${bars}
+  </svg>`;
+}
+
+/* ============================= CONSTANTS ============================= */
+const COLLEGES = ['Northgate College','Riverside Technical College','Meridian Institute of Technology','Ashfield Community College','Cedar Valley College','Fairview Polytechnic'];
+const TYPES = ['Hackathon','Placement Drive','Guest Lecture','Event','Activity'];
+const MODES = ['Online','In-person','Hybrid'];
+
+/* ============================= STATE / MOCK DATA ============================= */
+const state = {
+  active:'dashboard',
+  fType:'All', fCollege:'All', fMode:'All',
+  opportunities:[
+    {title:'InterCollege AI Hackathon 2026', type:'Hackathon', host:'Riverside Technical College', date:'04–05 Oct 2026', mode:'Hybrid', location:'Riverside Campus + online tracks',
+      description:'24-hour hackathon open to all ING network students. Teams of up to 4 build AI-powered civic tools, judged by a cross-campus panel with prizes for top three teams.',
+      eligibility:'Open to all enrolled ING network students', capacity:200, registered:148, status:'Open', saved:false, mine:false},
+    {title:'Meridian Health Systems Placement Drive', type:'Placement Drive', host:'Meridian Institute of Technology', date:'12 Oct 2026', mode:'In-person', location:'Meridian Campus, Hall B',
+      description:'On-campus recruitment drive for Nursing, Health Sciences and Business Administration graduates, with on-the-spot interviews for shortlisted candidates.',
+      eligibility:'Final-year students in Health & Business programs', capacity:120, registered:96, status:'Closing soon', saved:false, mine:false},
+    {title:'Guest Lecture: The Future of Renewable Energy', type:'Guest Lecture', host:'Northgate College', date:'22 Sep 2026', mode:'Online', location:'Zoom webinar',
+      description:'Industry expert talk on renewable energy careers and emerging technologies, open network-wide with a live Q&A session.',
+      eligibility:'Open to all enrolled students', capacity:500, registered:210, status:'Open', saved:false, mine:false},
+    {title:'Founders Day Alumni Homecoming', type:'Event', host:'Northgate College', date:'21 Nov 2026', mode:'In-person', location:'Northgate Main Quad',
+      description:'Evening homecoming event for students and alumni marking the college’s founding anniversary, with food trucks, live music and a networking mixer.',
+      eligibility:'Open to students and alumni', capacity:400, registered:260, status:'Open', saved:false, mine:false},
+    {title:'Cedar Valley Coding Bootcamp Weekend', type:'Activity', host:'Cedar Valley College', date:'17–18 Oct 2026', mode:'In-person', location:'Cedar Valley Innovation Lab',
+      description:'Weekend intensive coding bootcamp for beginners, free for all ING network students. Laptops provided for those who need one.',
+      eligibility:'Open to all, no experience required', capacity:60, registered:60, status:'Closed', saved:false, mine:false},
+    {title:'Ashfield Career Expo', type:'Placement Drive', host:'Ashfield Community College', date:'29 Oct 2026', mode:'In-person', location:'Ashfield Sports Hall',
+      description:'Multi-employer career expo with 40+ regional employers, open to students from all ING network colleges.',
+      eligibility:'Open to second-year and final-year students', capacity:300, registered:145, status:'Open', saved:false, mine:false},
+    {title:'Fairview Robotics Showcase', type:'Event', host:'Fairview Polytechnic', date:'08 Nov 2026', mode:'In-person', location:'Fairview Engineering Hall',
+      description:'Student robotics team showcase and competition, open to spectators and competing teams from across the network.',
+      eligibility:'Open to all — competitors and spectators', capacity:150, registered:40, status:'Open', saved:false, mine:false},
+    {title:'Guest Lecture: Ethics in Applied AI', type:'Guest Lecture', host:'Riverside Technical College', date:'30 Sep 2026', mode:'Online', location:'Online panel discussion',
+      description:'Panel discussion with industry ethicists and researchers on the responsible deployment of AI systems.',
+      eligibility:'Open to all enrolled students', capacity:500, registered:180, status:'Open', saved:false, mine:false},
+    {title:'Northgate × Meridian Joint Hackathon Kickoff', type:'Hackathon', host:'Northgate College', date:'15 Oct 2026', mode:'Hybrid', location:'Northgate Auditorium + online',
+      description:'Kickoff info session for the joint hackathon partnership between Northgate and Meridian, covering rules, team formation and mentor sign-ups.',
+      eligibility:'Open to all enrolled students', capacity:100, registered:55, status:'Open', saved:false, mine:false},
+  ],
+};
+
+/* ============================= NAV / TITLES ============================= */
+const NAV = [
+  {id:'dashboard', label:'Overview', mono:'OV'},
+  {id:'board', label:'Opportunity Board', mono:'OB'},
+  {id:'activity', label:'My Activity', mono:'MA'},
+  {id:'submit', label:'Submit a Tip', mono:'ST'},
+];
+const TITLES = {
+  dashboard:{title:'Cross-campus overview', desc:'What’s live across the ING network right now — hackathons, placement drives, guest lectures, events and activities from every active college.'},
+  board:{title:'Cross-Campus Activity & Opportunity Board', desc:'Public announcements shared by every active ING college. Filter by type, host college or mode, then register or save for later.'},
+  activity:{title:'My Activity', desc:'Everything you’ve registered for or saved from the board, in one place.'},
+  submit:{title:'Submit a Tip', desc:'Know about a hackathon, drive or event happening at your college? Suggest it for the network-wide board.'},
+};
+
+/* ============================= HELPERS ============================= */
+function statusTag(s){
+  if(s==='Closed') return `<span class="tag dim">${s}</span>`;
+  if(s==='Closing soon') return `<span class="tag">${s}</span>`;
+  return `<span class="tag">${s}</span>`;
+}
+function filteredOpportunities(){
+  return state.opportunities.filter(o =>
+    (state.fType==='All'||o.type===state.fType) &&
+    (state.fCollege==='All'||o.host===state.fCollege) &&
+    (state.fMode==='All'||o.mode===state.fMode)
+  );
+}
+
+/* ============================= DASHBOARD ============================= */
+function renderDashboard(){
+  const live = state.opportunities.filter(o=>o.status!=='Closed').length;
+  const colleges = new Set(state.opportunities.map(o=>o.host)).size;
+  const myRegs = state.opportunities.filter(o=>o.mine).length;
+  const closingSoon = state.opportunities.filter(o=>o.status==='Closing soon').length;
+  const byType = TYPES.map(t=>state.opportunities.filter(o=>o.type===t).length);
+  return `
+    <div class="kpi-row">
+      <div class="kpi"><div class="num">${live}</div><div class="label">Live opportunities</div></div>
+      <div class="kpi"><div class="num">${colleges}</div><div class="label">Colleges participating</div></div>
+      <div class="kpi"><div class="num">${myRegs}</div><div class="label">Your registrations</div></div>
+      <div class="kpi"><div class="num">${closingSoon}</div><div class="label">Closing soon</div></div>
+    </div>
+    <div class="section-head"><h2>Opportunities by type</h2><span class="hint">Across the whole ING network</span></div>
+    <div class="chart-wrap">${barChart('dash-chart', TYPES.map(t=>t.split(' ')[0]), [{name:'Count', values:byType}])}</div>
+
+    <div class="section-head"><h2>Explore the gateway</h2><span class="hint">3 ways to use the board</span></div>
+    <div class="dash-grid">
+      <div class="dash-card" onclick="navigate('board')">
+        <div class="mono">OB</div><h4>${TITLES.board.title}</h4><p>${TITLES.board.desc}</p>
+        <div class="metric">${state.opportunities.filter(o=>o.status!=='Closed').length}</div><div class="metric-label">Open right now</div>
+      </div>
+      <div class="dash-card" onclick="navigate('activity')">
+        <div class="mono">MA</div><h4>${TITLES.activity.title}</h4><p>${TITLES.activity.desc}</p>
+        <div class="metric">${myRegs} / ${state.opportunities.filter(o=>o.saved).length}</div><div class="metric-label">Registered / saved</div>
+      </div>
+      <div class="dash-card" onclick="navigate('submit')">
+        <div class="mono">ST</div><h4>${TITLES.submit.title}</h4><p>${TITLES.submit.desc}</p>
+        <div class="metric">${state.opportunities.filter(o=>o.status==='Pending review').length}</div><div class="metric-label">Your tips awaiting review</div>
+      </div>
+    </div>
+  `;
+}
+
+/* ============================= FEATURE: OPPORTUNITY BOARD ============================= */
+function renderBoard(){
+  const list = filteredOpportunities();
+  return `
+    <div class="section-head">
+      <h2>All opportunities</h2>
+      <div class="filters">
+        <select onchange="setFilter('fType', this.value)">
+          <option ${state.fType==='All'?'selected':''}>All</option>
+          ${TYPES.map(t=>`<option ${state.fType===t?'selected':''}>${t}</option>`).join('')}
+        </select>
+        <select onchange="setFilter('fCollege', this.value)">
+          <option ${state.fCollege==='All'?'selected':''}>All colleges</option>
+          ${COLLEGES.map(c=>`<option ${state.fCollege===c?'selected':''}>${c}</option>`).join('')}
+        </select>
+        <select onchange="setFilter('fMode', this.value)">
+          <option ${state.fMode==='All'?'selected':''}>All modes</option>
+          ${MODES.map(m=>`<option ${state.fMode===m?'selected':''}>${m}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <span class="hint" style="display:block;margin:-10px 0 16px;">${list.length} of ${state.opportunities.length} opportunities</span>
+    ${renderBoardGrid(list)}
+  `;
+}
+function renderBoardGrid(list){
+  if(!list.length) return `<div class="empty">Nothing matches these filters yet.</div>`;
+  return `<div class="board-grid">
+    ${list.map(o=>{
+      const idx = state.opportunities.indexOf(o);
+      const pctFull = Math.min(100, Math.round((o.registered/o.capacity)*100));
+      return `<div class="opp-card" onclick="openOppDetail(${idx})">
+        <div class="opp-top">
+          <div><span class="tag dim">${o.type}</span></div>
+          <button class="save-btn ${o.saved?'saved':''}" onclick="event.stopPropagation();toggleSave(${idx})" title="Save for later">${o.saved?'★':'☆'}</button>
+        </div>
+        <h4 class="opp-title">${o.title}</h4>
+        <div class="opp-college">${o.host}</div>
+        <div class="opp-meta">${o.date} · ${o.mode}</div>
+        <div class="bar-label"><span>${o.registered} / ${o.capacity} registered</span><span>${pctFull}%</span></div>
+        <div class="bar"><div class="bar-fill" style="width:${pctFull}%"></div></div>
+        <div class="card-foot"><span>${statusTag(o.status)}</span><span>${o.mine?'✓ You are registered':''}</span></div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+function setFilter(key, val){ state[key] = val; renderContent(); }
+function openOppDetail(idx){
+  const o = state.opportunities[idx];
+  const pctFull = Math.min(100, Math.round((o.registered/o.capacity)*100));
+  $('#drawer-root').innerHTML = `<div class="drawer-overlay" onclick="if(event.target===this)closeDrawer()">
+    <div class="drawer">
+      <div class="drawer-top"><div><div class="eyebrow">${o.type} · ${o.host}</div><h3>${o.title}</h3></div><button class="close-x" onclick="closeDrawer()">&times;</button></div>
+      <div class="kv"><span class="k">Date</span><span class="v">${o.date}</span></div>
+      <div class="kv"><span class="k">Mode</span><span class="v">${o.mode}</span></div>
+      <div class="kv"><span class="k">Location</span><span class="v">${o.location}</span></div>
+      <div class="kv"><span class="k">Eligibility</span><span class="v">${o.eligibility}</span></div>
+      <div class="kv"><span class="k">Status</span><span class="v">${o.status}</span></div>
+      <div class="desc-block">${o.description}</div>
+      <div class="bar-label"><span>${o.registered} / ${o.capacity} registered</span><span>${pctFull}%</span></div>
+      <div class="bar"><div class="bar-fill" style="width:${pctFull}%"></div></div>
+      <div class="drawer-actions">
+        ${o.status!=='Closed' ? (o.mine
+          ? `<button class="btn btn-outline" onclick="toggleRegister(${idx})">Cancel registration</button>`
+          : `<button class="btn" onclick="toggleRegister(${idx})">Register</button>`)
+          : `<button class="btn btn-outline" disabled style="opacity:.5;cursor:default;">Registration closed</button>`}
+        <button class="btn btn-outline" onclick="toggleSave(${idx});openOppDetail(${idx})">${o.saved?'Remove from saved':'Save for later'}</button>
+        <button class="btn btn-outline" onclick="closeDrawer()">Close</button>
+      </div>
+    </div>
+  </div>`;
+}
+function toggleSave(idx){
+  state.opportunities[idx].saved = !state.opportunities[idx].saved;
+  renderContent();
+  toast(state.opportunities[idx].saved ? 'Saved for later.' : 'Removed from saved.');
+}
+function toggleRegister(idx){
+  const o = state.opportunities[idx];
+  if(o.mine){
+    o.mine = false;
+    o.registered = Math.max(0, o.registered-1);
+    toast('Registration cancelled.');
+  } else {
+    if(o.registered >= o.capacity){ toast('This opportunity is full.'); return; }
+    o.mine = true;
+    o.registered += 1;
+    toast('You’re registered for ' + o.title + '.');
+  }
+  closeDrawer();
+  renderContent();
+}
+
+/* ============================= FEATURE: MY ACTIVITY ============================= */
+function renderActivity(){
+  const registered = state.opportunities.filter(o=>o.mine);
+  const saved = state.opportunities.filter(o=>o.saved && !o.mine);
+  return `
+    <div class="kpi-row">
+      <div class="kpi"><div class="num">${registered.length}</div><div class="label">Registered</div></div>
+      <div class="kpi"><div class="num">${saved.length}</div><div class="label">Saved for later</div></div>
+      <div class="kpi"><div class="num">${new Set(registered.map(o=>o.host)).size}</div><div class="label">Colleges you're engaging with</div></div>
+      <div class="kpi"><div class="num">${registered.filter(o=>o.status==='Closing soon').length}</div><div class="label">Closing soon</div></div>
+    </div>
+    <div class="section-head"><h2>Registered</h2><span class="hint">${registered.length} items</span></div>
+    ${registered.length ? renderBoardGrid(registered) : `<div class="empty">You haven’t registered for anything yet. Browse the Opportunity Board to get started.</div>`}
+    <div class="section-head"><h2>Saved for later</h2><span class="hint">${saved.length} items</span></div>
+    ${saved.length ? renderBoardGrid(saved) : `<div class="empty">Nothing saved yet. Tap the ☆ on any card to save it here.</div>`}
+  `;
+}
+
+/* ============================= FEATURE: SUBMIT A TIP ============================= */
+function renderSubmit(){
+  const mine = state.opportunities.filter(o=>o.status==='Pending review');
+  return `
+    <p class="lede">Colleges post the official announcements you see on the board. If you’ve heard about something happening at your college that should be shared network-wide, suggest it here — it’ll appear marked “Pending review” until your college confirms it.</p>
+    <div class="section-head"><h2>Suggest an opportunity</h2></div>
+    <div class="table-wrap" style="border:none;">
+      <form onsubmit="submitTip(event)" style="max-width:560px;">
+        <div class="field"><label>Title</label><input name="title" required placeholder="e.g. Winter Trades Open House"></div>
+        <div class="two-col">
+          <div class="field"><label>Type</label><select name="type">${TYPES.map(t=>`<option>${t}</option>`).join('')}</select></div>
+          <div class="field"><label>Host college</label><select name="host">${COLLEGES.map(c=>`<option>${c}</option>`).join('')}</select></div>
+        </div>
+        <div class="two-col">
+          <div class="field"><label>Date</label><input name="date" required placeholder="e.g. 03 Dec 2026"></div>
+          <div class="field"><label>Mode</label><select name="mode">${MODES.map(m=>`<option>${m}</option>`).join('')}</select></div>
+        </div>
+        <div class="field"><label>Description</label><textarea name="description" required placeholder="What is it, and who should come?"></textarea></div>
+        <button type="submit" class="btn btn-full">Submit tip for review</button>
+      </form>
+    </div>
+    <div class="section-head"><h2>Your submitted tips</h2><span class="hint">${mine.length} pending</span></div>
+    ${mine.length ? `<div class="table-wrap"><table class="ledger"><thead><tr>
+      <th>Title</th><th>Type</th><th>Host</th><th>Date</th><th>Status</th>
+    </tr></thead><tbody>
+      ${mine.map(o=>`<tr onclick="openOppDetail(${state.opportunities.indexOf(o)})">
+        <td>${o.title}</td><td>${o.type}</td><td>${o.host}</td><td>${o.date}</td><td><span class="tag dim">Pending review</span></td>
+      </tr>`).join('')}
+    </tbody></table></div>` : `<div class="empty">You haven’t submitted any tips yet.</div>`}
+  `;
+}
+function submitTip(e){
+  e.preventDefault();
+  const f = e.target;
+  state.opportunities.unshift({
+    title:f.title.value, type:f.type.value, host:f.host.value, date:f.date.value, mode:f.mode.value,
+    location:'To be confirmed', description:f.description.value, eligibility:'To be confirmed',
+    capacity:0, registered:0, status:'Pending review', saved:false, mine:false
+  });
+  f.reset();
+  renderContent();
+  toast('Tip submitted for review.');
+}
+
+/* ============================= TOP-LEVEL RENDER ============================= */
+function renderSidebar(){
+  $('#sidebar').innerHTML = `
+    <div class="brand">
+      <div class="brand-mark">ING Student Gateway</div>
+      <div class="brand-sub">ing-erp.com — Cross-Campus Benefit Hub</div>
+    </div>
+    <nav class="nav">
+      ${NAV.map(n=>`<button class="nav-item" data-id="${n.id}" onclick="navigate('${n.id}')"><span class="nav-mono">${n.mono}</span>${n.label}</button>`).join('')}
+    </nav>
+    <div class="sidebar-foot">
+      <div class="who">Signed in as Student</div>
+      Northgate College · ING Network
+    </div>
+  `;
+}
+function renderTopbar(){
+  const t = TITLES[state.active];
+  $('#topbar').innerHTML = `
+    <div>
+      <div class="title-row"><button class="menu-btn" onclick="toggleSidebar()">&#9776;</button><h1>${t.title}</h1></div>
+      <div class="desc">${t.desc}</div>
+    </div>
+    <div class="actions"></div>
+  `;
+}
+function renderContent(){
+  let html = '';
+  if(state.active==='dashboard') html = renderDashboard();
+  else if(state.active==='board') html = renderBoard();
+  else if(state.active==='activity') html = renderActivity();
+  else if(state.active==='submit') html = renderSubmit();
+  $('#content').innerHTML = html;
+}
+function navigate(id){
+  state.active = id;
+  document.querySelectorAll('.nav-item').forEach(el=>{
+    el.classList.toggle('active', el.getAttribute('data-id')===id);
+  });
+  renderTopbar();
+  renderContent();
+  closeModal(); closeDrawer();
+  document.getElementById('sidebar').classList.remove('open');
+  window.scrollTo(0,0);
+}
+function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); }
+
+/* ============================= INIT ============================= */
+renderSidebar();
+navigate('dashboard');
+</script>
+</body>
+</html>

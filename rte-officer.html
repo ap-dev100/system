@@ -1,0 +1,2170 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ING ERP — RTE Officer</title>
+    <style>
+      :root {
+        --surface-1: #fafafa;
+        --surface-2: #f2f2f2;
+        --border: #e6e6e6;
+        --border-strong: #cfcfcf;
+        --text-primary: #111111;
+        --text-secondary: #5a5a5e;
+        --text-muted: #9a9a9e;
+        --fill-primary: #000000;
+        --on-primary: #ffffff;
+        --radius: 10px;
+        --danger: #d9381e;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+          Arial, sans-serif;
+        background: var(--surface-2);
+        color: var(--text-primary);
+      }
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 24px;
+        background: #fff;
+        border-bottom: 1px solid var(--border);
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .topbar .who {
+        font-size: 12px;
+        color: var(--text-secondary);
+      }
+      .topbar .who strong {
+        color: var(--text-primary);
+        font-weight: 600;
+      }
+      .app {
+        display: flex;
+        min-height: 100vh;
+      }
+      .sidebar {
+        width: 225px;
+        flex-shrink: 0;
+        background: var(--surface-1);
+        border-right: 1px solid var(--border);
+        padding: 18px 12px;
+        overflow-y: auto;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0 8px 14px;
+      }
+      .brand .mark {
+        width: 24px;
+        height: 24px;
+        border-radius: 6px;
+        background: var(--fill-primary);
+        flex-shrink: 0;
+      }
+      .brand .name {
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 1.3;
+      }
+      .brand .role {
+        font-size: 11px;
+        color: var(--text-muted);
+        line-height: 1.3;
+      }
+      .nav-item {
+        display: block;
+        padding: 7px 10px;
+        border-radius: 7px;
+        font-size: 13px;
+        color: var(--text-secondary);
+        cursor: pointer;
+        margin-bottom: 2px;
+      }
+      .nav-item:hover {
+        background: var(--surface-2);
+      }
+      .nav-item.active {
+        background: var(--fill-primary);
+        color: var(--on-primary);
+      }
+      .nav-divider {
+        border-top: 1px solid var(--border);
+        margin: 10px 4px;
+      }
+      .group {
+        margin-bottom: 12px;
+      }
+      .group-label {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-muted);
+        margin: 0 0 4px 10px;
+      }
+      .main {
+        flex: 1;
+        padding: 32px 36px;
+        min-width: 0;
+      }
+      .page {
+        display: none;
+      }
+      .page.active {
+        display: block;
+      }
+      .page-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: 22px;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      h1 {
+        font-size: 22px;
+        margin: 0;
+        font-weight: 600;
+      }
+      .subtitle {
+        font-size: 13px;
+        color: var(--text-secondary);
+        margin: 5px 0 0;
+      }
+      button.primary {
+        background: var(--fill-primary);
+        color: var(--on-primary);
+        border: none;
+        border-radius: 8px;
+        padding: 10px 16px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      button.secondary {
+        background: #fff;
+        color: var(--text-primary);
+        border: 1px solid var(--border-strong);
+        border-radius: 8px;
+        padding: 10px 16px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      button.danger {
+        background: #fff;
+        color: var(--danger);
+        border: 1px solid var(--danger);
+        border-radius: 8px;
+        padding: 10px 16px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      .link-btn {
+        background: none;
+        border: none;
+        color: var(--text-primary);
+        font-size: 12px;
+        font-weight: 600;
+        text-decoration: underline;
+        cursor: pointer;
+        padding: 0;
+        white-space: nowrap;
+      }
+      .link-btn.danger {
+        color: var(--danger);
+      }
+      .toolbar {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 18px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      input[type="text"],
+      input[type="number"],
+      input[type="date"],
+      select,
+      textarea {
+        border: 1px solid var(--border-strong);
+        border-radius: 8px;
+        padding: 10px 12px;
+        font-size: 13px;
+        background: #fff;
+        color: var(--text-primary);
+        font-family: inherit;
+      }
+      input[type="text"] {
+        flex: 1;
+        min-width: 160px;
+      }
+      select {
+        width: 170px;
+      }
+      .badge {
+        font-size: 11px;
+        padding: 2px 9px;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+      .badge.filled {
+        background: var(--fill-primary);
+        color: var(--on-primary);
+      }
+      .badge.outline {
+        border: 1px solid var(--border-strong);
+        color: var(--text-secondary);
+      }
+      .badge.dashed {
+        border: 1px dashed var(--border-strong);
+        color: var(--text-secondary);
+      }
+      .list {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+        background: #fff;
+      }
+      .list-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 13px 18px;
+        gap: 14px;
+        border-bottom: 1px solid var(--border);
+      }
+      .list-row:last-child {
+        border-bottom: none;
+      }
+      .list-row .primary-text {
+        font-size: 14px;
+        font-weight: 600;
+      }
+      .list-row .secondary-text {
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-top: 3px;
+      }
+      .list-row .right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-shrink: 0;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+      .table-wrap {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+        background: #fff;
+        overflow-x: auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        padding: 11px 13px;
+        font-size: 13px;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+        white-space: nowrap;
+      }
+      th {
+        font-weight: 600;
+        color: var(--text-secondary);
+        background: var(--surface-1);
+        font-size: 12px;
+      }
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+      td.num {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+      .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        z-index: 50;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      .modal-overlay.open {
+        display: flex;
+      }
+      .modal {
+        background: #fff;
+        border-radius: 12px;
+        max-width: 460px;
+        width: 100%;
+        max-height: 86vh;
+        overflow-y: auto;
+        border: 1px solid var(--border-strong);
+      }
+      .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border);
+      }
+      .modal-header h3 {
+        margin: 0;
+        font-size: 16px;
+      }
+      .modal-close {
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        color: var(--text-secondary);
+        line-height: 1;
+        padding: 4px;
+      }
+      .modal-body {
+        padding: 18px 20px;
+      }
+      .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        padding: 14px 20px;
+        border-top: 1px solid var(--border);
+      }
+      .form-group {
+        margin-bottom: 14px;
+      }
+      .form-group label {
+        display: block;
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-bottom: 5px;
+        font-weight: 600;
+      }
+      .form-group input,
+      .form-group select,
+      .form-group textarea {
+        width: 100%;
+      }
+      .form-group textarea {
+        resize: vertical;
+        min-height: 70px;
+      }
+      .form-row-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 10px;
+      }
+      .form-row-2 input,
+      .form-row-2 select {
+        width: 100%;
+      }
+      @media (max-width: 640px) {
+        .sidebar {
+          display: none;
+        }
+        .main {
+          padding: 22px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="topbar">
+      <div class="who">
+        Signed in as <strong>Mr. Bijay Thapa</strong> — RTE Data Officer
+      </div>
+      <div class="who">Registry, Timetable, and Examinations Processing</div>
+    </div>
+
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="mark"></div>
+          <div>
+            <div class="name">ING ERP</div>
+            <div class="role">RTE Officer</div>
+          </div>
+        </div>
+        <nav>
+          <div class="group">
+            <p class="group-label">Enrollment</p>
+            <div
+              class="nav-item active"
+              data-page="enrollment"
+              onclick="showPage('enrollment', this)"
+            >
+              Enrollment registry
+            </div>
+            <div
+              class="nav-item"
+              data-page="credittransfer"
+              onclick="showPage('credittransfer', this)"
+            >
+              Credit transfer
+            </div>
+            <div
+              class="nav-item"
+              data-page="visa"
+              onclick="showPage('visa', this)"
+            >
+              Visa compliance
+            </div>
+          </div>
+          <div class="group">
+            <p class="group-label">Scheduling</p>
+            <div
+              class="nav-item"
+              data-page="timetable"
+              onclick="showPage('timetable', this)"
+            >
+              Timetabling engine
+            </div>
+            <div
+              class="nav-item"
+              data-page="roomalloc"
+              onclick="showPage('roomalloc', this)"
+            >
+              Classroom allocator
+            </div>
+            <div
+              class="nav-item"
+              data-page="calendar"
+              onclick="showPage('calendar', this)"
+            >
+              Academic calendar
+            </div>
+          </div>
+          <div class="group">
+            <p class="group-label">Examinations</p>
+            <div
+              class="nav-item"
+              data-page="examschedule"
+              onclick="showPage('examschedule', this)"
+            >
+              Exam schedule
+            </div>
+            <div
+              class="nav-item"
+              data-page="invigilation"
+              onclick="showPage('invigilation', this)"
+            >
+              Invigilation roster
+            </div>
+            <div
+              class="nav-item"
+              data-page="papervault"
+              onclick="showPage('papervault', this)"
+            >
+              Paper moderation vault
+            </div>
+          </div>
+          <div class="group">
+            <p class="group-label">Records</p>
+            <div
+              class="nav-item"
+              data-page="transcripts"
+              onclick="showPage('transcripts', this)"
+            >
+              Transcripts
+            </div>
+            <div
+              class="nav-item"
+              data-page="gradechange"
+              onclick="showPage('gradechange', this)"
+            >
+              Grade change pipeline
+            </div>
+            <div
+              class="nav-item"
+              data-page="certprint"
+              onclick="showPage('certprint', this)"
+            >
+              Certification printing
+            </div>
+          </div>
+          <div class="group">
+            <p class="group-label">Student cases</p>
+            <div
+              class="nav-item"
+              data-page="graduation"
+              onclick="showPage('graduation', this)"
+            >
+              Graduation status
+            </div>
+            <div
+              class="nav-item"
+              data-page="mitigating"
+              onclick="showPage('mitigating', this)"
+            >
+              Mitigating circumstances
+            </div>
+          </div>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <!-- ENROLLMENT -->
+        <section class="page active" id="page-enrollment">
+          <div class="page-header">
+            <div>
+              <h1>Student Enrollment Master Registry</h1>
+              <p class="subtitle">Manage student IDs and enrollment status</p>
+            </div>
+            <button class="primary" onclick="openNewEnrollment()">
+              + New enrollment
+            </button>
+          </div>
+          <div class="toolbar">
+            <input
+              type="text"
+              placeholder="Search by name, ID, or program"
+              oninput="filterRows(this, '#enrollment-list', '.list-row')"
+            />
+          </div>
+          <div class="list" id="enrollment-list">
+            <div class="list-row">
+              <div>
+                <div class="primary-text">ST1042 — Aisha Karki</div>
+                <div class="secondary-text">BSc Computer Science</div>
+              </div>
+              <div class="right">
+                <span class="badge filled">Active</span
+                ><button class="link-btn" onclick="openEditEnrollment(this)">
+                  Edit</button
+                ><button class="link-btn danger" onclick="deleteRow(this)">
+                  Delete
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">ST1043 — Bibek Rai</div>
+                <div class="secondary-text">BSc Computer Science</div>
+              </div>
+              <div class="right">
+                <span class="badge filled">Active</span
+                ><button class="link-btn" onclick="openEditEnrollment(this)">
+                  Edit</button
+                ><button class="link-btn danger" onclick="deleteRow(this)">
+                  Delete
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">ST1044 — Sunita Gurung</div>
+                <div class="secondary-text">BSc Computer Science</div>
+              </div>
+              <div class="right">
+                <span class="badge filled">Active</span
+                ><button class="link-btn" onclick="openEditEnrollment(this)">
+                  Edit</button
+                ><button class="link-btn danger" onclick="deleteRow(this)">
+                  Delete
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">ST1046 — Manisha Shrestha</div>
+                <div class="secondary-text">BSc Computer Science</div>
+              </div>
+              <div class="right">
+                <span class="badge dashed">Active — fee hold</span
+                ><button class="link-btn" onclick="openEditEnrollment(this)">
+                  Edit</button
+                ><button class="link-btn danger" onclick="deleteRow(this)">
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- CREDIT TRANSFER -->
+        <section class="page" id="page-credittransfer">
+          <div class="page-header">
+            <div>
+              <h1>Credit Transfer Evaluator</h1>
+              <p class="subtitle">Process credit transfer applications</p>
+            </div>
+            <button class="primary" onclick="openNewTransfer()">
+              + New evaluation
+            </button>
+          </div>
+          <div class="toolbar">
+            <input
+              type="text"
+              placeholder="Search applicant or institution"
+              oninput="filterRows(this, '#credittransfer-list', '.list-row')"
+            />
+          </div>
+          <div class="list" id="credittransfer-list">
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Ramesh KC</div>
+                <div class="secondary-text">
+                  Transferring from Kathmandu Tech College — 30 credits
+                  submitted (24 credits granted)
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge filled">Evaluated</span
+                ><button class="link-btn" onclick="openEditTransfer(this)">
+                  Edit</button
+                ><button class="link-btn danger" onclick="deleteRow(this)">
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- VISA COMPLIANCE -->
+        <section class="page" id="page-visa">
+          <div class="page-header">
+            <div>
+              <h1>Visa Compliance Records</h1>
+              <p class="subtitle">Track attendance and visa statuses</p>
+            </div>
+            <button class="primary" onclick="openNewVisa()">
+              + Add student record
+            </button>
+          </div>
+          <div class="toolbar">
+            <input
+              type="text"
+              placeholder="Search international student"
+              oninput="filterRows(this, '#visa-list', '.list-row')"
+            />
+          </div>
+          <div class="list" id="visa-list">
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Li Wei</div>
+                <div class="secondary-text">Student visa — 92% attendance</div>
+              </div>
+              <div class="right">
+                <span class="badge filled">Compliant</span
+                ><button class="link-btn" onclick="openEditVisa(this)">
+                  Edit</button
+                ><button class="link-btn danger" onclick="deleteRow(this)">
+                  Delete
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Ahmed Hassan</div>
+                <div class="secondary-text">Student visa — 68% attendance</div>
+              </div>
+              <div class="right">
+                <span class="badge outline">Non-compliant</span
+                ><button class="link-btn" onclick="notifyImmigration(this)">
+                  Notify officer</button
+                ><button class="link-btn" onclick="openEditVisa(this)">
+                  Edit</button
+                ><button class="link-btn danger" onclick="deleteRow(this)">
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- TIMETABLE -->
+        <section class="page" id="page-timetable">
+          <div class="page-header">
+            <div>
+              <h1>Timetabling Engine</h1>
+              <p class="subtitle">
+                Manage schedule slots and resolve room conflicts
+              </p>
+            </div>
+            <button class="primary" onclick="openNewTimetable()">
+              + New schedule entry
+            </button>
+          </div>
+          <div class="toolbar">
+            <input
+              type="text"
+              placeholder="Search module or room"
+              oninput="filterRows(this, '#timetable-list', '.list-row')"
+            />
+          </div>
+          <div class="list" id="timetable-list">
+            <div class="list-row">
+              <div>
+                <div class="primary-text">
+                  CS204 — Database Management Systems
+                </div>
+                <div class="secondary-text">
+                  Mon &amp; Wed, 10:00–11:30 — Room B204
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge filled">No conflict</span
+                ><button class="link-btn" onclick="openEditTimetable(this)">
+                  Edit</button
+                ><button class="link-btn danger" onclick="deleteRow(this)">
+                  Delete
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">CS230 lab session</div>
+                <div class="secondary-text">
+                  Fri, 1:00–3:00 — Room B204 — Clashes with existing booking
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge outline">Conflict</span
+                ><button class="link-btn" onclick="resolveConflict(this)">
+                  Resolve conflict</button
+                ><button class="link-btn" onclick="openEditTimetable(this)">
+                  Edit</button
+                ><button class="link-btn danger" onclick="deleteRow(this)">
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ROOM ALLOCATOR -->
+        <section class="page" id="page-roomalloc">
+          <div class="page-header">
+            <div>
+              <h1>Classroom Space Allocator</h1>
+              <p class="subtitle">
+                Manage room allocations and active bookings
+              </p>
+            </div>
+            <button class="primary" onclick="openBookRoom()">
+              + Book room
+            </button>
+          </div>
+          <div class="toolbar">
+            <input
+              type="text"
+              placeholder="Search room or building"
+              oninput="filterRows(this, '#roomalloc-list', '.list-row')"
+            />
+          </div>
+          <div class="list" id="roomalloc-list">
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Room B204</div>
+                <div class="secondary-text">
+                  Main Building — Capacity: 60 — CS204 lecture, Mon &amp; Wed
+                  10:00
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge filled">Booked</span
+                ><button class="link-btn" onclick="openEditRoom(this)">
+                  Edit</button
+                ><button class="link-btn danger" onclick="deleteRow(this)">
+                  Delete
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Room C101</div>
+                <div class="secondary-text">
+                  Main Building — Capacity: 40 — Available
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge outline">Available</span
+                ><button class="link-btn" onclick="openEditRoom(this)">
+                  Edit</button
+                ><button class="link-btn danger" onclick="deleteRow(this)">
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ACADEMIC CALENDAR -->
+        <section class="page" id="page-calendar">
+          <div class="page-header">
+            <div>
+              <h1>Academic Calendar</h1>
+              <p class="subtitle">Maintain academic dates and deadlines</p>
+            </div>
+            <button class="primary" onclick="openNewCalendarEvent()">
+              + Add event
+            </button>
+          </div>
+          <div class="list" id="calendar-list">
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Semester 1 start</div>
+                <div class="secondary-text">Jul 15, 2026</div>
+              </div>
+              <div class="right">
+                <button class="link-btn" onclick="openEditCalendarEvent(this)">
+                  Edit</button
+                ><button class="link-btn danger" onclick="deleteRow(this)">
+                  Delete
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Reading week</div>
+                <div class="secondary-text">Oct 6–10, 2026</div>
+              </div>
+              <div class="right">
+                <button class="link-btn" onclick="openEditCalendarEvent(this)">
+                  Edit</button
+                ><button class="link-btn danger" onclick="deleteRow(this)">
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- EXAM SCHEDULE -->
+        <section class="page" id="page-examschedule">
+          <div class="page-header">
+            <div>
+              <h1>Examination Schedule</h1>
+              <p class="subtitle">
+                Set dates, exam halls, and assigned personnel
+              </p>
+            </div>
+            <button class="primary" onclick="openNewExam()">+ New exam</button>
+          </div>
+          <div class="toolbar">
+            <input
+              type="text"
+              placeholder="Search module or hall"
+              oninput="filterRows(this, '#examschedule-list', '.list-row')"
+            />
+          </div>
+          <div class="list" id="examschedule-list">
+            <div class="list-row">
+              <div>
+                <div class="primary-text">CS204 Midterm</div>
+                <div class="secondary-text">
+                  Oct 22 — Hall A — Invigilators: Rohan Adhikari, Sarita Koirala
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge filled">Scheduled</span
+                ><button class="link-btn" onclick="openEditExam(this)">
+                  Edit</button
+                ><button class="link-btn danger" onclick="deleteRow(this)">
+                  Delete
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">CS210 Midterm</div>
+                <div class="secondary-text">
+                  Oct 23 — Hall B — Invigilators not assigned
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge dashed">Needs invigilators</span
+                ><button class="link-btn" onclick="assignInvigilators(this)">
+                  Assign</button
+                ><button class="link-btn" onclick="openEditExam(this)">
+                  Edit</button
+                ><button class="link-btn danger" onclick="deleteRow(this)">
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- INVIGILATION ROSTER -->
+        <section class="page" id="page-invigilation">
+          <div class="page-header">
+            <div>
+              <h1>Exam Hall Invigilation Roster</h1>
+              <p class="subtitle">Assign exam duties to academic staff</p>
+            </div>
+            <button class="primary" onclick="openNewInvigilator()">
+              + Add staff member
+            </button>
+          </div>
+          <div class="list" id="invigilation-list">
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Mr. Rohan Adhikari</div>
+                <div class="secondary-text">
+                  6 hours assigned — CS204 Midterm
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge filled">Assigned</span
+                ><button class="link-btn" onclick="openEditInvigilator(this)">
+                  Edit</button
+                ><button class="link-btn danger" onclick="deleteRow(this)">
+                  Delete
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Ms. Anita Bhandari</div>
+                <div class="secondary-text">0 hours assigned — Available</div>
+              </div>
+              <div class="right">
+                <span class="badge outline">Unassigned</span
+                ><button class="link-btn" onclick="assignDuty(this)">
+                  Quick assign</button
+                ><button class="link-btn" onclick="openEditInvigilator(this)">
+                  Edit</button
+                ><button class="link-btn danger" onclick="deleteRow(this)">
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- PAPER VAULT -->
+        <section class="page" id="page-papervault">
+          <div class="page-header">
+            <div>
+              <h1>Exam Paper Moderation Vault</h1>
+              <p class="subtitle">
+                Upload exam papers and handle moderation workflows
+              </p>
+            </div>
+            <button class="primary" onclick="openNewPaper()">
+              + Upload exam paper
+            </button>
+          </div>
+          <div class="list" id="papervault-list">
+            <div class="list-row">
+              <div>
+                <div class="primary-text">CS204 Midterm Draft</div>
+                <div class="secondary-text">
+                  Reviewed by Prof. David Whitfield
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge filled">Approved</span
+                ><button class="link-btn" onclick="openEditPaper(this)">
+                  Edit details</button
+                ><button class="link-btn danger" onclick="deleteRow(this)">
+                  Delete
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">CS210 Midterm Draft</div>
+                <div class="secondary-text">Awaiting external review</div>
+              </div>
+              <div class="right">
+                <span class="badge dashed">Pending review</span
+                ><button class="link-btn" onclick="sendToExaminer(this)">
+                  Send to examiner</button
+                ><button class="link-btn" onclick="openEditPaper(this)">
+                  Edit details</button
+                ><button class="link-btn danger" onclick="deleteRow(this)">
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- TRANSCRIPTS -->
+        <section class="page" id="page-transcripts">
+          <div class="page-header">
+            <div>
+              <h1>Official Transcript Generator</h1>
+              <p class="subtitle">Process and sign student transcripts</p>
+            </div>
+            <button class="primary" onclick="openNewTranscript()">
+              + Request transcript
+            </button>
+          </div>
+          <div class="toolbar">
+            <input
+              type="text"
+              placeholder="Search by student name"
+              oninput="filterRows(this, '#transcripts-list', '.list-row')"
+            />
+          </div>
+          <div class="list" id="transcripts-list">
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Sunita Gurung</div>
+                <div class="secondary-text">Requested Sep 5</div>
+              </div>
+              <div class="right">
+                <span class="badge filled">Generated &amp; signed</span
+                ><button class="link-btn danger" onclick="deleteRow(this)">
+                  Delete
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Bibek Rai</div>
+                <div class="secondary-text">Requested Sep 8</div>
+              </div>
+              <div class="right">
+                <span class="badge dashed">Pending generation</span
+                ><button class="link-btn" onclick="generateTranscript(this)">
+                  Generate</button
+                ><button class="link-btn danger" onclick="deleteRow(this)">
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- GRADE CHANGE -->
+        <section class="page" id="page-gradechange">
+          <div class="page-header">
+            <div>
+              <h1>Grade Change Pipeline</h1>
+              <p class="subtitle">Submit and update grade adjustments</p>
+            </div>
+            <button class="primary" onclick="openNewGradeChange()">
+              + New request
+            </button>
+          </div>
+          <div class="list" id="gradechange-list">
+            <div class="list-row">
+              <div>
+                <div class="primary-text">CS204 Midterm — Rajesh Karki</div>
+                <div class="secondary-text">
+                  First approval: Dr. Anil Sharma — Approved
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge dashed">Awaiting approval</span
+                ><button class="link-btn" onclick="secondApprove(this)">
+                  Process approval</button
+                ><button class="link-btn danger" onclick="deleteRow(this)">
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- CERTIFICATION PRINTING -->
+        <section class="page" id="page-certprint">
+          <div class="page-header">
+            <div>
+              <h1>Certification Print Control</h1>
+              <p class="subtitle">Manage certificate batches and serials</p>
+            </div>
+            <button class="primary" onclick="openPrintBatch()">
+              + Print new batch
+            </button>
+          </div>
+          <div class="list" id="certprint-list">
+            <div class="list-row">
+              <div>
+                <div class="primary-text">
+                  BSc Computer Science — Sabina Thapa
+                </div>
+                <div class="secondary-text">Serial DIP-2022-0142</div>
+              </div>
+              <div class="right">
+                <span class="badge filled">Printed &amp; released</span
+                ><button class="link-btn danger" onclick="deleteRow(this)">
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- GRADUATION STATUS -->
+        <section class="page" id="page-graduation">
+          <div class="page-header">
+            <div>
+              <h1>Graduation Status Records</h1>
+              <p class="subtitle">
+                Update credit completion and fee clearance state
+              </p>
+            </div>
+            <button class="primary" onclick="openAddGraduationRecord()">
+              + Add student record
+            </button>
+          </div>
+          <div class="table-wrap">
+            <table id="graduation-table">
+              <thead>
+                <tr>
+                  <th>Student</th>
+                  <th>Credits</th>
+                  <th>Fee clearance</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Aisha Karki</td>
+                  <td class="num">120 / 120</td>
+                  <td>Clear</td>
+                  <td><span class="badge filled">Cleared</span></td>
+                  <td>
+                    <button class="link-btn" onclick="openEditGraduation(this)">
+                      Edit
+                    </button>
+                    <button
+                      class="link-btn danger"
+                      onclick="deleteTableRow(this)"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Manisha Shrestha</td>
+                  <td class="num">110 / 120</td>
+                  <td>NPR 360,000 outstanding</td>
+                  <td><span class="badge outline">Blocked</span></td>
+                  <td>
+                    <button class="link-btn" onclick="recheckClearance(this)">
+                      Recheck
+                    </button>
+                    <button class="link-btn" onclick="openEditGraduation(this)">
+                      Edit
+                    </button>
+                    <button
+                      class="link-btn danger"
+                      onclick="deleteTableRow(this)"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- MITIGATING CIRCUMSTANCES -->
+        <section class="page" id="page-mitigating">
+          <div class="page-header">
+            <div>
+              <h1>Mitigating Circumstances Log</h1>
+              <p class="subtitle">Process extension and deferral requests</p>
+            </div>
+            <button class="primary" onclick="openNewMitigating()">
+              + New request
+            </button>
+          </div>
+          <div class="list" id="mitigating-list">
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Bibek Rai</div>
+                <div class="secondary-text">
+                  Medical — 3-day assignment extension
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge filled">Approved</span
+                ><button class="link-btn" onclick="openEditMitigating(this)">
+                  Edit</button
+                ><button class="link-btn danger" onclick="deleteRow(this)">
+                  Delete
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Suman Basnet</div>
+                <div class="secondary-text">
+                  Family emergency — Exam deferral request
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge dashed">Pending</span
+                ><button class="link-btn" onclick="reviewMitigating(this)">
+                  Review</button
+                ><button class="link-btn" onclick="openEditMitigating(this)">
+                  Edit</button
+                ><button class="link-btn danger" onclick="deleteRow(this)">
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- COMMON MODAL OVERLAY -->
+    <div
+      class="modal-overlay"
+      id="modal-overlay"
+      onclick="if (event.target === this) closeModal();"
+    >
+      <div class="modal">
+        <div class="modal-header">
+          <h3 id="modal-title"></h3>
+          <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body" id="modal-body"></div>
+        <div class="modal-footer" id="modal-footer"></div>
+      </div>
+    </div>
+
+    <script>
+      var modalContext = null;
+
+      function showPage(id, el) {
+        document.querySelectorAll(".page").forEach(function (p) {
+          p.classList.remove("active");
+        });
+        document.getElementById("page-" + id).classList.add("active");
+        document.querySelectorAll(".nav-item").forEach(function (n) {
+          n.classList.remove("active");
+        });
+        if (el) el.classList.add("active");
+      }
+
+      function filterRows(inputEl, containerSelector, rowSelector) {
+        var q = inputEl.value.toLowerCase();
+        document
+          .querySelectorAll(containerSelector + " " + rowSelector)
+          .forEach(function (row) {
+            row.style.display =
+              row.textContent.toLowerCase().indexOf(q) > -1 ? "" : "none";
+          });
+      }
+
+      function deleteRow(btn) {
+        if (confirm("Are you sure you want to delete this record?")) {
+          var row = btn.closest(".list-row");
+          row.remove();
+        }
+      }
+
+      function deleteTableRow(btn) {
+        if (confirm("Are you sure you want to delete this entry?")) {
+          var tr = btn.closest("tr");
+          tr.remove();
+        }
+      }
+
+      /* ---------- Modal Shell ---------- */
+      function openModal(title, bodyHtml, footerHtml) {
+        document.getElementById("modal-title").textContent = title;
+        document.getElementById("modal-body").innerHTML = bodyHtml;
+        document.getElementById("modal-footer").innerHTML =
+          footerHtml ||
+          '<button class="secondary" onclick="closeModal()">Close</button>';
+        document.getElementById("modal-overlay").classList.add("open");
+      }
+      function closeModal() {
+        document.getElementById("modal-overlay").classList.remove("open");
+        modalContext = null;
+      }
+      function formInput(label, id, val, type) {
+        type = type || "text";
+        return (
+          '<div class="form-group"><label>' +
+          label +
+          '</label><input type="' +
+          type +
+          '" id="' +
+          id +
+          '" value="' +
+          (val === undefined ? "" : val) +
+          '"></div>'
+        );
+      }
+      function formTextarea(label, id, val) {
+        return (
+          '<div class="form-group"><label>' +
+          label +
+          '</label><textarea id="' +
+          id +
+          '">' +
+          (val || "") +
+          "</textarea></div>"
+        );
+      }
+      function formSelect(label, id, opts, selectedVal) {
+        var o = opts
+          .map(function (x) {
+            var sel = x === selectedVal ? " selected" : "";
+            return "<option" + sel + ">" + x + "</option>";
+          })
+          .join("");
+        return (
+          '<div class="form-group"><label>' +
+          label +
+          '</label><select id="' +
+          id +
+          '">' +
+          o +
+          "</select></div>"
+        );
+      }
+
+      /* ---------- Enrollment CRUD ---------- */
+      function openNewEnrollment() {
+        openModal(
+          "New Enrollment",
+          formInput("Student Name", "ne-name", "") +
+            formSelect("Program", "ne-program", [
+              "BSc Computer Science",
+              "BA Business",
+              "BBA",
+            ]) +
+            formSelect("Status", "ne-status", [
+              "Active",
+              "Active — fee hold",
+              "Inactive",
+            ]),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveEnrollment()">Save Record</button>',
+        );
+      }
+      function saveEnrollment() {
+        var name =
+          document.getElementById("ne-name").value || "Unnamed Student";
+        var program = document.getElementById("ne-program").value;
+        var status = document.getElementById("ne-status").value;
+        var list = document.getElementById("enrollment-list");
+        var newId = 1052 + list.querySelectorAll(".list-row").length;
+        var badgeClass = status.indexOf("hold") > -1 ? "dashed" : "filled";
+
+        var row = document.createElement("div");
+        row.className = "list-row";
+        row.innerHTML =
+          '<div><div class="primary-text">ST' +
+          newId +
+          " — " +
+          name +
+          '</div><div class="secondary-text">' +
+          program +
+          '</div></div><div class="right"><span class="badge ' +
+          badgeClass +
+          '">' +
+          status +
+          '</span><button class="link-btn" onclick="openEditEnrollment(this)">Edit</button><button class="link-btn danger" onclick="deleteRow(this)">Delete</button></div>';
+        list.appendChild(row);
+        closeModal();
+      }
+      function openEditEnrollment(btn) {
+        var row = btn.closest(".list-row");
+        modalContext = { row: row };
+        var fullTitle = row.querySelector(".primary-text").textContent;
+        var name = fullTitle.split(" — ")[1] || fullTitle;
+        var program = row.querySelector(".secondary-text").textContent;
+        var status = row.querySelector(".badge").textContent;
+
+        openModal(
+          "Edit Enrollment",
+          formInput("Student Name", "ee-name", name) +
+            formSelect(
+              "Program",
+              "ee-program",
+              ["BSc Computer Science", "BA Business", "BBA"],
+              program,
+            ) +
+            formSelect(
+              "Status",
+              "ee-status",
+              ["Active", "Active — fee hold", "Inactive"],
+              status,
+            ),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="updateEnrollment()">Update Record</button>',
+        );
+      }
+      function updateEnrollment() {
+        var row = modalContext.row;
+        var name = document.getElementById("ee-name").value;
+        var program = document.getElementById("ee-program").value;
+        var status = document.getElementById("ee-status").value;
+        var id = row.querySelector(".primary-text").textContent.split(" — ")[0];
+        var badgeClass = status.indexOf("hold") > -1 ? "dashed" : "filled";
+
+        row.querySelector(".primary-text").textContent = id + " — " + name;
+        row.querySelector(".secondary-text").textContent = program;
+        row.querySelector(".right").querySelector(".badge").className =
+          "badge " + badgeClass;
+        row.querySelector(".right").querySelector(".badge").textContent =
+          status;
+        closeModal();
+      }
+
+      /* ---------- Credit Transfer CRUD ---------- */
+      function openNewTransfer() {
+        openModal(
+          "New Credit Evaluation",
+          formInput("Applicant Name", "nt-name", "") +
+            '<div class="form-row-2">' +
+            formInput("Transferring From", "nt-from", "") +
+            formInput("Credits Submitted", "nt-submitted", "") +
+            "</div>" +
+            formInput("Credits Granted", "nt-granted", "0") +
+            formSelect("Status", "nt-status", [
+              "Under evaluation",
+              "Evaluated",
+              "Rejected",
+            ]),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveTransfer()">Save Evaluation</button>',
+        );
+      }
+      function saveTransfer() {
+        var name =
+          document.getElementById("nt-name").value || "Unnamed applicant";
+        var from =
+          document.getElementById("nt-from").value || "Unspecified institution";
+        var submitted = document.getElementById("nt-submitted").value || "0";
+        var granted = document.getElementById("nt-granted").value || "0";
+        var status = document.getElementById("nt-status").value;
+        var list = document.getElementById("credittransfer-list");
+
+        var row = document.createElement("div");
+        row.className = "list-row";
+        row.innerHTML =
+          '<div><div class="primary-text">' +
+          name +
+          '</div><div class="secondary-text">Transferring from ' +
+          from +
+          " — " +
+          submitted +
+          " credits submitted (" +
+          granted +
+          ' credits granted)</div></div><div class="right"><span class="badge filled">' +
+          status +
+          '</span><button class="link-btn" onclick="openEditTransfer(this)">Edit</button><button class="link-btn danger" onclick="deleteRow(this)">Delete</button></div>';
+        list.appendChild(row);
+        closeModal();
+      }
+      function openEditTransfer(btn) {
+        var row = btn.closest(".list-row");
+        modalContext = { row: row };
+        var name = row.querySelector(".primary-text").textContent;
+
+        openModal(
+          "Edit Credit Evaluation",
+          formInput("Applicant Name", "et-name", name) +
+            formSelect("Status", "et-status", [
+              "Under evaluation",
+              "Evaluated",
+              "Rejected",
+            ]),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="updateTransfer()">Update Evaluation</button>',
+        );
+      }
+      function updateTransfer() {
+        var row = modalContext.row;
+        row.querySelector(".primary-text").textContent =
+          document.getElementById("et-name").value;
+        row.querySelector(".badge").textContent =
+          document.getElementById("et-status").value;
+        closeModal();
+      }
+
+      /* ---------- Visa Compliance CRUD ---------- */
+      function openNewVisa() {
+        openModal(
+          "New Visa Record",
+          formInput("Student Name", "nv-name", "") +
+            formInput("Attendance %", "nv-att", "100") +
+            formSelect("Compliance Status", "nv-status", [
+              "Compliant",
+              "Non-compliant",
+            ]),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveVisa()">Save Record</button>',
+        );
+      }
+      function saveVisa() {
+        var name = document.getElementById("nv-name").value;
+        var att = document.getElementById("nv-att").value;
+        var status = document.getElementById("nv-status").value;
+        var list = document.getElementById("visa-list");
+        var row = document.createElement("div");
+        row.className = "list-row";
+        row.innerHTML =
+          '<div><div class="primary-text">' +
+          name +
+          '</div><div class="secondary-text">Student visa — ' +
+          att +
+          '% attendance</div></div><div class="right"><span class="badge ' +
+          (status === "Compliant" ? "filled" : "outline") +
+          '">' +
+          status +
+          '</span><button class="link-btn" onclick="openEditVisa(this)">Edit</button><button class="link-btn danger" onclick="deleteRow(this)">Delete</button></div>';
+        list.appendChild(row);
+        closeModal();
+      }
+      function openEditVisa(btn) {
+        var row = btn.closest(".list-row");
+        modalContext = { row: row };
+        openModal(
+          "Edit Visa Record",
+          formInput(
+            "Student Name",
+            "ev-name",
+            row.querySelector(".primary-text").textContent,
+          ) +
+            formSelect("Compliance Status", "ev-status", [
+              "Compliant",
+              "Non-compliant",
+            ]),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="updateVisa()">Update Record</button>',
+        );
+      }
+      function updateVisa() {
+        var row = modalContext.row;
+        row.querySelector(".primary-text").textContent =
+          document.getElementById("ev-name").value;
+        var status = document.getElementById("ev-status").value;
+        row.querySelector(".badge").className =
+          "badge " + (status === "Compliant" ? "filled" : "outline");
+        row.querySelector(".badge").textContent = status;
+        closeModal();
+      }
+      function notifyImmigration(btn) {
+        openModal(
+          "Immigration Officer Notified",
+          '<p style="font-size:13px;">Notification sent to the designated immigration officer for review.</p>',
+          '<button class="primary" onclick="closeModal()">Done</button>',
+        );
+      }
+
+      /* ---------- Timetable CRUD ---------- */
+      function openNewTimetable() {
+        openModal(
+          "New Timetable Slot",
+          formInput("Module / Session", "ntt-mod", "") +
+            formInput(
+              "Schedule & Room",
+              "ntt-sched",
+              "Mon & Wed, 10:00 - Room A1",
+            ),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveTimetable()">Save Schedule</button>',
+        );
+      }
+      function saveTimetable() {
+        var mod = document.getElementById("ntt-mod").value;
+        var sched = document.getElementById("ntt-sched").value;
+        var list = document.getElementById("timetable-list");
+        var row = document.createElement("div");
+        row.className = "list-row";
+        row.innerHTML =
+          '<div><div class="primary-text">' +
+          mod +
+          '</div><div class="secondary-text">' +
+          sched +
+          '</div></div><div class="right"><span class="badge filled">No conflict</span><button class="link-btn" onclick="openEditTimetable(this)">Edit</button><button class="link-btn danger" onclick="deleteRow(this)">Delete</button></div>';
+        list.appendChild(row);
+        closeModal();
+      }
+      function openEditTimetable(btn) {
+        var row = btn.closest(".list-row");
+        modalContext = { row: row };
+        openModal(
+          "Edit Schedule Entry",
+          formInput(
+            "Module / Session",
+            "ett-mod",
+            row.querySelector(".primary-text").textContent,
+          ) +
+            formInput(
+              "Schedule & Room",
+              "ett-sched",
+              row.querySelector(".secondary-text").textContent,
+            ),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="updateTimetable()">Update Schedule</button>',
+        );
+      }
+      function updateTimetable() {
+        var row = modalContext.row;
+        row.querySelector(".primary-text").textContent =
+          document.getElementById("ett-mod").value;
+        row.querySelector(".secondary-text").textContent =
+          document.getElementById("ett-sched").value;
+        closeModal();
+      }
+      function resolveConflict(btn) {
+        var row = btn.closest(".list-row");
+        modalContext = { row: row };
+        openModal(
+          "Resolve Conflict",
+          formSelect("Move to Room", "rc-room", [
+            "Room C101",
+            "Room A110",
+            "SQL Server Lab",
+          ]),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveConflictResolution()">Reassign Room</button>',
+        );
+      }
+      function saveConflictResolution() {
+        var room = document.getElementById("rc-room").value;
+        var row = modalContext.row;
+        row.querySelector(".secondary-text").textContent =
+          "Fri, 1:00–3:00 — Reassigned to " + room;
+        row.querySelector(".right").querySelector(".badge").className =
+          "badge filled";
+        row.querySelector(".right").querySelector(".badge").textContent =
+          "No conflict";
+        closeModal();
+      }
+
+      /* ---------- Room Allocator CRUD ---------- */
+      function openBookRoom() {
+        openModal(
+          "Book Room",
+          formSelect("Room", "br-room", [
+            "Room B204",
+            "Room A110",
+            "SQL Server Lab",
+            "Room C101",
+          ]) +
+            '<div class="form-row-2">' +
+            formInput("Booked By", "br-by", "") +
+            formInput("Date & Time", "br-time", "") +
+            "</div>",
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveBooking()">Save Booking</button>',
+        );
+      }
+      function saveBooking() {
+        var room = document.getElementById("br-room").value;
+        var by =
+          document.getElementById("br-by").value || "Unspecified requester";
+        var time = document.getElementById("br-time").value || "time TBC";
+        var rows = document.querySelectorAll("#roomalloc-list .list-row");
+        rows.forEach(function (row) {
+          if (row.querySelector(".primary-text").textContent === room) {
+            row.querySelector(".secondary-text").textContent =
+              "Booked by " + by + " (" + time + ")";
+            row.querySelector(".right").querySelector(".badge").className =
+              "badge filled";
+            row.querySelector(".right").querySelector(".badge").textContent =
+              "Booked";
+          }
+        });
+        closeModal();
+      }
+      function openEditRoom(btn) {
+        var row = btn.closest(".list-row");
+        modalContext = { row: row };
+        openModal(
+          "Edit Room Details",
+          formInput(
+            "Room Name",
+            "er-name",
+            row.querySelector(".primary-text").textContent,
+          ) +
+            formInput(
+              "Details / Status",
+              "er-det",
+              row.querySelector(".secondary-text").textContent,
+            ),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="updateRoom()">Update Room</button>',
+        );
+      }
+      function updateRoom() {
+        var row = modalContext.row;
+        row.querySelector(".primary-text").textContent =
+          document.getElementById("er-name").value;
+        row.querySelector(".secondary-text").textContent =
+          document.getElementById("er-det").value;
+        closeModal();
+      }
+
+      /* ---------- Academic Calendar CRUD ---------- */
+      function openNewCalendarEvent() {
+        openModal(
+          "Add Calendar Event",
+          formInput("Event Name", "nce-name", "") +
+            formInput("Dates", "nce-dates", ""),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveCalendarEvent()">Save Event</button>',
+        );
+      }
+      function saveCalendarEvent() {
+        var name = document.getElementById("nce-name").value;
+        var dates = document.getElementById("nce-dates").value;
+        var list = document.getElementById("calendar-list");
+        var row = document.createElement("div");
+        row.className = "list-row";
+        row.innerHTML =
+          '<div><div class="primary-text">' +
+          name +
+          '</div><div class="secondary-text">' +
+          dates +
+          '</div></div><div class="right"><button class="link-btn" onclick="openEditCalendarEvent(this)">Edit</button><button class="link-btn danger" onclick="deleteRow(this)">Delete</button></div>';
+        list.appendChild(row);
+        closeModal();
+      }
+      function openEditCalendarEvent(btn) {
+        var row = btn.closest(".list-row");
+        modalContext = { row: row };
+        openModal(
+          "Edit Calendar Event",
+          formInput(
+            "Event Name",
+            "ece-name",
+            row.querySelector(".primary-text").textContent,
+          ) +
+            formInput(
+              "Dates",
+              "ece-dates",
+              row.querySelector(".secondary-text").textContent,
+            ),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="updateCalendarEvent()">Update Event</button>',
+        );
+      }
+      function updateCalendarEvent() {
+        var row = modalContext.row;
+        row.querySelector(".primary-text").textContent =
+          document.getElementById("ece-name").value;
+        row.querySelector(".secondary-text").textContent =
+          document.getElementById("ece-dates").value;
+        closeModal();
+      }
+
+      /* ---------- Exam Schedule CRUD ---------- */
+      function openNewExam() {
+        openModal(
+          "Schedule New Exam",
+          formInput("Module Title", "ne2-module", "") +
+            '<div class="form-row-2">' +
+            formInput("Date", "ne2-date", "", "date") +
+            formInput("Hall", "ne2-hall", "") +
+            "</div>",
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveExam()">Schedule Exam</button>',
+        );
+      }
+      function saveExam() {
+        var module =
+          document.getElementById("ne2-module").value || "Untitled Exam";
+        var date = document.getElementById("ne2-date").value || "TBC";
+        var hall = document.getElementById("ne2-hall").value || "Hall TBC";
+        var list = document.getElementById("examschedule-list");
+        var row = document.createElement("div");
+        row.className = "list-row";
+        row.innerHTML =
+          '<div><div class="primary-text">' +
+          module +
+          '</div><div class="secondary-text">' +
+          date +
+          " — " +
+          hall +
+          ' — Invigilators not assigned</div></div><div class="right"><span class="badge dashed">Needs invigilators</span><button class="link-btn" onclick="assignInvigilators(this)">Assign</button><button class="link-btn" onclick="openEditExam(this)">Edit</button><button class="link-btn danger" onclick="deleteRow(this)">Delete</button></div>';
+        list.appendChild(row);
+        closeModal();
+      }
+      function openEditExam(btn) {
+        var row = btn.closest(".list-row");
+        modalContext = { row: row };
+        openModal(
+          "Edit Exam Schedule",
+          formInput(
+            "Module Title",
+            "ee2-module",
+            row.querySelector(".primary-text").textContent,
+          ) +
+            formInput(
+              "Details",
+              "ee2-details",
+              row.querySelector(".secondary-text").textContent,
+            ),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="updateExam()">Update Exam</button>',
+        );
+      }
+      function updateExam() {
+        var row = modalContext.row;
+        row.querySelector(".primary-text").textContent =
+          document.getElementById("ee2-module").value;
+        row.querySelector(".secondary-text").textContent =
+          document.getElementById("ee2-details").value;
+        closeModal();
+      }
+      function assignInvigilators(btn) {
+        var row = btn.closest(".list-row");
+        row.querySelector(".secondary-text").textContent = row
+          .querySelector(".secondary-text")
+          .textContent.replace(
+            "Invigilators not assigned",
+            "Invigilators assigned",
+          );
+        row.querySelector(".badge").className = "badge filled";
+        row.querySelector(".badge").textContent = "Scheduled";
+      }
+
+      /* ---------- Invigilation Roster CRUD ---------- */
+      function openNewInvigilator() {
+        openModal(
+          "Add Staff Member",
+          formInput("Staff Name", "ni-name", "") +
+            formInput("Assigned Duty", "ni-duty", "0 hours assigned"),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveInvigilator()">Save Staff</button>',
+        );
+      }
+      function saveInvigilator() {
+        var name = document.getElementById("ni-name").value;
+        var duty = document.getElementById("ni-duty").value;
+        var list = document.getElementById("invigilation-list");
+        var row = document.createElement("div");
+        row.className = "list-row";
+        row.innerHTML =
+          '<div><div class="primary-text">' +
+          name +
+          '</div><div class="secondary-text">' +
+          duty +
+          '</div></div><div class="right"><span class="badge outline">Unassigned</span><button class="link-btn" onclick="assignDuty(this)">Quick assign</button><button class="link-btn" onclick="openEditInvigilator(this)">Edit</button><button class="link-btn danger" onclick="deleteRow(this)">Delete</button></div>';
+        list.appendChild(row);
+        closeModal();
+      }
+      function openEditInvigilator(btn) {
+        var row = btn.closest(".list-row");
+        modalContext = { row: row };
+        openModal(
+          "Edit Invigilator Assignment",
+          formInput(
+            "Staff Name",
+            "ei-name",
+            row.querySelector(".primary-text").textContent,
+          ) +
+            formInput(
+              "Assigned Hours / Exam",
+              "ei-duty",
+              row.querySelector(".secondary-text").textContent,
+            ),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="updateInvigilator()">Update Staff</button>',
+        );
+      }
+      function updateInvigilator() {
+        var row = modalContext.row;
+        row.querySelector(".primary-text").textContent =
+          document.getElementById("ei-name").value;
+        row.querySelector(".secondary-text").textContent =
+          document.getElementById("ei-duty").value;
+        closeModal();
+      }
+      function assignDuty(btn) {
+        var row = btn.closest(".list-row");
+        row.querySelector(".secondary-text").textContent =
+          "6 hours assigned — Exam duty";
+        row.querySelector(".badge").className = "badge filled";
+        row.querySelector(".badge").textContent = "Assigned";
+      }
+
+      /* ---------- Paper Vault CRUD ---------- */
+      function openNewPaper() {
+        openModal(
+          "Upload Exam Paper",
+          formInput("Paper Title", "np-title", "") +
+            formInput("Reviewer/Moderator", "np-rev", ""),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="savePaper()">Upload Paper</button>',
+        );
+      }
+      function savePaper() {
+        var title = document.getElementById("np-title").value;
+        var rev = document.getElementById("np-rev").value;
+        var list = document.getElementById("papervault-list");
+        var row = document.createElement("div");
+        row.className = "list-row";
+        row.innerHTML =
+          '<div><div class="primary-text">' +
+          title +
+          '</div><div class="secondary-text">Assigned to: ' +
+          rev +
+          '</div></div><div class="right"><span class="badge dashed">Pending review</span><button class="link-btn" onclick="sendToExaminer(this)">Send to examiner</button><button class="link-btn" onclick="openEditPaper(this)">Edit details</button><button class="link-btn danger" onclick="deleteRow(this)">Delete</button></div>';
+        list.appendChild(row);
+        closeModal();
+      }
+      function openEditPaper(btn) {
+        var row = btn.closest(".list-row");
+        modalContext = { row: row };
+        openModal(
+          "Edit Paper Details",
+          formInput(
+            "Paper Title",
+            "ep-title",
+            row.querySelector(".primary-text").textContent,
+          ) +
+            formInput(
+              "Review Status",
+              "ep-rev",
+              row.querySelector(".secondary-text").textContent,
+            ),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="updatePaper()">Update Paper</button>',
+        );
+      }
+      function updatePaper() {
+        var row = modalContext.row;
+        row.querySelector(".primary-text").textContent =
+          document.getElementById("ep-title").value;
+        row.querySelector(".secondary-text").textContent =
+          document.getElementById("ep-rev").value;
+        closeModal();
+      }
+      function sendToExaminer(btn) {
+        var row = btn.closest(".list-row");
+        row.querySelector(".right").querySelector(".badge").textContent =
+          "Sent to examiner";
+      }
+
+      /* ---------- Transcripts CRUD ---------- */
+      function openNewTranscript() {
+        openModal(
+          "Request Transcript",
+          formInput("Student Name", "nt3-name", ""),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveTranscriptRequest()">Submit Request</button>',
+        );
+      }
+      function saveTranscriptRequest() {
+        var name =
+          document.getElementById("nt3-name").value || "Unnamed student";
+        var list = document.getElementById("transcripts-list");
+        var row = document.createElement("div");
+        row.className = "list-row";
+        row.innerHTML =
+          '<div><div class="primary-text">' +
+          name +
+          '</div><div class="secondary-text">Requested just now</div></div><div class="right"><span class="badge dashed">Pending generation</span><button class="link-btn" onclick="generateTranscript(this)">Generate</button><button class="link-btn danger" onclick="deleteRow(this)">Delete</button></div>';
+        list.appendChild(row);
+        closeModal();
+      }
+      function generateTranscript(btn) {
+        var row = btn.closest(".list-row");
+        row.querySelector(".right").querySelector(".badge").className =
+          "badge filled";
+        row.querySelector(".right").querySelector(".badge").textContent =
+          "Generated & signed";
+        btn.remove();
+      }
+
+      /* ---------- Grade Change CRUD ---------- */
+      function openNewGradeChange() {
+        openModal(
+          "New Grade Change Request",
+          formInput("Module & Student", "gc-detail", "") +
+            formTextarea("Reason", "gc-reason", ""),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveGradeChange()">Submit Request</button>',
+        );
+      }
+      function saveGradeChange() {
+        var detail =
+          document.getElementById("gc-detail").value || "Untitled request";
+        var list = document.getElementById("gradechange-list");
+        var row = document.createElement("div");
+        row.className = "list-row";
+        row.innerHTML =
+          '<div><div class="primary-text">' +
+          detail +
+          '</div><div class="secondary-text">Awaiting approval</div></div><div class="right"><span class="badge dashed">Pending</span><button class="link-btn" onclick="secondApprove(this)">Process approval</button><button class="link-btn danger" onclick="deleteRow(this)">Delete</button></div>';
+        list.appendChild(row);
+        closeModal();
+      }
+      function secondApprove(btn) {
+        var row = btn.closest(".list-row");
+        row.querySelector(".right").querySelector(".badge").className =
+          "badge filled";
+        row.querySelector(".right").querySelector(".badge").textContent =
+          "Approved — grade updated";
+        btn.remove();
+      }
+
+      /* ---------- Certification Printing CRUD ---------- */
+      function openPrintBatch() {
+        openModal(
+          "Print New Batch",
+          '<p style="font-size:13px;">This will generate and serialize diploma records for cleared graduates.</p>',
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveBatchPrint()">Print Batch</button>',
+        );
+      }
+      function saveBatchPrint() {
+        var list = document.getElementById("certprint-list");
+        var row = document.createElement("div");
+        row.className = "list-row";
+        row.innerHTML =
+          '<div><div class="primary-text">BSc Computer Science — Aisha Karki</div><div class="secondary-text">Serial DIP-2026-0201</div></div><div class="right"><span class="badge filled">Printed &amp; released</span><button class="link-btn danger" onclick="deleteRow(this)">Delete</button></div>';
+        list.appendChild(row);
+        closeModal();
+      }
+
+      /* ---------- Graduation Records CRUD ---------- */
+      function openAddGraduationRecord() {
+        openModal(
+          "Add Graduation Record",
+          formInput("Student Name", "agr-name", "") +
+            formInput("Completed Credits", "agr-cred", "120 / 120") +
+            formInput("Fee Clearance Details", "agr-fee", "Clear") +
+            formSelect("Graduation Status", "agr-status", [
+              "Cleared",
+              "Blocked",
+            ]),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveGraduationRecord()">Save Record</button>',
+        );
+      }
+      function saveGraduationRecord() {
+        var name = document.getElementById("agr-name").value;
+        var cred = document.getElementById("agr-cred").value;
+        var fee = document.getElementById("agr-fee").value;
+        var status = document.getElementById("agr-status").value;
+        var tbody = document.querySelector("#graduation-table tbody");
+        var tr = document.createElement("tr");
+        tr.innerHTML =
+          "<td>" +
+          name +
+          '</td><td class="num">' +
+          cred +
+          "</td><td>" +
+          fee +
+          '</td><td><span class="badge ' +
+          (status === "Cleared" ? "filled" : "outline") +
+          '">' +
+          status +
+          '</span></td><td><button class="link-btn" onclick="openEditGraduation(this)">Edit</button> <button class="link-btn danger" onclick="deleteTableRow(this)">Delete</button></td>';
+        tbody.appendChild(tr);
+        closeModal();
+      }
+      function openEditGraduation(btn) {
+        var tr = btn.closest("tr");
+        modalContext = { tr: tr };
+        var tds = tr.querySelectorAll("td");
+        openModal(
+          "Edit Graduation Record",
+          formInput("Student Name", "egr-name", tds[0].textContent) +
+            formInput("Completed Credits", "egr-cred", tds[1].textContent) +
+            formInput("Fee Clearance Details", "egr-fee", tds[2].textContent) +
+            formSelect(
+              "Graduation Status",
+              "egr-status",
+              ["Cleared", "Blocked"],
+              tds[3].textContent.trim(),
+            ),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="updateGraduationRecord()">Update Record</button>',
+        );
+      }
+      function updateGraduationRecord() {
+        var tr = modalContext.tr;
+        var tds = tr.querySelectorAll("td");
+        tds[0].textContent = document.getElementById("egr-name").value;
+        tds[1].textContent = document.getElementById("egr-cred").value;
+        tds[2].textContent = document.getElementById("egr-fee").value;
+        var status = document.getElementById("egr-status").value;
+        tds[3].innerHTML =
+          '<span class="badge ' +
+          (status === "Cleared" ? "filled" : "outline") +
+          '">' +
+          status +
+          "</span>";
+        closeModal();
+      }
+      function recheckClearance(btn) {
+        openModal(
+          "Clearance Recheck Request",
+          '<p style="font-size:13px;">Re-evaluating financial clearance status against central finance ledger.</p>',
+          '<button class="primary" onclick="closeModal()">Done</button>',
+        );
+      }
+
+      /* ---------- Mitigating Circumstances CRUD ---------- */
+      function openNewMitigating() {
+        openModal(
+          "New Mitigating Circumstance Request",
+          formInput("Student Name", "nm-name", "") +
+            '<div class="form-row-2">' +
+            formSelect("Reason", "nm-reason", [
+              "Medical",
+              "Family emergency",
+              "Other",
+            ]) +
+            formInput("Request", "nm-request", "3-day extension") +
+            "</div>",
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveMitigating()">Submit Request</button>',
+        );
+      }
+      function saveMitigating() {
+        var name =
+          document.getElementById("nm-name").value || "Unnamed student";
+        var reason = document.getElementById("nm-reason").value;
+        var request =
+          document.getElementById("nm-request").value || "Unspecified request";
+        var list = document.getElementById("mitigating-list");
+        var row = document.createElement("div");
+        row.className = "list-row";
+        row.innerHTML =
+          '<div><div class="primary-text">' +
+          name +
+          '</div><div class="secondary-text">' +
+          reason +
+          " — " +
+          request +
+          '</div></div><div class="right"><span class="badge dashed">Pending</span><button class="link-btn" onclick="reviewMitigating(this)">Review</button><button class="link-btn" onclick="openEditMitigating(this)">Edit</button><button class="link-btn danger" onclick="deleteRow(this)">Delete</button></div>';
+        list.appendChild(row);
+        closeModal();
+      }
+      function openEditMitigating(btn) {
+        var row = btn.closest(".list-row");
+        modalContext = { row: row };
+        openModal(
+          "Edit Mitigating Request",
+          formInput(
+            "Student Name",
+            "em-name",
+            row.querySelector(".primary-text").textContent,
+          ) +
+            formInput(
+              "Request Details",
+              "em-req",
+              row.querySelector(".secondary-text").textContent,
+            ),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="updateMitigating()">Update Request</button>',
+        );
+      }
+      function updateMitigating() {
+        var row = modalContext.row;
+        row.querySelector(".primary-text").textContent =
+          document.getElementById("em-name").value;
+        row.querySelector(".secondary-text").textContent =
+          document.getElementById("em-req").value;
+        closeModal();
+      }
+      function reviewMitigating(btn) {
+        var row = btn.closest(".list-row");
+        row.querySelector(".right").querySelector(".badge").className =
+          "badge filled";
+        row.querySelector(".right").querySelector(".badge").textContent =
+          "Approved";
+        btn.remove();
+      }
+    </script>
+  </body>
+</html>

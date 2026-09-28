@@ -1,0 +1,1474 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ING ERP — Human Resources (Officer Portal)</title>
+    <style>
+      :root {
+        --surface-1: #fafafa;
+        --surface-2: #f2f2f2;
+        --border: #e6e6e6;
+        --border-strong: #cfcfcf;
+        --text-primary: #111111;
+        --text-secondary: #5a5a5e;
+        --text-muted: #9a9a9e;
+        --fill-primary: #000000;
+        --on-primary: #ffffff;
+        --danger: #d9381e;
+        --radius: 10px;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+          Arial, sans-serif;
+        background: var(--surface-2);
+        color: var(--text-primary);
+      }
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 24px;
+        background: #fff;
+        border-bottom: 1px solid var(--border);
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .topbar .who {
+        font-size: 12px;
+        color: var(--text-secondary);
+      }
+      .topbar .who strong {
+        color: var(--text-primary);
+        font-weight: 600;
+      }
+      .app {
+        display: flex;
+        min-height: 100vh;
+      }
+      .sidebar {
+        width: 225px;
+        flex-shrink: 0;
+        background: var(--surface-1);
+        border-right: 1px solid var(--border);
+        padding: 18px 12px;
+        overflow-y: auto;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0 8px 14px;
+      }
+      .brand .mark {
+        width: 24px;
+        height: 24px;
+        border-radius: 6px;
+        background: var(--fill-primary);
+        flex-shrink: 0;
+      }
+      .brand .name {
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 1.3;
+      }
+      .brand .role {
+        font-size: 11px;
+        color: var(--text-muted);
+        line-height: 1.3;
+      }
+      .nav-item {
+        display: block;
+        padding: 7px 10px;
+        border-radius: 7px;
+        font-size: 13px;
+        color: var(--text-secondary);
+        cursor: pointer;
+        margin-bottom: 2px;
+      }
+      .nav-item:hover {
+        background: var(--surface-2);
+      }
+      .nav-item.active {
+        background: var(--fill-primary);
+        color: var(--on-primary);
+      }
+      .nav-divider {
+        border-top: 1px solid var(--border);
+        margin: 10px 4px;
+      }
+      .group {
+        margin-bottom: 12px;
+      }
+      .group-label {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-muted);
+        margin: 0 0 4px 10px;
+      }
+      .main {
+        flex: 1;
+        padding: 32px 36px;
+        min-width: 0;
+      }
+      .page {
+        display: none;
+      }
+      .page.active {
+        display: block;
+      }
+      .page-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: 22px;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      h1 {
+        font-size: 22px;
+        margin: 0;
+        font-weight: 600;
+      }
+      .subtitle {
+        font-size: 13px;
+        color: var(--text-secondary);
+        margin: 5px 0 0;
+      }
+      .section-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-muted);
+        margin: 0 0 8px;
+      }
+      button.primary {
+        background: var(--fill-primary);
+        color: var(--on-primary);
+        border: none;
+        border-radius: 8px;
+        padding: 10px 16px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      button.secondary {
+        background: #fff;
+        color: var(--text-primary);
+        border: 1px solid var(--border-strong);
+        border-radius: 8px;
+        padding: 10px 16px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      .link-btn {
+        background: none;
+        border: none;
+        color: var(--text-primary);
+        font-size: 12px;
+        font-weight: 600;
+        text-decoration: underline;
+        cursor: pointer;
+        padding: 0;
+        white-space: nowrap;
+      }
+      .danger-btn {
+        background: none;
+        border: none;
+        color: var(--danger);
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        padding: 0;
+        white-space: nowrap;
+      }
+      .toolbar {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 18px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      input[type="text"],
+      input[type="number"],
+      input[type="date"],
+      select,
+      textarea {
+        border: 1px solid var(--border-strong);
+        border-radius: 8px;
+        padding: 10px 12px;
+        font-size: 13px;
+        background: #fff;
+        color: var(--text-primary);
+        font-family: inherit;
+      }
+      input[type="text"] {
+        flex: 1;
+        min-width: 160px;
+      }
+      select {
+        width: 170px;
+      }
+      .badge {
+        font-size: 11px;
+        padding: 2px 9px;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+      .badge.filled {
+        background: var(--fill-primary);
+        color: var(--on-primary);
+      }
+      .badge.outline {
+        border: 1px solid var(--border-strong);
+        color: var(--text-secondary);
+      }
+      .badge.dashed {
+        border: 1px dashed var(--border-strong);
+        color: var(--text-secondary);
+      }
+      .list {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+        background: #fff;
+      }
+      .list-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 13px 18px;
+        gap: 14px;
+        border-bottom: 1px solid var(--border);
+      }
+      .list-row:last-child {
+        border-bottom: none;
+      }
+      .list-row .primary-text {
+        font-size: 14px;
+        font-weight: 600;
+      }
+      .list-row .secondary-text {
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-top: 3px;
+      }
+      .list-row .right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-shrink: 0;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+      .table-wrap {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+        background: #fff;
+        overflow-x: auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        padding: 11px 13px;
+        font-size: 13px;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+        white-space: nowrap;
+      }
+      th {
+        font-weight: 600;
+        color: var(--text-secondary);
+        background: var(--surface-1);
+        font-size: 12px;
+      }
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+      td.num {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+      .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        z-index: 50;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      .modal-overlay.open {
+        display: flex;
+      }
+      .modal {
+        background: #fff;
+        border-radius: 12px;
+        max-width: 460px;
+        width: 100%;
+        max-height: 86vh;
+        overflow-y: auto;
+        border: 1px solid var(--border-strong);
+      }
+      .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border);
+      }
+      .modal-header h3 {
+        margin: 0;
+        font-size: 16px;
+      }
+      .modal-close {
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        color: var(--text-secondary);
+        line-height: 1;
+        padding: 4px;
+      }
+      .modal-body {
+        padding: 18px 20px;
+      }
+      .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        padding: 14px 20px;
+        border-top: 1px solid var(--border);
+      }
+      .form-group {
+        margin-bottom: 14px;
+      }
+      .form-group label {
+        display: block;
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-bottom: 5px;
+        font-weight: 600;
+      }
+      .form-group input,
+      .form-group select,
+      .form-group textarea {
+        width: 100%;
+      }
+      .form-group textarea {
+        resize: vertical;
+        min-height: 70px;
+      }
+      .form-row-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 10px;
+      }
+      .form-row-2 input,
+      .form-row-2 select {
+        width: 100%;
+      }
+      @media (max-width: 640px) {
+        .sidebar {
+          display: none;
+        }
+        .main {
+          padding: 22px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="topbar">
+      <div class="who">
+        Signed in as <strong>HR Officer</strong> — Operations &amp; Records
+        Management
+      </div>
+      <div class="who">Data Entry &amp; Lifecycle Execution</div>
+    </div>
+
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="mark"></div>
+          <div>
+            <div class="name">ING ERP</div>
+            <div class="role">HR Officer Console</div>
+          </div>
+        </div>
+        <nav>
+          <div class="group">
+            <p class="group-label">Lifecycle &amp; Records</p>
+            <div
+              class="nav-item active"
+              data-page="lifecycle"
+              onclick="showPage('lifecycle', this)"
+            >
+              Employee Directory
+            </div>
+            <div
+              class="nav-item"
+              data-page="onboarding"
+              onclick="showPage('onboarding', this)"
+            >
+              Onboarding Checklist
+            </div>
+            <div
+              class="nav-item"
+              data-page="exitinterview"
+              onclick="showPage('exitinterview', this)"
+            >
+              Exit Records
+            </div>
+          </div>
+          <div class="group">
+            <p class="group-label">Recruitment Operations</p>
+            <div
+              class="nav-item"
+              data-page="applicants"
+              onclick="showPage('applicants', this)"
+            >
+              Job Openings &amp; Applicants
+            </div>
+          </div>
+          <div class="group">
+            <p class="group-label">Performance Management</p>
+            <div
+              class="nav-item"
+              data-page="appraisals"
+              onclick="showPage('appraisals', this)"
+            >
+              Appraisals &amp; Reviews
+            </div>
+          </div>
+          <div class="group">
+            <p class="group-label">Time &amp; Leave Administration</p>
+            <div
+              class="nav-item"
+              data-page="leave"
+              onclick="showPage('leave', this)"
+            >
+              Leave Management
+            </div>
+            <div
+              class="nav-item"
+              data-page="remotework"
+              onclick="showPage('remotework', this)"
+            >
+              Remote Work Agreements
+            </div>
+          </div>
+          <div class="group">
+            <p class="group-label">Development &amp; Compliance</p>
+            <div
+              class="nav-item"
+              data-page="profdev"
+              onclick="showPage('profdev', this)"
+            >
+              Training &amp; Certifications
+            </div>
+            <div
+              class="nav-item"
+              data-page="grievance"
+              onclick="showPage('grievance', this)"
+            >
+              Grievance Registry
+            </div>
+            <div
+              class="nav-item"
+              data-page="compliance"
+              onclick="showPage('compliance', this)"
+            >
+              Compliance Filings
+            </div>
+          </div>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <!-- EMPLOYEE DIRECTORY PAGE -->
+        <section class="page active" id="page-lifecycle">
+          <div class="page-header">
+            <div>
+              <h1>Employee Directory &amp; Records</h1>
+              <p class="subtitle">
+                Create, update, and manage staff files and contracts
+              </p>
+            </div>
+            <button class="primary" onclick="openNewHire()">
+              + Add New Employee
+            </button>
+          </div>
+          <div class="toolbar">
+            <input
+              type="text"
+              placeholder="Filter by name, department, or role..."
+              oninput="filterRows(this, '#lifecycle-list', '.list-row')"
+            />
+          </div>
+          <div class="list" id="lifecycle-list">
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Dr. Meera Joshi</div>
+                <div class="secondary-text">
+                  Academics — Faculty — Joined Jan 2022
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge filled">Active</span>
+                <button class="link-btn" onclick="editProfile(this)">
+                  Edit Profile
+                </button>
+                <button class="danger-btn" onclick="deleteRow(this)">
+                  Delete
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Dr. Anil Sharma</div>
+                <div class="secondary-text">
+                  Module Leader — Faculty — Joined Aug 2019
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge filled">Active</span>
+                <button class="link-btn" onclick="editProfile(this)">
+                  Edit Profile
+                </button>
+                <button class="danger-btn" onclick="deleteRow(this)">
+                  Delete
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Dr. Sita Poudel</div>
+                <div class="secondary-text">
+                  R&amp;D Wing — Faculty — Joined Sep 2026
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge dashed">Onboarding</span>
+                <button class="link-btn" onclick="editProfile(this)">
+                  Edit Profile
+                </button>
+                <button class="danger-btn" onclick="deleteRow(this)">
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+          <p class="secondary-text" style="margin-top: 10px">
+            Showing active staff records.
+          </p>
+        </section>
+
+        <!-- ONBOARDING PAGE -->
+        <section class="page" id="page-onboarding">
+          <div class="page-header">
+            <div>
+              <h1>New Hire Onboarding Execution</h1>
+              <p class="subtitle">
+                Track and complete onboarding steps for active recruits
+              </p>
+            </div>
+            <button class="primary" onclick="openAddOnboardingStep()">
+              + Add Task
+            </button>
+          </div>
+          <div class="section-label">Dr. Sita Poudel — R&amp;D Wing</div>
+          <div class="list" id="onboarding-list" style="margin-bottom: 20px">
+            <div class="list-row">
+              <div class="primary-text">Workspace setup</div>
+              <div class="right">
+                <span class="badge filled">Complete</span>
+                <button class="danger-btn" onclick="deleteRow(this)">
+                  Remove
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div class="primary-text">Asset delivery (laptop, ID card)</div>
+              <div class="right">
+                <span class="badge filled">Complete</span>
+                <button class="danger-btn" onclick="deleteRow(this)">
+                  Remove
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div class="primary-text">Basic compliance training</div>
+              <div class="right">
+                <span class="badge dashed">Pending</span>
+                <button class="link-btn" onclick="toggleTaskStatus(this)">
+                  Mark Complete
+                </button>
+                <button class="danger-btn" onclick="deleteRow(this)">
+                  Remove
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- EXIT INTERVIEWS PAGE -->
+        <section class="page" id="page-exitinterview">
+          <div class="page-header">
+            <div>
+              <h1>Exit Interview Records</h1>
+              <p class="subtitle">Log resignations and exit details</p>
+            </div>
+            <button class="primary" onclick="openLogExit()">
+              + Log Exit Interview
+            </button>
+          </div>
+          <div class="list" id="exitinterview-list">
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Mr. Bishnu Adhikari</div>
+                <div class="secondary-text">
+                  IT technician — Resigned Jun 2026
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge outline">Career growth limited</span>
+                <button class="danger-btn" onclick="deleteRow(this)">
+                  Delete
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Ms. Sarika Bhandari</div>
+                <div class="secondary-text">
+                  Marketing assistant — Resigned Mar 2026
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge outline">Relocated</span>
+                <button class="danger-btn" onclick="deleteRow(this)">
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- APPLICANTS PAGE -->
+        <section class="page" id="page-applicants">
+          <div class="page-header">
+            <div>
+              <h1>Job Openings &amp; Recruitment CRUD</h1>
+              <p class="subtitle">Manage job postings and applicant counts</p>
+            </div>
+            <button class="primary" onclick="openPostJob()">
+              + Post Job Opening
+            </button>
+          </div>
+          <div class="list" id="applicants-list">
+            <div class="list-row">
+              <div>
+                <div class="primary-text">
+                  Assistant Professor — Computer Science
+                </div>
+                <div class="secondary-text">12 applicants</div>
+              </div>
+              <div class="right">
+                <span class="badge dashed">Interviewing</span>
+                <button class="link-btn" onclick="updateJob(this)">
+                  Update Status
+                </button>
+                <button class="danger-btn" onclick="deleteRow(this)">
+                  Close Opening
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Lab Assistant — Physics</div>
+                <div class="secondary-text">5 applicants</div>
+              </div>
+              <div class="right">
+                <span class="badge outline">Screening</span>
+                <button class="link-btn" onclick="updateJob(this)">
+                  Update Status
+                </button>
+                <button class="danger-btn" onclick="deleteRow(this)">
+                  Close Opening
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- APPRAISALS & REVIEWS PAGE -->
+        <section class="page" id="page-appraisals">
+          <div class="page-header">
+            <div>
+              <h1>Performance Review Tasks</h1>
+              <p class="subtitle">Log reviews and track appraisal status</p>
+            </div>
+            <button class="primary" onclick="openLogReview()">
+              + Schedule Review
+            </button>
+          </div>
+          <div class="list" id="appraisals-list">
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Dr. Meera Joshi — Annual Review</div>
+                <div class="secondary-text">
+                  Score: 4.6 / 5 — Completed Jul 2026
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge filled">Completed</span>
+                <button class="danger-btn" onclick="deleteRow(this)">
+                  Delete
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Ms. Reema Gurung — Annual Review</div>
+                <div class="secondary-text">Due this month</div>
+              </div>
+              <div class="right">
+                <span class="badge dashed">Due</span>
+                <button class="link-btn" onclick="toggleTaskStatus(this)">
+                  Mark Done
+                </button>
+                <button class="danger-btn" onclick="deleteRow(this)">
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- LEAVE MANAGEMENT PAGE -->
+        <section class="page" id="page-leave">
+          <div class="page-header">
+            <div>
+              <h1>Leave Allocation &amp; Logging</h1>
+              <p class="subtitle">
+                Maintain leave balances and record leave requests
+              </p>
+            </div>
+            <button class="primary" onclick="openLogLeave()">
+              + Log Leave Request
+            </button>
+          </div>
+          <div class="table-wrap">
+            <table id="leave-table">
+              <thead>
+                <tr>
+                  <th>Staff</th>
+                  <th>Annual Leave (Days)</th>
+                  <th>Sick Leave Used</th>
+                  <th>Parental Leave Used</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="staff-name">Dr. Meera Joshi</td>
+                  <td class="num leave-bal">12</td>
+                  <td class="num sick-used">3</td>
+                  <td class="num parent-used">0</td>
+                  <td>
+                    <button class="link-btn" onclick="editLeave(this)">
+                      Update Balances
+                    </button>
+                    <button class="danger-btn" onclick="deleteTableRow(this)">
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="staff-name">Mr. Deepak Karki</td>
+                  <td class="num leave-bal">8</td>
+                  <td class="num sick-used">1</td>
+                  <td class="num parent-used">0</td>
+                  <td>
+                    <button class="link-btn" onclick="editLeave(this)">
+                      Update Balances
+                    </button>
+                    <button class="danger-btn" onclick="deleteTableRow(this)">
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- REMOTE WORK PAGE -->
+        <section class="page" id="page-remotework">
+          <div class="page-header">
+            <div>
+              <h1>Remote Work Tracker</h1>
+              <p class="subtitle">Manage remote agreements and schedules</p>
+            </div>
+            <button class="primary" onclick="openNewRemoteAgreement()">
+              + New Agreement
+            </button>
+          </div>
+          <div class="list" id="remotework-list">
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Ms. Alisha Thapa</div>
+                <div class="secondary-text">
+                  Hybrid — 2 days remote per week
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge filled">Active</span>
+                <button class="danger-btn" onclick="deleteRow(this)">
+                  Terminate Agreement
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- PROFESSIONAL DEVELOPMENT PAGE -->
+        <section class="page" id="page-profdev">
+          <div class="page-header">
+            <div>
+              <h1>Training &amp; Certifications CRUD</h1>
+              <p class="subtitle">Record professional development activities</p>
+            </div>
+            <button class="primary" onclick="openLogTraining()">
+              + Log Training
+            </button>
+          </div>
+          <div class="list" id="profdev-list">
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Dr. Meera Joshi</div>
+                <div class="secondary-text">Advanced Pedagogy Certificate</div>
+              </div>
+              <div class="right">
+                <span class="badge filled">Completed</span>
+                <button class="danger-btn" onclick="deleteRow(this)">
+                  Delete
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Mr. Deepak Karki</div>
+                <div class="secondary-text">ITIL v4 Foundation</div>
+              </div>
+              <div class="right">
+                <span class="badge dashed">In progress</span>
+                <button class="link-btn" onclick="toggleTaskStatus(this)">
+                  Mark Complete
+                </button>
+                <button class="danger-btn" onclick="deleteRow(this)">
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- GRIEVANCE REGISTRY PAGE -->
+        <section class="page" id="page-grievance">
+          <div class="page-header">
+            <div>
+              <h1>Grievance Logging Portal</h1>
+              <p class="subtitle">Record and update disciplinary incidents</p>
+            </div>
+            <button class="primary" onclick="openNewGrievance()">
+              + Log Case
+            </button>
+          </div>
+          <div class="list" id="grievance-list">
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Workplace conduct complaint</div>
+                <div class="secondary-text">
+                  Case #GR-014 — confidential entry
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge dashed">Under investigation</span>
+                <button class="link-btn" onclick="toggleTaskStatus(this)">
+                  Mark Resolved
+                </button>
+                <button class="danger-btn" onclick="deleteRow(this)">
+                  Delete Case
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- COMPLIANCE PAGE -->
+        <section class="page" id="page-compliance">
+          <div class="page-header">
+            <div>
+              <h1>Compliance Filing Registry</h1>
+              <p class="subtitle">
+                Manage state, employment, and diversity reports
+              </p>
+            </div>
+            <button class="primary" onclick="openNewCompliance()">
+              + Add Compliance Filing
+            </button>
+          </div>
+          <div class="list" id="compliance-list">
+            <div class="list-row">
+              <div>
+                <div class="primary-text">
+                  Government Employment Filing — Q3 2026
+                </div>
+                <div class="secondary-text">Status: Logged</div>
+              </div>
+              <div class="right">
+                <span class="badge filled">Filed</span>
+                <button class="danger-btn" onclick="deleteRow(this)">
+                  Delete
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">
+                  Diversity &amp; Equity Report — Annual 2026
+                </div>
+                <div class="secondary-text">Due: Oct 1</div>
+              </div>
+              <div class="right">
+                <span class="badge dashed">Pending</span>
+                <button class="link-btn" onclick="toggleTaskStatus(this)">
+                  Mark Filed
+                </button>
+                <button class="danger-btn" onclick="deleteRow(this)">
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- MODAL SHELL -->
+    <div
+      class="modal-overlay"
+      id="modal-overlay"
+      onclick="if (event.target === this) closeModal();"
+    >
+      <div class="modal">
+        <div class="modal-header">
+          <h3 id="modal-title"></h3>
+          <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body" id="modal-body"></div>
+        <div class="modal-footer" id="modal-footer"></div>
+      </div>
+    </div>
+
+    <script>
+      var modalContext = null;
+
+      /* Navigation */
+      function showPage(id, el) {
+        document.querySelectorAll(".page").forEach(function (p) {
+          p.classList.remove("active");
+        });
+        document.getElementById("page-" + id).classList.add("active");
+        document.querySelectorAll(".nav-item").forEach(function (n) {
+          n.classList.remove("active");
+        });
+        if (el) el.classList.add("active");
+      }
+
+      function filterRows(inputEl, containerSelector, rowSelector) {
+        var q = inputEl.value.toLowerCase();
+        document
+          .querySelectorAll(containerSelector + " " + rowSelector)
+          .forEach(function (row) {
+            row.style.display =
+              row.textContent.toLowerCase().indexOf(q) > -1 ? "" : "none";
+          });
+      }
+
+      /* Modal Helpers */
+      function openModal(title, bodyHtml, footerHtml) {
+        document.getElementById("modal-title").textContent = title;
+        document.getElementById("modal-body").innerHTML = bodyHtml;
+        document.getElementById("modal-footer").innerHTML =
+          footerHtml ||
+          '<button class="secondary" onclick="closeModal()">Close</button>';
+        document.getElementById("modal-overlay").classList.add("open");
+      }
+      function closeModal() {
+        document.getElementById("modal-overlay").classList.remove("open");
+        modalContext = null;
+      }
+      function formInput(label, id, val, type) {
+        type = type || "text";
+        return (
+          '<div class="form-group"><label>' +
+          label +
+          '</label><input type="' +
+          type +
+          '" id="' +
+          id +
+          '" value="' +
+          (val === undefined ? "" : val) +
+          '"></div>'
+        );
+      }
+      function formTextarea(label, id, val) {
+        return (
+          '<div class="form-group"><label>' +
+          label +
+          '</label><textarea id="' +
+          id +
+          '">' +
+          (val || "") +
+          "</textarea></div>"
+        );
+      }
+      function formSelect(label, id, opts) {
+        var o = opts
+          .map(function (x) {
+            return "<option>" + x + "</option>";
+          })
+          .join("");
+        return (
+          '<div class="form-group"><label>' +
+          label +
+          '</label><select id="' +
+          id +
+          '">' +
+          o +
+          "</select></div>"
+        );
+      }
+
+      /* Generic CRUD Actions */
+      function deleteRow(btn) {
+        var row = btn.closest(".list-row");
+        if (row && confirm("Are you sure you want to delete this entry?")) {
+          row.remove();
+        }
+      }
+
+      function deleteTableRow(btn) {
+        var tr = btn.closest("tr");
+        if (tr && confirm("Are you sure you want to delete this record?")) {
+          tr.remove();
+        }
+      }
+
+      function toggleTaskStatus(btn) {
+        var row = btn.closest(".list-row");
+        var rightDiv = row.querySelector(".right");
+        rightDiv.querySelector(".badge").className = "badge filled";
+        rightDiv.querySelector(".badge").textContent = "Completed / Filed";
+        btn.remove();
+      }
+
+      /* CRUD Handler: Employee Directory */
+      function openNewHire() {
+        openModal(
+          "Add New Employee Record",
+          formInput("Full Name", "nh-name", "") +
+            '<div class="form-row-2">' +
+            formInput("Department", "nh-dept", "") +
+            formInput("Role Title", "nh-role", "") +
+            "</div>" +
+            formSelect("Status", "nh-status", ["Active", "Onboarding"]),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveNewHire()">Create Employee</button>',
+        );
+      }
+      function saveNewHire() {
+        var name = document.getElementById("nh-name").value || "Unnamed Hire";
+        var dept = document.getElementById("nh-dept").value || "General";
+        var role = document.getElementById("nh-role").value || "Staff";
+        var status = document.getElementById("nh-status").value;
+
+        var list = document.getElementById("lifecycle-list");
+        var row = document.createElement("div");
+        row.className = "list-row";
+        var badgeClass = status === "Active" ? "filled" : "dashed";
+        row.innerHTML =
+          '<div><div class="primary-text">' +
+          name +
+          '</div><div class="secondary-text">' +
+          dept +
+          " — " +
+          role +
+          '</div></div><div class="right"><span class="badge ' +
+          badgeClass +
+          '">' +
+          status +
+          '</span><button class="link-btn" onclick="editProfile(this)">Edit Profile</button><button class="danger-btn" onclick="deleteRow(this)">Delete</button></div>';
+        list.appendChild(row);
+        closeModal();
+      }
+      function editProfile(btn) {
+        modalContext = btn.closest(".list-row");
+        var name = modalContext.querySelector(".primary-text").textContent;
+        var subText = modalContext.querySelector(".secondary-text").textContent;
+
+        openModal(
+          "Edit Employee: " + name,
+          formInput("Full Name", "ed-name", name) +
+            formInput("Department & Role Info", "ed-sub", subText),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveProfileEdit()">Update Record</button>',
+        );
+      }
+      function saveProfileEdit() {
+        if (modalContext) {
+          modalContext.querySelector(".primary-text").textContent =
+            document.getElementById("ed-name").value;
+          modalContext.querySelector(".secondary-text").textContent =
+            document.getElementById("ed-sub").value;
+        }
+        closeModal();
+      }
+
+      /* CRUD Handler: Onboarding */
+      function openAddOnboardingStep() {
+        openModal(
+          "Add Onboarding Task",
+          formInput("Task Name", "ob-task", ""),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveOnboardingStep()">Add Task</button>',
+        );
+      }
+      function saveOnboardingStep() {
+        var task = document.getElementById("ob-task").value || "New Task";
+        var list = document.getElementById("onboarding-list");
+        var row = document.createElement("div");
+        row.className = "list-row";
+        row.innerHTML =
+          '<div class="primary-text">' +
+          task +
+          '</div><div class="right"><span class="badge dashed">Pending</span><button class="link-btn" onclick="toggleTaskStatus(this)">Mark Complete</button><button class="danger-btn" onclick="deleteRow(this)">Remove</button></div>';
+        list.appendChild(row);
+        closeModal();
+      }
+
+      /* CRUD Handler: Exit Interviews */
+      function openLogExit() {
+        openModal(
+          "Log Exit Record",
+          formInput("Employee Name", "ex-name", "") +
+            formInput("Role & Department", "ex-role", "") +
+            formInput("Primary Exit Reason", "ex-reason", ""),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveExit()">Save Exit File</button>',
+        );
+      }
+      function saveExit() {
+        var name = document.getElementById("ex-name").value || "Employee";
+        var role = document.getElementById("ex-role").value || "Role";
+        var reason =
+          document.getElementById("ex-reason").value || "Unspecified";
+
+        var list = document.getElementById("exitinterview-list");
+        var row = document.createElement("div");
+        row.className = "list-row";
+        row.innerHTML =
+          '<div><div class="primary-text">' +
+          name +
+          '</div><div class="secondary-text">' +
+          role +
+          '</div></div><div class="right"><span class="badge outline">' +
+          reason +
+          '</span><button class="danger-btn" onclick="deleteRow(this)">Delete</button></div>';
+        list.appendChild(row);
+        closeModal();
+      }
+
+      /* CRUD Handler: Recruitment */
+      function openPostJob() {
+        openModal(
+          "Post Job Opening",
+          formInput("Position Title", "pj-title", "") +
+            formInput("Initial Applicant Count", "pj-count", "0", "number"),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveJob()">Post Job</button>',
+        );
+      }
+      function saveJob() {
+        var title = document.getElementById("pj-title").value || "Title";
+        var count = document.getElementById("pj-count").value || "0";
+
+        var list = document.getElementById("applicants-list");
+        var row = document.createElement("div");
+        row.className = "list-row";
+        row.innerHTML =
+          '<div><div class="primary-text">' +
+          title +
+          '</div><div class="secondary-text">' +
+          count +
+          ' applicants</div></div><div class="right"><span class="badge outline">Active Screening</span><button class="link-btn" onclick="updateJob(this)">Update Status</button><button class="danger-btn" onclick="deleteRow(this)">Close Opening</button></div>';
+        list.appendChild(row);
+        closeModal();
+      }
+      function updateJob(btn) {
+        modalContext = btn.closest(".list-row");
+        openModal(
+          "Update Job Status",
+          formSelect("Recruitment Phase", "uj-status", [
+            "Screening",
+            "Interviewing",
+            "Offer Extended",
+            "Closed",
+          ]),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveJobUpdate()">Save Status</button>',
+        );
+      }
+      function saveJobUpdate() {
+        if (modalContext) {
+          var val = document.getElementById("uj-status").value;
+          var badge = modalContext.querySelector(".badge");
+          badge.textContent = val;
+          badge.className = "badge filled";
+        }
+        closeModal();
+      }
+
+      /* CRUD Handler: Performance Reviews */
+      function openLogReview() {
+        openModal(
+          "Schedule Review",
+          formInput("Staff Name & Review Type", "pr-title", ""),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveReview()">Log Review</button>',
+        );
+      }
+      function saveReview() {
+        var title =
+          document.getElementById("pr-title").value || "Performance Review";
+        var list = document.getElementById("appraisals-list");
+        var row = document.createElement("div");
+        row.className = "list-row";
+        row.innerHTML =
+          '<div><div class="primary-text">' +
+          title +
+          '</div><div class="secondary-text">Scheduled</div></div><div class="right"><span class="badge dashed">Due</span><button class="link-btn" onclick="toggleTaskStatus(this)">Mark Done</button><button class="danger-btn" onclick="deleteRow(this)">Delete</button></div>';
+        list.appendChild(row);
+        closeModal();
+      }
+
+      /* CRUD Handler: Leave Administration */
+      function openLogLeave() {
+        openModal(
+          "Log Leave Request",
+          formInput("Staff Name", "ll-name", "") +
+            '<div class="form-row-2">' +
+            formSelect("Leave Category", "ll-cat", [
+              "Annual",
+              "Sick",
+              "Parental",
+            ]) +
+            formInput("Days Count", "ll-days", "1", "number") +
+            "</div>",
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveLeaveRequest()">Submit Entry</button>',
+        );
+      }
+      function saveLeaveRequest() {
+        var name = document.getElementById("ll-name").value || "Staff";
+        var cat = document.getElementById("ll-cat").value;
+        var days = parseInt(
+          document.getElementById("ll-days").value || "1",
+          10,
+        );
+
+        var table = document
+          .getElementById("leave-table")
+          .querySelector("tbody");
+        var rows = table.querySelectorAll("tr");
+        var found = false;
+
+        rows.forEach(function (tr) {
+          if (
+            tr.querySelector(".staff-name").textContent.toLowerCase() ===
+            name.toLowerCase()
+          ) {
+            found = true;
+            if (cat === "Annual") {
+              var bal = tr.querySelector(".leave-bal");
+              bal.textContent = Math.max(
+                0,
+                parseInt(bal.textContent, 10) - days,
+              );
+            } else if (cat === "Sick") {
+              var sick = tr.querySelector(".sick-used");
+              sick.textContent = parseInt(sick.textContent, 10) + days;
+            } else if (cat === "Parental") {
+              var parent = tr.querySelector(".parent-used");
+              parent.textContent = parseInt(parent.textContent, 10) + days;
+            }
+          }
+        });
+
+        if (!found) {
+          var tr = document.createElement("tr");
+          tr.innerHTML =
+            '<td class="staff-name">' +
+            name +
+            '</td><td class="num leave-bal">' +
+            (cat === "Annual" ? 15 - days : 15) +
+            '</td><td class="num sick-used">' +
+            (cat === "Sick" ? days : 0) +
+            '</td><td class="num parent-used">' +
+            (cat === "Parental" ? days : 0) +
+            '</td><td><button class="link-btn" onclick="editLeave(this)">Update Balances</button> <button class="danger-btn" onclick="deleteTableRow(this)">Delete</button></td>';
+          table.appendChild(tr);
+        }
+        closeModal();
+      }
+      function editLeave(btn) {
+        modalContext = btn.closest("tr");
+        var name = modalContext.querySelector(".staff-name").textContent;
+        var bal = modalContext.querySelector(".leave-bal").textContent;
+        var sick = modalContext.querySelector(".sick-used").textContent;
+        var parent = modalContext.querySelector(".parent-used").textContent;
+
+        openModal(
+          "Update Leave Balances: " + name,
+          formInput("Annual Leave Balance (Days)", "el-bal", bal, "number") +
+            formInput("Sick Leave Used", "el-sick", sick, "number") +
+            formInput("Parental Leave Used", "el-parent", parent, "number"),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveLeaveEdit()">Save Balances</button>',
+        );
+      }
+      function saveLeaveEdit() {
+        if (modalContext) {
+          modalContext.querySelector(".leave-bal").textContent =
+            document.getElementById("el-bal").value;
+          modalContext.querySelector(".sick-used").textContent =
+            document.getElementById("el-sick").value;
+          modalContext.querySelector(".parent-used").textContent =
+            document.getElementById("el-parent").value;
+        }
+        closeModal();
+      }
+
+      /* CRUD Handler: Remote Work */
+      function openNewRemoteAgreement() {
+        openModal(
+          "Add Remote Work Agreement",
+          formInput("Staff Name", "rw-name", "") +
+            formInput(
+              "Agreement Details (e.g., Hybrid 2 days/wk)",
+              "rw-details",
+              "",
+            ),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveRemote()">Save Agreement</button>',
+        );
+      }
+      function saveRemote() {
+        var name = document.getElementById("rw-name").value || "Staff";
+        var details = document.getElementById("rw-details").value || "Hybrid";
+
+        var list = document.getElementById("remotework-list");
+        var row = document.createElement("div");
+        row.className = "list-row";
+        row.innerHTML =
+          '<div><div class="primary-text">' +
+          name +
+          '</div><div class="secondary-text">' +
+          details +
+          '</div></div><div class="right"><span class="badge filled">Active</span><button class="danger-btn" onclick="deleteRow(this)">Terminate Agreement</button></div>';
+        list.appendChild(row);
+        closeModal();
+      }
+
+      /* CRUD Handler: Training */
+      function openLogTraining() {
+        openModal(
+          "Log Training Course",
+          formInput("Staff Name", "tr-name", "") +
+            formInput("Course Title", "tr-title", ""),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveTraining()">Record Course</button>',
+        );
+      }
+      function saveTraining() {
+        var name = document.getElementById("tr-name").value || "Staff";
+        var title =
+          document.getElementById("tr-title").value || "Training Course";
+
+        var list = document.getElementById("profdev-list");
+        var row = document.createElement("div");
+        row.className = "list-row";
+        row.innerHTML =
+          '<div><div class="primary-text">' +
+          name +
+          '</div><div class="secondary-text">' +
+          title +
+          '</div></div><div class="right"><span class="badge dashed">In progress</span><button class="link-btn" onclick="toggleTaskStatus(this)">Mark Complete</button><button class="danger-btn" onclick="deleteRow(this)">Delete</button></div>';
+        list.appendChild(row);
+        closeModal();
+      }
+
+      /* CRUD Handler: Grievance */
+      function openNewGrievance() {
+        openModal(
+          "Log Confidential Case",
+          formTextarea("Case Details", "gr-details", ""),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveGrievance()">Log Case Entry</button>',
+        );
+      }
+      function saveGrievance() {
+        var details =
+          document.getElementById("gr-details").value || "Confidential Entry";
+        var list = document.getElementById("grievance-list");
+        var count = list.querySelectorAll(".list-row").length + 15;
+        var row = document.createElement("div");
+        row.className = "list-row";
+        row.innerHTML =
+          '<div><div class="primary-text">Case #GR-0' +
+          count +
+          '</div><div class="secondary-text">' +
+          details +
+          '</div></div><div class="right"><span class="badge dashed">Under investigation</span><button class="link-btn" onclick="toggleTaskStatus(this)">Mark Resolved</button><button class="danger-btn" onclick="deleteRow(this)">Delete Case</button></div>';
+        list.appendChild(row);
+        closeModal();
+      }
+
+      /* CRUD Handler: Compliance */
+      function openNewCompliance() {
+        openModal(
+          "Add Compliance Record",
+          formInput("Report Title", "cp-title", ""),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveCompliance()">Add Filing</button>',
+        );
+      }
+      function saveCompliance() {
+        var title =
+          document.getElementById("cp-title").value || "Compliance Report";
+        var list = document.getElementById("compliance-list");
+        var row = document.createElement("div");
+        row.className = "list-row";
+        row.innerHTML =
+          '<div><div class="primary-text">' +
+          title +
+          '</div><div class="secondary-text">Status: Pending Filing</div></div><div class="right"><span class="badge dashed">Pending</span><button class="link-btn" onclick="toggleTaskStatus(this)">Mark Filed</button><button class="danger-btn" onclick="deleteRow(this)">Delete</button></div>';
+        list.appendChild(row);
+        closeModal();
+      }
+    </script>
+  </body>
+</html>

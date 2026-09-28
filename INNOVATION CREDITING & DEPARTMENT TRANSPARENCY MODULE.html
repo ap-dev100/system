@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Innovation Ledger Console — Northgate College</title>
+<style>
+:root{
+  --bg:#ffffff;
+  --ink:#111111;
+  --ink-soft:#5b5b5b;
+  --ink-faint:#9a9a9a;
+  --line:#dcdcdc;
+  --line-strong:#b7b7b7;
+  --fill:#f4f4f4;
+  --sidebar:#070707;
+  --sidebar-line:#242424;
+  --sidebar-ink:#cfcfcf;
+  --sidebar-ink-dim:#7a7a7a;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{font-family:var(--sans);color:var(--ink);background:var(--bg);font-size:14.5px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+button,input,select,textarea{font-family:inherit;}
+.app{display:flex;min-height:100vh;}
+
+.sidebar{width:264px;flex-shrink:0;background:var(--sidebar);color:var(--sidebar-ink);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.brand{padding:26px 24px 18px;border-bottom:1px solid var(--sidebar-line);}
+.brand-mark{font-family:var(--serif);font-size:19px;color:#fff;letter-spacing:.01em;}
+.brand-sub{font-size:11px;color:var(--sidebar-ink-dim);margin-top:5px;}
+.nav{flex:1;padding:12px 10px;overflow-y:auto;}
+.nav-item{display:flex;align-items:center;gap:11px;width:100%;padding:9px 12px;background:none;border:none;color:var(--sidebar-ink);font-size:13px;text-align:left;cursor:pointer;border-left:2px solid transparent;font-family:var(--sans);}
+.nav-item:hover{color:#fff;}
+.nav-item.active{color:#fff;border-left-color:#fff;background:rgba(255,255,255,.06);}
+.nav-mono{width:30px;height:20px;border:1px solid var(--sidebar-line);display:flex;align-items:center;justify-content:center;font-size:9.5px;letter-spacing:.02em;color:var(--sidebar-ink-dim);flex-shrink:0;}
+.nav-item.active .nav-mono{border-color:#fff;color:#fff;}
+.sidebar-foot{padding:16px 24px;border-top:1px solid var(--sidebar-line);font-size:11.5px;color:var(--sidebar-ink-dim);}
+.sidebar-foot .who{color:#e6e6e6;font-size:12.5px;margin-bottom:2px;}
+
+.main{flex:1;min-width:0;}
+.topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;padding:28px 40px 20px;border-bottom:1px solid var(--line);flex-wrap:wrap;}
+.topbar h1{font-family:var(--serif);font-weight:400;font-size:26px;margin:0;}
+.topbar .desc{font-size:13px;color:var(--ink-soft);margin-top:6px;max-width:660px;}
+.topbar .actions{display:flex;gap:10px;flex-shrink:0;padding-top:2px;flex-wrap:wrap;}
+.content{padding:32px 40px 90px;max-width:1180px;}
+
+.btn{font-family:var(--sans);font-size:13px;padding:9px 16px;border:1px solid var(--ink);background:var(--ink);color:#fff;cursor:pointer;white-space:nowrap;}
+.btn:hover{background:#000;}
+.btn-outline{background:transparent;color:var(--ink);border:1px solid var(--line-strong);}
+.btn-outline:hover{border-color:var(--ink);}
+.btn-small{padding:5px 11px;font-size:12px;}
+
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-bottom:38px;}
+.kpi{padding:20px 22px;border-left:1px solid var(--line);}
+.kpi:first-child{border-left:none;}
+.kpi .num{font-family:var(--serif);font-size:29px;font-variant-numeric:tabular-nums;}
+.kpi .label{font-size:11.8px;color:var(--ink-soft);margin-top:5px;}
+.kpi .delta{font-size:11.3px;margin-top:7px;color:var(--ink-faint);}
+
+.section-head{display:flex;justify-content:space-between;align-items:baseline;margin:44px 0 14px;flex-wrap:wrap;gap:6px;}
+.section-head h2{font-family:var(--serif);font-weight:400;font-size:18px;margin:0;}
+.section-head .hint{font-size:11.8px;color:var(--ink-faint);}
+.section-head .filters{display:flex;gap:8px;}
+.section-head select{border:1px solid var(--line-strong);padding:6px 10px;font-size:12.5px;background:#fff;font-family:var(--sans);}
+
+.chart-wrap{border:1px solid var(--line);padding:22px 24px 16px;}
+.legend{display:flex;gap:20px;font-size:12px;color:var(--ink-soft);margin-top:12px;flex-wrap:wrap;}
+.legend span{display:inline-flex;align-items:center;gap:6px;}
+.swatch{width:10px;height:10px;display:inline-block;border:1px solid var(--ink);}
+
+.table-wrap{overflow-x:auto;border-bottom:1px solid var(--line);}
+table.ledger{width:100%;border-collapse:collapse;font-size:13px;min-width:560px;}
+table.ledger th{text-align:left;font-weight:500;color:var(--ink-soft);font-size:11.3px;padding:0 14px 10px;border-bottom:1px solid var(--ink);white-space:nowrap;}
+table.ledger td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top;}
+table.ledger tbody tr{cursor:pointer;}
+table.ledger tbody tr:hover{background:var(--fill);}
+table.ledger td.num, table.ledger th.num{text-align:right;font-variant-numeric:tabular-nums;}
+.tag{display:inline-block;font-size:10.8px;padding:2.5px 8px;border:1px solid var(--ink);white-space:nowrap;}
+.tag.dim{border-color:var(--line-strong);color:var(--ink-soft);}
+
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);}
+.dash-card{background:#fff;padding:22px;cursor:pointer;}
+.dash-card:hover{background:var(--fill);}
+.dash-card .mono{width:34px;height:24px;border:1px solid var(--ink);display:flex;align-items:center;justify-content:center;font-size:10px;margin-bottom:16px;}
+.dash-card h4{font-family:var(--serif);font-weight:400;font-size:16px;margin:0 0 8px;}
+.dash-card p{font-size:12.3px;color:var(--ink-soft);margin:0 0 14px;min-height:50px;}
+.dash-card .metric{font-family:var(--serif);font-size:21px;}
+.dash-card .metric-label{font-size:11px;color:var(--ink-faint);}
+
+.feed-item{border-bottom:1px solid var(--line);padding:26px 0;}
+.feed-item:first-child{padding-top:4px;}
+.feed-top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;}
+.feed-title{font-family:var(--serif);font-size:19px;margin:0 0 6px;}
+.feed-tags{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
+.feed-desc{font-size:13.2px;color:var(--ink-soft);max-width:680px;margin:0 0 14px;}
+.feed-foot{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--ink-faint);flex-wrap:wrap;gap:10px;}
+.vote-btn{border:1px solid var(--ink);background:#fff;color:var(--ink);padding:7px 14px;font-size:12.5px;cursor:pointer;font-family:var(--sans);}
+.vote-btn:hover{background:var(--fill);}
+.vote-count{font-family:var(--serif);font-size:16px;color:var(--ink);}
+
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.32);display:flex;align-items:center;justify-content:center;z-index:80;padding:20px;}
+.modal{background:#fff;width:500px;max-width:100%;max-height:92vh;overflow-y:auto;padding:30px 32px;border:1px solid var(--ink);}
+.modal h3{font-family:var(--serif);font-weight:400;font-size:21px;margin:0 0 4px;}
+.modal .sub{font-size:12.5px;color:var(--ink-soft);margin-bottom:22px;}
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:11.8px;color:var(--ink-soft);margin-bottom:6px;}
+.field input, .field select, .field textarea{width:100%;padding:9px 10px;border:1px solid var(--line-strong);font-family:var(--sans);font-size:13.5px;background:#fff;color:var(--ink);}
+.field input:focus, .field select:focus, .field textarea:focus{outline:2px solid var(--ink);outline-offset:1px;}
+.field textarea{min-height:70px;resize:vertical;}
+.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:24px;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+
+.drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.25);z-index:70;display:flex;justify-content:flex-end;}
+.drawer{width:440px;max-width:94vw;background:#fff;height:100%;overflow-y:auto;padding:32px 34px;border-left:1px solid var(--ink);}
+.drawer .eyebrow{font-size:11.5px;color:var(--ink-faint);margin-bottom:6px;}
+.drawer h3{font-family:var(--serif);font-size:21px;font-weight:400;margin:0 0 18px;}
+.kv{display:flex;justify-content:space-between;gap:16px;padding:11px 0;border-bottom:1px solid var(--line);font-size:13px;}
+.kv .k{color:var(--ink-soft);flex-shrink:0;}
+.kv .v{text-align:right;}
+.drawer-actions{display:flex;gap:10px;margin-top:26px;flex-wrap:wrap;}
+.close-x{background:none;border:none;font-size:20px;color:var(--ink-soft);cursor:pointer;line-height:1;padding:0;}
+.drawer-top{display:flex;justify-content:space-between;align-items:flex-start;}
+.mini-list{list-style:none;padding:0;margin:16px 0 0;}
+.mini-list li{padding:11px 0;border-bottom:1px solid var(--line);font-size:12.8px;display:flex;justify-content:space-between;gap:10px;}
+.mini-list li .t{color:var(--ink);}
+.mini-list li .d{color:var(--ink-faint);flex-shrink:0;}
+
+.toast{position:fixed;bottom:26px;right:26px;background:#111;color:#fff;padding:13px 20px;font-size:13px;z-index:100;border:1px solid #000;}
+.empty{padding:40px 0;text-align:center;color:var(--ink-faint);font-size:13px;border:1px dashed var(--line-strong);}
+.menu-btn{display:none;border:1px solid var(--line-strong);background:#fff;padding:8px 10px;cursor:pointer;margin-right:12px;}
+.title-row{display:flex;align-items:center;}
+
+@media (max-width:820px){
+  .sidebar{position:fixed;z-index:60;transform:translateX(-100%);transition:transform .2s;}
+  .sidebar.open{transform:translateX(0);}
+  .topbar,.content{padding-left:20px;padding-right:20px;}
+  .menu-btn{display:inline-flex !important;}
+  .two-col{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <main class="main">
+    <div class="topbar" id="topbar"></div>
+    <div class="content" id="content"></div>
+  </main>
+</div>
+<div id="modal-root"></div>
+<div id="drawer-root"></div>
+<div id="toast-root"></div>
+
+<script>
+/* ============================= UTILITIES ============================= */
+const $ = sel => document.querySelector(sel);
+const money = n => '$' + Math.round(n).toLocaleString('en-US');
+function toast(msg){
+  const root = $('#toast-root');
+  root.innerHTML = `<div class="toast">${msg}</div>`;
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(()=>{ root.innerHTML=''; }, 2600);
+}
+function closeModal(){ $('#modal-root').innerHTML=''; }
+function closeDrawer(){ $('#drawer-root').innerHTML=''; }
+
+/* ============================= CHART ============================= */
+function barChart(id, labels, series){
+  const w = Math.max(600, labels.length*Math.max(74, series.length*44));
+  const h = 200, padL=8, padB=30, padT=16, padR=8;
+  const max = Math.max(1, ...series.flatMap(s=>s.values)) * 1.18;
+  const groupW = (w-padL-padR)/labels.length;
+  const barW = Math.min(28, (groupW-16)/series.length);
+  let bars='';
+  labels.forEach((lab,li)=>{
+    const gx = padL + li*groupW + (groupW - (barW*series.length+(series.length-1)*6))/2;
+    series.forEach((s,si)=>{
+      const val = s.values[li];
+      const bh = (val/max)*(h-padT-padB);
+      const bx = gx + si*(barW+6);
+      const by = h-padB-bh;
+      const fillId = si===0? `url(#${id}-f0)` : si===1? `url(#${id}-f1)` : `url(#${id}-f2)`;
+      bars += `<rect x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(bh,0).toFixed(1)}" fill="${fillId}" stroke="#111" stroke-width="0.6"/>`;
+      bars += `<text x="${(bx+barW/2).toFixed(1)}" y="${(by-5).toFixed(1)}" font-size="9.2" text-anchor="middle" fill="#5b5b5b" font-family="sans-serif">${val}</text>`;
+    });
+    bars += `<text x="${(gx + (barW*series.length+(series.length-1)*6)/2).toFixed(1)}" y="${h-10}" font-size="9.8" text-anchor="middle" fill="#5b5b5b" font-family="sans-serif">${lab}</text>`;
+  });
+  bars += `<line x1="${padL}" y1="${h-padB}" x2="${w-padR}" y2="${h-padB}" stroke="#111" stroke-width="1"/>`;
+  return `<svg viewBox="0 0 ${w} ${h}" style="width:100%;height:${h}px;display:block;">
+    <defs>
+      <pattern id="${id}-f1" width="6" height="6" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"><rect width="6" height="6" fill="#fff"/><line x1="0" y1="0" x2="0" y2="6" stroke="#111" stroke-width="2.6"/></pattern>
+      <pattern id="${id}-f0" width="2" height="2" patternUnits="userSpaceOnUse"><rect width="2" height="2" fill="#111"/></pattern>
+      <pattern id="${id}-f2" width="2" height="2" patternUnits="userSpaceOnUse"><rect width="2" height="2" fill="#c7c7c7"/></pattern>
+    </defs>
+    ${bars}
+  </svg>`;
+}
+
+/* ============================= CONSTANTS ============================= */
+const DEPARTMENTS = ['Academics','BD','IT','SSD','Finance','HR','RTE','Resource'];
+const TYPES = ['Automation Script','Workflow Fix','Marketing Funnel','Process Improvement','Tool/Integration'];
+const STATUSES = ['Submitted','Under review','Approved','Implemented'];
+const METRICS = ['Hours saved / week','Budget reduced','Lead conversion improvement','Other'];
+
+/* ============================= STATE / MOCK DATA ============================= */
+const state = {
+  active:'dashboard',
+  ledgerDeptFilter:'All',
+  ledgerStatusFilter:'All',
+  innovations:[
+    {title:'Automated attendance reconciliation script', dept:'IT', type:'Automation Script', creator:'Daniel Osei', date:'Jun 2026', status:'Implemented',
+      description:'Nightly script cross-checks card-swipe logs against the SIS attendance register and flags mismatches automatically, replacing a manual weekly review.',
+      showcase:{featured:true, votes:24},
+      roiEntries:[{metric:'Hours saved / week', value:6, verifiedBy:'IT Manager', date:'Jul 2026'}]},
+    {title:'Two-step lead nurture email funnel', dept:'BD', type:'Marketing Funnel', creator:'Tomás Reyes', date:'May 2026', status:'Implemented',
+      description:'Automated two-step email sequence for open-day leads that re-engages non-responders after 72 hours, before handing warm leads to admissions.',
+      showcase:{featured:true, votes:31},
+      roiEntries:[{metric:'Lead conversion improvement', value:9, verifiedBy:'BD Director', date:'Jun 2026'}]},
+    {title:'Self-service transcript request portal', dept:'Academics', type:'Workflow Fix', creator:'Dr. Priya Nandakumar', date:'Jul 2026', status:'Under review',
+      description:'Online form replacing in-person transcript requests, auto-routing submissions to the registrar’s queue with status tracking for students.',
+      showcase:{featured:false, votes:4},
+      roiEntries:[]},
+    {title:'Shared onboarding checklist template', dept:'HR', type:'Process Improvement', creator:'Grace Lin', date:'Apr 2026', status:'Implemented',
+      description:'Standardized new-hire onboarding checklist adopted across all departments, replacing eight inconsistent department-specific versions.',
+      showcase:{featured:true, votes:18},
+      roiEntries:[{metric:'Hours saved / week', value:3, verifiedBy:'HR Director', date:'May 2026'}]},
+    {title:'Budget variance auto-flagging sheet', dept:'Finance', type:'Automation Script', creator:'Samuel Okafor', date:'Aug 2026', status:'Submitted',
+      description:'Spreadsheet macro that automatically flags cost-centre variances over 10% at each month-end close, before the manual review pass.',
+      showcase:{featured:false, votes:2},
+      roiEntries:[]},
+    {title:'Peer tutoring scheduling bot', dept:'SSD', type:'Tool/Integration', creator:'SSD Coordination Team', date:'Jun 2026', status:'Implemented',
+      description:'Chat-based bot that matches students to available peer tutors and books sessions automatically, removing manual scheduling by staff.',
+      showcase:{featured:true, votes:27},
+      roiEntries:[{metric:'Hours saved / week', value:5, verifiedBy:'SSD Lead', date:'Jul 2026'},{metric:'Budget reduced', value:1200, verifiedBy:'SSD Lead', date:'Jul 2026'}]},
+    {title:'Equipment loan tracking app migration', dept:'Resource', type:'Tool/Integration', creator:'Resource Mgmt Lead', date:'Mar 2026', status:'Implemented',
+      description:'Migrated the paper-based equipment loan log to a lightweight tracking app, cutting lost-item write-offs and speeding returns.',
+      showcase:{featured:false, votes:11},
+      roiEntries:[{metric:'Budget reduced', value:2600, verifiedBy:'Resource Mgmt Director', date:'Apr 2026'}]},
+    {title:'Research grant application tracker', dept:'RTE', type:'Workflow Fix', creator:'RTE Coordinator', date:'Jul 2026', status:'Under review',
+      description:'Shared tracker for grant application deadlines and status, replacing ad hoc email threads between faculty and the grants office.',
+      showcase:{featured:false, votes:6},
+      roiEntries:[]},
+  ],
+};
+
+/* ============================= NAV / TITLES ============================= */
+const NAV = [
+  {id:'dashboard', label:'Overview', mono:'OV'},
+  {id:'ledger', label:'Innovation Ledger', mono:'IL'},
+  {id:'credit', label:'Credit Attribution', mono:'CA'},
+  {id:'showcase', label:'Showcase Feed', mono:'SF'},
+  {id:'roi', label:'ROI Tracker', mono:'RT'},
+];
+const TITLES = {
+  dashboard:{title:'Innovation & transparency overview', desc:'Every logged idea, who it’s credited to, and the measurable impact it has had — across Academics, BD, IT, SSD, Finance, HR, RTE and Resource.'},
+  ledger:{title:'Departmental Innovation Ledger', desc:'Any staff member or department head can log a new operational idea, automation script, marketing funnel, or workflow fix here.'},
+  credit:{title:'Credit Attribution Engine', desc:'Permanent creator metadata for every logged innovation — preserved as a standing record for annual HR performance appraisals.'},
+  showcase:{title:'Cross-Departmental Showcase Feed', desc:'Top-rated innovations from across the college, surfaced for peer recognition and knowledge sharing.'},
+  roi:{title:'Innovation ROI Tracker', desc:'Real-world impact of logged innovations — hours saved, budget reduced, and conversion improvements.'},
+};
+
+/* ============================= HELPERS ============================= */
+function statusTag(s){
+  if(s==='Implemented') return `<span class="tag">${s}</span>`;
+  if(s==='Approved') return `<span class="tag">${s}</span>`;
+  return `<span class="tag dim">${s}</span>`;
+}
+function hoursSaved(inv){ return inv.roiEntries.filter(r=>r.metric==='Hours saved / week').reduce((a,r)=>a+r.value,0); }
+function budgetReduced(inv){ return inv.roiEntries.filter(r=>r.metric==='Budget reduced').reduce((a,r)=>a+r.value,0); }
+function totalHoursSaved(){ return state.innovations.reduce((a,i)=>a+hoursSaved(i),0); }
+function totalBudgetReduced(){ return state.innovations.reduce((a,i)=>a+budgetReduced(i),0); }
+function avgConversion(){
+  const vals = state.innovations.flatMap(i=>i.roiEntries.filter(r=>r.metric==='Lead conversion improvement').map(r=>r.value));
+  return vals.length ? (vals.reduce((a,v)=>a+v,0)/vals.length) : 0;
+}
+function creators(){
+  const map = {};
+  state.innovations.forEach(inv=>{
+    if(!map[inv.creator]) map[inv.creator] = {name:inv.creator, dept:inv.dept, items:[]};
+    map[inv.creator].items.push(inv);
+  });
+  return Object.values(map);
+}
+
+/* ============================= DASHBOARD ============================= */
+function renderDashboard(){
+  const implemented = state.innovations.filter(i=>i.status==='Implemented').length;
+  const byDept = DEPARTMENTS.map(d=>state.innovations.filter(i=>i.dept===d).length);
+  return `
+    <div class="kpi-row">
+      <div class="kpi"><div class="num">${state.innovations.length}</div><div class="label">Innovations logged</div></div>
+      <div class="kpi"><div class="num">${implemented}</div><div class="label">Implemented</div></div>
+      <div class="kpi"><div class="num">${totalHoursSaved()} hrs/wk</div><div class="label">Total hours saved</div></div>
+      <div class="kpi"><div class="num">${money(totalBudgetReduced())}</div><div class="label">Total budget reduced</div></div>
+    </div>
+    <div class="section-head"><h2>Innovations logged by department</h2><span class="hint">All 8 department profiles</span></div>
+    <div class="chart-wrap">${barChart('dash-chart', DEPARTMENTS, [{name:'Count', values:byDept}])}</div>
+
+    <div class="section-head"><h2>Modules</h2><span class="hint">4 areas of oversight</span></div>
+    <div class="dash-grid">
+      <div class="dash-card" onclick="navigate('ledger')">
+        <div class="mono">IL</div><h4>${TITLES.ledger.title}</h4><p>${TITLES.ledger.desc}</p>
+        <div class="metric">${state.innovations.length}</div><div class="metric-label">Total entries logged</div>
+      </div>
+      <div class="dash-card" onclick="navigate('credit')">
+        <div class="mono">CA</div><h4>${TITLES.credit.title}</h4><p>${TITLES.credit.desc}</p>
+        <div class="metric">${creators().length}</div><div class="metric-label">Staff with credited work</div>
+      </div>
+      <div class="dash-card" onclick="navigate('showcase')">
+        <div class="mono">SF</div><h4>${TITLES.showcase.title}</h4><p>${TITLES.showcase.desc}</p>
+        <div class="metric">${state.innovations.filter(i=>i.showcase.featured).length}</div><div class="metric-label">Currently showcased</div>
+      </div>
+      <div class="dash-card" onclick="navigate('roi')">
+        <div class="mono">RT</div><h4>${TITLES.roi.title}</h4><p>${TITLES.roi.desc}</p>
+        <div class="metric">${state.innovations.filter(i=>i.roiEntries.length).length}</div><div class="metric-label">Innovations with tracked ROI</div>
+      </div>
+    </div>
+  `;
+}
+
+/* ============================= FEATURE 1: INNOVATION LEDGER ============================= */
+function renderLedger(){
+  const rows = state.innovations.filter(i=>
+    (state.ledgerDeptFilter==='All'||i.dept===state.ledgerDeptFilter) &&
+    (state.ledgerStatusFilter==='All'||i.status===state.ledgerStatusFilter)
+  );
+  return `
+    <div class="section-head">
+      <h2>All submissions</h2>
+      <div class="filters">
+        <select onchange="setLedgerFilter('dept', this.value)">
+          <option ${state.ledgerDeptFilter==='All'?'selected':''}>All</option>
+          ${DEPARTMENTS.map(d=>`<option ${state.ledgerDeptFilter===d?'selected':''}>${d}</option>`).join('')}
+        </select>
+        <select onchange="setLedgerFilter('status', this.value)">
+          <option ${state.ledgerStatusFilter==='All'?'selected':''}>All statuses</option>
+          ${STATUSES.map(s=>`<option ${state.ledgerStatusFilter===s?'selected':''}>${s}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <span class="hint" style="display:block;margin:-10px 0 14px;">${rows.length} of ${state.innovations.length} entries</span>
+    ${rows.length ? `<div class="table-wrap"><table class="ledger"><thead><tr>
+      <th>Title</th><th>Department</th><th>Type</th><th>Credited to</th><th>Logged</th><th>Status</th>
+    </tr></thead><tbody>
+      ${rows.map(inv=>`<tr onclick="openLedgerDetail(${state.innovations.indexOf(inv)})">
+        <td>${inv.title}</td><td>${inv.dept}</td><td>${inv.type}</td><td>${inv.creator}</td><td>${inv.date}</td><td>${statusTag(inv.status)}</td>
+      </tr>`).join('')}
+    </tbody></table></div>` : `<div class="empty">No submissions match these filters.</div>`}
+  `;
+}
+function setLedgerFilter(kind, v){
+  if(kind==='dept') state.ledgerDeptFilter = v; else state.ledgerStatusFilter = v;
+  renderContent();
+}
+function openLedgerModal(){
+  $('#modal-root').innerHTML = `<div class="overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <h3>Log an innovation</h3>
+      <div class="sub">Submit a new operational idea, automation script, marketing funnel, or workflow fix. Your name is permanently attributed to this entry.</div>
+      <form onsubmit="submitLedger(event)">
+        <div class="field"><label>Title</label><input name="title" required placeholder="e.g. Automated fee-reminder SMS sequence"></div>
+        <div class="two-col">
+          <div class="field"><label>Department</label><select name="dept">${DEPARTMENTS.map(d=>`<option>${d}</option>`).join('')}</select></div>
+          <div class="field"><label>Type</label><select name="type">${TYPES.map(t=>`<option>${t}</option>`).join('')}</select></div>
+        </div>
+        <div class="field"><label>Description</label><textarea name="description" required placeholder="What does it do, and what did it replace?"></textarea></div>
+        <div class="field"><label>Your name (credited creator)</label><input name="creator" required placeholder="e.g. Jordan Blake"></div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
+          <button type="submit" class="btn">Log innovation</button>
+        </div>
+      </form>
+    </div>
+  </div>`;
+}
+function submitLedger(e){
+  e.preventDefault();
+  const f = e.target;
+  state.innovations.unshift({
+    title:f.title.value, dept:f.dept.value, type:f.type.value, creator:f.creator.value,
+    date:'Sep 2026', status:'Submitted', description:f.description.value,
+    showcase:{featured:false, votes:0}, roiEntries:[]
+  });
+  closeModal();
+  renderContent();
+  toast('Innovation logged and credited to ' + f.creator.value + '.');
+}
+function openLedgerDetail(idx){
+  const inv = state.innovations[idx];
+  const nextStatus = STATUSES[STATUSES.indexOf(inv.status)+1];
+  $('#drawer-root').innerHTML = `<div class="drawer-overlay" onclick="if(event.target===this)closeDrawer()">
+    <div class="drawer">
+      <div class="drawer-top"><div><div class="eyebrow">${inv.dept} · ${inv.type}</div><h3>${inv.title}</h3></div><button class="close-x" onclick="closeDrawer()">&times;</button></div>
+      <div class="kv"><span class="k">Credited to</span><span class="v">${inv.creator}</span></div>
+      <div class="kv"><span class="k">Logged</span><span class="v">${inv.date}</span></div>
+      <div class="kv"><span class="k">Status</span><span class="v">${inv.status}</span></div>
+      <div class="kv"><span class="k">Showcase votes</span><span class="v">${inv.showcase.votes}${inv.showcase.featured?' · Featured':''}</span></div>
+      <div class="kv"><span class="k">Description</span><span class="v">${inv.description}</span></div>
+      ${inv.roiEntries.length ? `<ul class="mini-list">${inv.roiEntries.map(r=>`<li><span class="t">${r.metric}: ${r.metric==='Budget reduced'?money(r.value):r.value+(r.metric==='Hours saved / week'?' hrs':'%')}</span><span class="d">${r.date}</span></li>`).join('')}</ul>` : ''}
+      <div class="drawer-actions">
+        ${nextStatus ? `<button class="btn" onclick="advanceStatus(${idx})">Advance to “${nextStatus}”</button>` : ''}
+        ${!inv.showcase.featured ? `<button class="btn btn-outline" onclick="nominateForShowcase(${idx})">Nominate for showcase</button>` : ''}
+        <button class="btn btn-outline" onclick="closeDrawer()">Close</button>
+      </div>
+    </div>
+  </div>`;
+}
+function advanceStatus(idx){
+  const inv = state.innovations[idx];
+  const nextStatus = STATUSES[STATUSES.indexOf(inv.status)+1];
+  if(nextStatus) inv.status = nextStatus;
+  closeDrawer();
+  renderContent();
+  toast(`Status advanced to “${nextStatus}.”`);
+}
+function nominateForShowcase(idx){
+  state.innovations[idx].showcase.featured = true;
+  closeDrawer();
+  renderContent();
+  toast('Nominated for the cross-departmental showcase.');
+}
+
+/* ============================= FEATURE 2: CREDIT ATTRIBUTION ENGINE ============================= */
+function renderCredit(){
+  const list = creators().map(c=>({
+    ...c,
+    implemented:c.items.filter(i=>i.status==='Implemented').length,
+    hours:c.items.reduce((a,i)=>a+hoursSaved(i),0),
+    budget:c.items.reduce((a,i)=>a+budgetReduced(i),0),
+    last:c.items[0].date,
+  })).sort((a,b)=>b.items.length-a.items.length);
+  return `
+    <div class="kpi-row">
+      <div class="kpi"><div class="num">${list.length}</div><div class="label">Staff with credited work</div></div>
+      <div class="kpi"><div class="num">${state.innovations.length}</div><div class="label">Total attributed entries</div></div>
+      <div class="kpi"><div class="num">${Math.max(...list.map(c=>c.items.length))}</div><div class="label">Most by one person</div></div>
+      <div class="kpi"><div class="num">100%</div><div class="label">Entries with permanent attribution</div></div>
+    </div>
+    <div class="section-head"><h2>Attribution roster</h2><span class="hint">Click a name for their full HR appraisal record</span></div>
+    <div class="table-wrap"><table class="ledger"><thead><tr>
+      <th>Name</th><th>Department</th><th>Credited</th><th>Implemented</th><th>Hours saved / wk</th><th>Budget reduced</th><th>Last credited</th>
+    </tr></thead><tbody>
+      ${list.map(c=>`<tr onclick="openCreditDetail('${c.name.replace(/'/g,"\\'")}')">
+        <td>${c.name}</td><td>${c.dept}</td><td class="num">${c.items.length}</td><td class="num">${c.implemented}</td>
+        <td class="num">${c.hours}</td><td class="num">${money(c.budget)}</td><td>${c.last}</td>
+      </tr>`).join('')}
+    </tbody></table></div>
+  `;
+}
+function openCreditDetail(name){
+  const c = creators().find(x=>x.name===name);
+  const hours = c.items.reduce((a,i)=>a+hoursSaved(i),0);
+  const budget = c.items.reduce((a,i)=>a+budgetReduced(i),0);
+  $('#drawer-root').innerHTML = `<div class="drawer-overlay" onclick="if(event.target===this)closeDrawer()">
+    <div class="drawer">
+      <div class="drawer-top"><div><div class="eyebrow">${c.dept}</div><h3>${c.name}</h3></div><button class="close-x" onclick="closeDrawer()">&times;</button></div>
+      <div class="kv"><span class="k">Innovations credited</span><span class="v">${c.items.length}</span></div>
+      <div class="kv"><span class="k">Implemented</span><span class="v">${c.items.filter(i=>i.status==='Implemented').length}</span></div>
+      <div class="kv"><span class="k">Combined hours saved / wk</span><span class="v">${hours}</span></div>
+      <div class="kv"><span class="k">Combined budget reduced</span><span class="v">${money(budget)}</span></div>
+      <div class="section-head" style="margin-top:26px;"><h2 style="font-size:15px;">Portfolio</h2></div>
+      <ul class="mini-list">
+        ${c.items.map(i=>`<li><span class="t">${i.title} — ${i.status}</span><span class="d">${i.date}</span></li>`).join('')}
+      </ul>
+      <div class="drawer-actions">
+        <button class="btn" onclick="toast('Attribution record exported for HR appraisal.')">Export attribution record</button>
+        <button class="btn btn-outline" onclick="closeDrawer()">Close</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ============================= FEATURE 3: SHOWCASE FEED ============================= */
+function renderShowcase(){
+  const list = [...state.innovations].filter(i=>i.showcase.featured).sort((a,b)=>b.showcase.votes-a.showcase.votes);
+  return `
+    <div class="kpi-row">
+      <div class="kpi"><div class="num">${list.length}</div><div class="label">Currently showcased</div></div>
+      <div class="kpi"><div class="num">${list.reduce((a,i)=>a+i.showcase.votes,0)}</div><div class="label">Total peer votes</div></div>
+      <div class="kpi"><div class="num">${new Set(list.map(i=>i.dept)).size}</div><div class="label">Departments represented</div></div>
+      <div class="kpi"><div class="num">${list[0]?list[0].dept:'—'}</div><div class="label">Top-voted department</div></div>
+    </div>
+    <div class="section-head"><h2>Top-rated across the college</h2><span class="hint">Sorted by peer votes</span></div>
+    ${list.length ? list.map(inv=>`
+      <div class="feed-item">
+        <div class="feed-top">
+          <div>
+            <h3 class="feed-title">${inv.title}</h3>
+            <div class="feed-tags"><span class="tag dim">${inv.dept}</span><span class="tag dim">${inv.type}</span>${statusTag(inv.status)}</div>
+          </div>
+          <button class="vote-btn" onclick="upvote(${state.innovations.indexOf(inv)})">▲ Upvote <span class="vote-count">${inv.showcase.votes}</span></button>
+        </div>
+        <p class="feed-desc">${inv.description}</p>
+        <div class="feed-foot">
+          <span>Credited to ${inv.creator} · logged ${inv.date}</span>
+          <button class="btn btn-outline btn-small" onclick="openLedgerDetail(${state.innovations.indexOf(inv)})">View full record</button>
+        </div>
+      </div>
+    `).join('') : `<div class="empty">No innovations showcased yet. Nominate one from the Innovation Ledger.</div>`}
+  `;
+}
+function upvote(idx){
+  state.innovations[idx].showcase.votes += 1;
+  renderContent();
+}
+
+/* ============================= FEATURE 4: ROI TRACKER ============================= */
+function renderRoi(){
+  const entries = [];
+  state.innovations.forEach((inv,idx)=>inv.roiEntries.forEach(r=>entries.push({...r, invIdx:idx, title:inv.title, dept:inv.dept})));
+  return `
+    <div class="kpi-row">
+      <div class="kpi"><div class="num">${totalHoursSaved()} hrs/wk</div><div class="label">Total hours saved</div></div>
+      <div class="kpi"><div class="num">${money(totalBudgetReduced())}</div><div class="label">Total budget reduced</div></div>
+      <div class="kpi"><div class="num">${avgConversion().toFixed(1)}%</div><div class="label">Avg. conversion improvement</div></div>
+      <div class="kpi"><div class="num">${state.innovations.filter(i=>i.roiEntries.length).length} / ${state.innovations.length}</div><div class="label">Innovations with tracked ROI</div></div>
+    </div>
+    <div class="section-head"><h2>ROI impact log</h2><span class="hint">${entries.length} recorded impact entries · click a row to open the innovation</span></div>
+    ${entries.length ? `<div class="table-wrap"><table class="ledger"><thead><tr>
+      <th>Innovation</th><th>Department</th><th>Metric</th><th>Value</th><th>Verified by</th><th>Date</th>
+    </tr></thead><tbody>
+      ${entries.map(r=>`<tr onclick="openLedgerDetail(${r.invIdx})">
+        <td>${r.title}</td><td>${r.dept}</td><td>${r.metric}</td>
+        <td class="num">${r.metric==='Budget reduced'?money(r.value):r.value+(r.metric==='Hours saved / week'?' hrs':r.metric==='Lead conversion improvement'?'%':'')}</td>
+        <td>${r.verifiedBy}</td><td>${r.date}</td>
+      </tr>`).join('')}
+    </tbody></table></div>` : `<div class="empty">No ROI impact logged yet.</div>`}
+  `;
+}
+function openRoiModal(){
+  $('#modal-root').innerHTML = `<div class="overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <h3>Log ROI impact</h3>
+      <div class="sub">Record the measurable, real-world impact of a logged innovation.</div>
+      <form onsubmit="submitRoi(event)">
+        <div class="field"><label>Innovation</label><select name="invIdx">${state.innovations.map((inv,i)=>`<option value="${i}">${inv.title}</option>`).join('')}</select></div>
+        <div class="two-col">
+          <div class="field"><label>Metric</label><select name="metric">${METRICS.map(m=>`<option>${m}</option>`).join('')}</select></div>
+          <div class="field"><label>Value</label><input name="value" type="number" step="0.1" required placeholder="e.g. 4"></div>
+        </div>
+        <div class="field"><label>Verified by</label><input name="verifiedBy" required placeholder="e.g. Department Head"></div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
+          <button type="submit" class="btn">Log impact</button>
+        </div>
+      </form>
+    </div>
+  </div>`;
+}
+function submitRoi(e){
+  e.preventDefault();
+  const f = e.target;
+  const idx = +f.invIdx.value;
+  state.innovations[idx].roiEntries.unshift({metric:f.metric.value, value:+f.value.value||0, verifiedBy:f.verifiedBy.value, date:'Sep 2026'});
+  closeModal();
+  renderContent();
+  toast('ROI impact logged for ' + state.innovations[idx].title + '.');
+}
+
+/* ============================= TOP-LEVEL RENDER ============================= */
+function renderSidebar(){
+  $('#sidebar').innerHTML = `
+    <div class="brand">
+      <div class="brand-mark">ING College OS</div>
+      <div class="brand-sub">Innovation Ledger Console — Northgate College</div>
+    </div>
+    <nav class="nav">
+      ${NAV.map(n=>`<button class="nav-item" data-id="${n.id}" onclick="navigate('${n.id}')"><span class="nav-mono">${n.mono}</span>${n.label}</button>`).join('')}
+    </nav>
+    <div class="sidebar-foot">
+      <div class="who">Signed in as Department Head</div>
+      Northgate College · All departments
+    </div>
+  `;
+}
+function renderTopbar(){
+  const t = TITLES[state.active];
+  let actionsHtml = '';
+  if(state.active==='ledger') actionsHtml = `<button class="btn" onclick="openLedgerModal()">+ Log innovation</button>`;
+  else if(state.active==='roi') actionsHtml = `<button class="btn" onclick="openRoiModal()">+ Log ROI impact</button>`;
+  $('#topbar').innerHTML = `
+    <div>
+      <div class="title-row"><button class="menu-btn" onclick="toggleSidebar()">&#9776;</button><h1>${t.title}</h1></div>
+      <div class="desc">${t.desc}</div>
+    </div>
+    <div class="actions">${actionsHtml}</div>
+  `;
+}
+function renderContent(){
+  let html = '';
+  if(state.active==='dashboard') html = renderDashboard();
+  else if(state.active==='ledger') html = renderLedger();
+  else if(state.active==='credit') html = renderCredit();
+  else if(state.active==='showcase') html = renderShowcase();
+  else if(state.active==='roi') html = renderRoi();
+  $('#content').innerHTML = html;
+}
+function navigate(id){
+  state.active = id;
+  document.querySelectorAll('.nav-item').forEach(el=>{
+    el.classList.toggle('active', el.getAttribute('data-id')===id);
+  });
+  renderTopbar();
+  renderContent();
+  closeModal(); closeDrawer();
+  document.getElementById('sidebar').classList.remove('open');
+  window.scrollTo(0,0);
+}
+function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); }
+
+/* ============================= INIT ============================= */
+renderSidebar();
+navigate('dashboard');
+</script>
+</body>
+</html>

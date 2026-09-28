@@ -1,0 +1,2285 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ING ERP — Placement Management Unit</title>
+    <style>
+      :root {
+        --surface-1: #fafafa;
+        --surface-2: #f2f2f2;
+        --border: #e6e6e6;
+        --border-strong: #cfcfcf;
+        --text-primary: #111111;
+        --text-secondary: #5a5a5e;
+        --text-muted: #9a9a9e;
+        --fill-primary: #000000;
+        --on-primary: #ffffff;
+        --radius: 10px;
+        --warning-bg: #fffbe6;
+        --warning-border: #ffe58f;
+        --warning-text: #873800;
+        --danger-bg: #fff1f0;
+        --danger-border: #ffa39e;
+        --danger-text: #cf1322;
+        --success-bg: #f6ffed;
+        --success-border: #b7eb8f;
+        --success-text: #389e0d;
+        --info-bg: #e6f7ff;
+        --info-border: #91d5ff;
+        --info-text: #096dd9;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+          Arial, sans-serif;
+        background: var(--surface-2);
+        color: var(--text-primary);
+      }
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 24px;
+        background: #fff;
+        border-bottom: 1px solid var(--border);
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .topbar .who {
+        font-size: 12px;
+        color: var(--text-secondary);
+      }
+      .topbar .who strong {
+        color: var(--text-primary);
+        font-weight: 600;
+      }
+      .app {
+        display: flex;
+        min-height: 100vh;
+      }
+      .sidebar {
+        width: 230px;
+        flex-shrink: 0;
+        background: var(--surface-1);
+        border-right: 1px solid var(--border);
+        padding: 20px 12px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0 8px 16px;
+      }
+      .brand .mark {
+        width: 24px;
+        height: 24px;
+        border-radius: 6px;
+        background: var(--fill-primary);
+        flex-shrink: 0;
+      }
+      .brand .name {
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 1.3;
+      }
+      .brand .role {
+        font-size: 11px;
+        color: var(--text-muted);
+        line-height: 1.3;
+      }
+      .nav-item {
+        display: block;
+        padding: 8px 10px;
+        border-radius: 7px;
+        font-size: 13px;
+        color: var(--text-secondary);
+        cursor: pointer;
+        margin-bottom: 2px;
+      }
+      .nav-item:hover {
+        background: var(--surface-2);
+      }
+      .nav-item.active {
+        background: var(--fill-primary);
+        color: var(--on-primary);
+      }
+      .nav-divider {
+        border-top: 1px solid var(--border);
+        margin: 12px 4px;
+      }
+      .group {
+        margin-bottom: 16px;
+      }
+      .group-label {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-muted);
+        margin: 0 0 6px 10px;
+      }
+      .main {
+        flex: 1;
+        padding: 32px 36px;
+        min-width: 0;
+      }
+      .page {
+        display: none;
+      }
+      .page.active {
+        display: block;
+      }
+      .page-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: 22px;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .header-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      h1 {
+        font-size: 22px;
+        margin: 0;
+        font-weight: 600;
+      }
+      .subtitle {
+        font-size: 13px;
+        color: var(--text-secondary);
+        margin: 5px 0 0;
+      }
+      button.primary {
+        background: var(--fill-primary);
+        color: var(--on-primary);
+        border: none;
+        border-radius: 8px;
+        padding: 10px 16px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      button.secondary {
+        background: #fff;
+        color: var(--text-primary);
+        border: 1px solid var(--border-strong);
+        border-radius: 8px;
+        padding: 10px 16px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      button.primary:hover {
+        opacity: 0.9;
+      }
+      button.secondary:hover {
+        background: var(--surface-1);
+      }
+      .link-btn {
+        background: none;
+        border: none;
+        color: var(--text-primary);
+        font-size: 12px;
+        font-weight: 600;
+        text-decoration: underline;
+        cursor: pointer;
+        padding: 0;
+        white-space: nowrap;
+      }
+      .toolbar {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 18px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      input[type="text"],
+      input[type="number"],
+      input[type="date"],
+      select,
+      textarea {
+        border: 1px solid var(--border-strong);
+        border-radius: 8px;
+        padding: 10px 12px;
+        font-size: 13px;
+        background: #fff;
+        color: var(--text-primary);
+        font-family: inherit;
+      }
+      input[type="text"] {
+        flex: 1;
+        min-width: 160px;
+      }
+      select {
+        width: 180px;
+      }
+      .badge {
+        font-size: 11px;
+        padding: 3px 9px;
+        border-radius: 999px;
+        white-space: nowrap;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .badge.filled {
+        background: var(--fill-primary);
+        color: var(--on-primary);
+      }
+      .badge.outline {
+        border: 1px solid var(--border-strong);
+        color: var(--text-secondary);
+      }
+      .badge.dashed {
+        border: 1px dashed var(--border-strong);
+        color: var(--text-secondary);
+      }
+      .badge.mou-active {
+        background: var(--success-bg);
+        border: 1px solid var(--success-border);
+        color: var(--success-text);
+      }
+      .badge.mou-process {
+        background: var(--info-bg);
+        border: 1px solid var(--info-border);
+        color: var(--info-text);
+      }
+      .badge.mou-expiring {
+        background: var(--warning-bg);
+        border: 1px solid var(--warning-border);
+        color: var(--warning-text);
+      }
+      .badge.mou-expired {
+        background: var(--danger-bg);
+        border: 1px solid var(--danger-border);
+        color: var(--danger-text);
+      }
+
+      .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+      .stat-card {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: #fff;
+        padding: 16px 18px;
+      }
+      .stat-value {
+        font-size: 24px;
+        font-weight: 700;
+      }
+      .stat-label {
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-top: 4px;
+      }
+
+      .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 20px;
+      }
+      .card {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: #fff;
+        padding: 18px;
+      }
+      .card-title {
+        font-size: 14px;
+        font-weight: 600;
+        margin: 0 0 14px 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .list {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+        background: #fff;
+      }
+      .list-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 18px;
+        gap: 14px;
+        border-bottom: 1px solid var(--border);
+      }
+      .list-row:last-child {
+        border-bottom: none;
+      }
+      .list-row .primary-text {
+        font-size: 14px;
+        font-weight: 600;
+      }
+      .list-row .secondary-text {
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-top: 3px;
+      }
+      .list-row .right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-shrink: 0;
+      }
+
+      .table-wrap {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+        background: #fff;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        padding: 12px 14px;
+        font-size: 13px;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+      }
+      th {
+        font-weight: 600;
+        color: var(--text-secondary);
+        background: var(--surface-1);
+        font-size: 12px;
+      }
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+      td.num {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .bar-track {
+        background: var(--surface-2);
+        border-radius: 6px;
+        height: 8px;
+        width: 120px;
+        overflow: hidden;
+        flex-shrink: 0;
+      }
+      .bar-fill {
+        background: var(--fill-primary);
+        height: 100%;
+        transition: width 0.3s ease;
+      }
+
+      .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        z-index: 50;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      .modal-overlay.open {
+        display: flex;
+      }
+      .modal {
+        background: #fff;
+        border-radius: 12px;
+        max-width: 520px;
+        width: 100%;
+        max-height: 88vh;
+        overflow-y: auto;
+        border: 1px solid var(--border-strong);
+      }
+      .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border);
+      }
+      .modal-header h3 {
+        margin: 0;
+        font-size: 16px;
+      }
+      .modal-close {
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        color: var(--text-secondary);
+        line-height: 1;
+        padding: 4px;
+      }
+      .modal-body {
+        padding: 18px 20px;
+      }
+      .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        padding: 14px 20px;
+        border-top: 1px solid var(--border);
+      }
+
+      .form-group {
+        margin-bottom: 14px;
+      }
+      .form-group label {
+        display: block;
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-bottom: 5px;
+        font-weight: 600;
+      }
+      .form-group input,
+      .form-group select,
+      .form-group textarea {
+        width: 100%;
+      }
+      .form-group textarea {
+        resize: vertical;
+        min-height: 70px;
+      }
+      .form-row-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 10px;
+      }
+      .form-row-2 input,
+      .form-row-2 select {
+        width: 100%;
+      }
+
+      .checkbox-group {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-top: 6px;
+      }
+      .checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        color: var(--text-primary);
+      }
+      .checkbox-item input {
+        width: auto;
+      }
+
+      .tag-container {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        margin-top: 4px;
+      }
+      .tag {
+        font-size: 11px;
+        background: var(--surface-2);
+        border: 1px solid var(--border-strong);
+        padding: 2px 6px;
+        border-radius: 4px;
+        color: var(--text-secondary);
+      }
+
+      @media (max-width: 850px) {
+        .stat-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+        .grid-2 {
+          grid-template-columns: 1fr;
+        }
+      }
+      @media (max-width: 640px) {
+        .sidebar {
+          display: none;
+        }
+        .main {
+          padding: 22px;
+        }
+        .stat-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="topbar">
+      <div class="who">
+        Signed in as <strong>Mr. Sanjay Rai</strong> — Placement Officer
+      </div>
+      <div class="who">BSc Computer Science, graduating cohort 2027</div>
+    </div>
+
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="mark"></div>
+          <div>
+            <div class="name">ING ERP</div>
+            <div class="role">Placement Unit</div>
+          </div>
+        </div>
+        <div
+          class="nav-item active"
+          data-page="dashboard"
+          onclick="showPage('dashboard', this)"
+        >
+          Dashboard
+        </div>
+        <div class="nav-divider"></div>
+        <nav>
+          <div class="group">
+            <p class="group-label">Corporate</p>
+            <div
+              class="nav-item"
+              data-page="corporate"
+              onclick="showPage('corporate', this)"
+            >
+              Corporate directory &amp; MOUs
+            </div>
+          </div>
+          <div class="group">
+            <p class="group-label">Opportunities</p>
+            <div
+              class="nav-item"
+              data-page="vacancies"
+              onclick="showPage('vacancies', this)"
+            >
+              Vacancies &amp; Sharing
+            </div>
+            <div
+              class="nav-item"
+              data-page="interviews"
+              onclick="showPage('interviews', this)"
+            >
+              Interview schedule
+            </div>
+          </div>
+          <div class="group">
+            <p class="group-label">Students</p>
+            <div
+              class="nav-item"
+              data-page="resumes"
+              onclick="showPage('resumes', this)"
+            >
+              Resume archive
+            </div>
+          </div>
+          <div class="group">
+            <p class="group-label">Analytics &amp; Success</p>
+            <div
+              class="nav-item"
+              data-page="success"
+              onclick="showPage('success', this)"
+            >
+              Placement success
+            </div>
+            <div
+              class="nav-item"
+              data-page="market"
+              onclick="showPage('market', this)"
+            >
+              Market analysis
+            </div>
+          </div>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <!-- PAGE: DASHBOARD -->
+        <section class="page active" id="page-dashboard">
+          <div class="page-header">
+            <div>
+              <h1>Placement overview</h1>
+              <p class="subtitle">
+                BSc Computer Science, graduating cohort 2027
+              </p>
+            </div>
+          </div>
+          <div class="stat-grid">
+            <div class="stat-card">
+              <div class="stat-value" id="dash-active-comp">24</div>
+              <div class="stat-label">Active companies</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="dash-open-vacancies">8</div>
+              <div class="stat-label">Open vacancies</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="dash-expiring-mous">2</div>
+              <div class="stat-label">MOUs Expiring Soon</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="dash-placement-rate">87%</div>
+              <div class="stat-label">Placement rate</div>
+            </div>
+          </div>
+          <div class="list" style="margin-bottom: 20px">
+            <div class="list-row">
+              <div>
+                <div class="primary-text">2 MOUs need attention or renewal</div>
+                <div class="secondary-text">
+                  CloudPeak Systems (Expiring in 12 days), Sagarmatha Logistics
+                  (In process)
+                </div>
+              </div>
+              <div class="right">
+                <button class="link-btn" onclick="goTo('corporate')">
+                  Manage MOUs
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">2 vacancies ready to be shared</div>
+                <div class="secondary-text">
+                  Cloud Support Engineer, Supply Chain Analyst
+                </div>
+              </div>
+              <div class="right">
+                <button class="link-btn" onclick="goTo('vacancies')">
+                  Share vacancies
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">5 interviews scheduled this week</div>
+                <div class="secondary-text">
+                  Sunita Gurung, Nisha Adhikari, Aisha Karki and 2 others
+                </div>
+              </div>
+              <div class="right">
+                <button class="link-btn" onclick="goTo('interviews')">
+                  View schedule
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">
+                  2 students have never uploaded a resume
+                </div>
+                <div class="secondary-text">Manisha Shrestha, Kiran Magar</div>
+              </div>
+              <div class="right">
+                <button class="link-btn" onclick="goTo('resumes')">
+                  Follow up
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="toolbar">
+            <button class="secondary" onclick="openAddCompany()">
+              + Add company
+            </button>
+            <button class="secondary" onclick="openPostVacancy()">
+              + Post vacancy
+            </button>
+            <button class="secondary" onclick="openScheduleInterview()">
+              + Schedule interview
+            </button>
+            <button class="primary" onclick="openAddPlacementRecord()">
+              + Record Placement Success
+            </button>
+          </div>
+        </section>
+
+        <!-- PAGE: CORPORATE DIRECTORY & MOUS -->
+        <section class="page" id="page-corporate">
+          <div class="page-header">
+            <div>
+              <h1>Corporate Directory &amp; MOUs</h1>
+              <p class="subtitle">
+                Partnerships, contact persons, and legal MOU status flags
+              </p>
+            </div>
+            <button class="primary" onclick="openAddCompany()">
+              + Add company
+            </button>
+          </div>
+          <div class="toolbar">
+            <input
+              type="text"
+              placeholder="Search companies or contacts"
+              oninput="filterRows(this, '#corporate-list', '.list-row')"
+            />
+            <select onchange="filterMOU(this.value)">
+              <option value="ALL">All MOU Statuses</option>
+              <option value="Active">Active MOUs</option>
+              <option value="In Process">In Process MOUs</option>
+              <option value="Expiring Soon">Expiring Soon</option>
+              <option value="Expired">Expired</option>
+            </select>
+          </div>
+          <div class="list" id="corporate-list">
+            <div class="list-row" data-mou="Active">
+              <div>
+                <div class="primary-text">TechNova Solutions</div>
+                <div class="secondary-text">
+                  Software — POC: Rita Sharma, HR Manager — MOU: Valid till Dec
+                  2027
+                </div>
+              </div>
+              <div class="right">
+                <span class="secondary-text">14 hires</span>
+                <span class="badge mou-active">🚩 MOU Active</span>
+                <button class="link-btn" onclick="viewHistory(this)">
+                  History
+                </button>
+                <button
+                  class="link-btn"
+                  onclick="
+                    openEditMOU(
+                      this,
+                      'TechNova Solutions',
+                      'Active',
+                      '2024-01-10',
+                      '2027-12-31',
+                    )
+                  "
+                >
+                  MOU Details
+                </button>
+              </div>
+            </div>
+            <div class="list-row" data-mou="Active">
+              <div>
+                <div class="primary-text">Himalayan Bank Ltd</div>
+                <div class="secondary-text">
+                  Banking &amp; Finance — POC: Bikash Rana, Talent Acquisition —
+                  MOU: Valid till Nov 2026
+                </div>
+              </div>
+              <div class="right">
+                <span class="secondary-text">8 hires</span>
+                <span class="badge mou-active">🚩 MOU Active</span>
+                <button class="link-btn" onclick="viewHistory(this)">
+                  History
+                </button>
+                <button
+                  class="link-btn"
+                  onclick="
+                    openEditMOU(
+                      this,
+                      'Himalayan Bank Ltd',
+                      'Active',
+                      '2023-11-15',
+                      '2026-11-15',
+                    )
+                  "
+                >
+                  MOU Details
+                </button>
+              </div>
+            </div>
+            <div class="list-row" data-mou="Active">
+              <div>
+                <div class="primary-text">Everest Analytics</div>
+                <div class="secondary-text">
+                  Data &amp; AI — POC: Sneha Gurung, CTO — MOU: Valid till Aug
+                  2027
+                </div>
+              </div>
+              <div class="right">
+                <span class="secondary-text">5 hires</span>
+                <span class="badge mou-active">🚩 MOU Active</span>
+                <button class="link-btn" onclick="viewHistory(this)">
+                  History
+                </button>
+                <button
+                  class="link-btn"
+                  onclick="
+                    openEditMOU(
+                      this,
+                      'Everest Analytics',
+                      'Active',
+                      '2024-08-01',
+                      '2027-08-01',
+                    )
+                  "
+                >
+                  MOU Details
+                </button>
+              </div>
+            </div>
+            <div class="list-row" data-mou="Expiring Soon">
+              <div>
+                <div class="primary-text">CloudPeak Systems</div>
+                <div class="secondary-text">
+                  Cloud Infrastructure — POC: Rohit Bista, Recruiter — MOU
+                  Expiration: Oct 15, 2026
+                </div>
+              </div>
+              <div class="right">
+                <span class="secondary-text">6 hires</span>
+                <span class="badge mou-expiring">⚠️ MOU Expiring Soon</span>
+                <button class="link-btn" onclick="viewHistory(this)">
+                  History
+                </button>
+                <button
+                  class="link-btn"
+                  onclick="
+                    openEditMOU(
+                      this,
+                      'CloudPeak Systems',
+                      'Expiring Soon',
+                      '2023-10-15',
+                      '2026-10-15',
+                    )
+                  "
+                >
+                  Renew MOU
+                </button>
+              </div>
+            </div>
+            <div class="list-row" data-mou="In Process">
+              <div>
+                <div class="primary-text">Sagarmatha Logistics</div>
+                <div class="secondary-text">
+                  Supply Chain — POC: Deepak Thapa, Ops Director — Draft MoU
+                  sent for approval
+                </div>
+              </div>
+              <div class="right">
+                <span class="secondary-text">2 hires</span>
+                <span class="badge mou-process">⏳ MOU In Process</span>
+                <button class="link-btn" onclick="viewHistory(this)">
+                  History
+                </button>
+                <button
+                  class="link-btn"
+                  onclick="
+                    openEditMOU(
+                      this,
+                      'Sagarmatha Logistics',
+                      'In Process',
+                      '2026-09-01',
+                      '2028-09-01',
+                    )
+                  "
+                >
+                  Update Status
+                </button>
+              </div>
+            </div>
+            <div class="list-row" data-mou="Expired">
+              <div>
+                <div class="primary-text">NextGen Retail Group</div>
+                <div class="secondary-text">
+                  Retail Tech — POC: Anjali Karki, HR Lead — MOU Expired on Jul
+                  2026
+                </div>
+              </div>
+              <div class="right">
+                <span class="secondary-text">0 hires</span>
+                <span class="badge mou-expired">❌ MOU Expired</span>
+                <button class="link-btn" onclick="viewHistory(this)">
+                  History
+                </button>
+                <button
+                  class="link-btn"
+                  onclick="
+                    openEditMOU(
+                      this,
+                      'NextGen Retail Group',
+                      'Expired',
+                      '2023-07-01',
+                      '2026-07-01',
+                    )
+                  "
+                >
+                  Renew MOU
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- PAGE: VACANCIES & SHARING -->
+        <section class="page" id="page-vacancies">
+          <div class="page-header">
+            <div>
+              <h1>Vacancy Dispatch &amp; Sharing Portal</h1>
+              <p class="subtitle">
+                Post job openings, track vacancy dates, and dispatch via
+                multiple channels
+              </p>
+            </div>
+            <button class="primary" onclick="openPostVacancy()">
+              + Post vacancy
+            </button>
+          </div>
+          <div class="toolbar">
+            <input
+              type="text"
+              placeholder="Search vacancies or roles"
+              oninput="filterRows(this, '#vacancies-list', '.list-row')"
+            />
+          </div>
+          <div class="list" id="vacancies-list">
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Software Engineer Intern</div>
+                <div class="secondary-text">
+                  TechNova Solutions — Posted: Sep 01, 2026 | Deadline: Oct 15,
+                  2026
+                </div>
+                <div class="tag-container">
+                  <span class="tag">Shared: Student Portal</span
+                  ><span class="tag">Email Broadcast</span>
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge filled">Dispatched</span>
+                <button
+                  class="link-btn"
+                  onclick="
+                    openShareVacancy(
+                      'Software Engineer Intern',
+                      'TechNova Solutions',
+                    )
+                  "
+                >
+                  Share Vacancy
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Data Analyst</div>
+                <div class="secondary-text">
+                  Everest Analytics — Posted: Sep 05, 2026 | Deadline: Oct 20,
+                  2026
+                </div>
+                <div class="tag-container">
+                  <span class="tag">Shared: Student Portal</span
+                  ><span class="tag">LinkedIn</span>
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge filled">Dispatched</span>
+                <button
+                  class="link-btn"
+                  onclick="
+                    openShareVacancy('Data Analyst', 'Everest Analytics')
+                  "
+                >
+                  Share Vacancy
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Graduate Trainee — Banking</div>
+                <div class="secondary-text">
+                  Himalayan Bank Ltd — Posted: Sep 10, 2026 | Deadline: Oct 05,
+                  2026
+                </div>
+                <div class="tag-container">
+                  <span class="tag">Shared: WhatsApp Group</span
+                  ><span class="tag">Email Broadcast</span>
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge filled">Dispatched</span>
+                <button
+                  class="link-btn"
+                  onclick="
+                    openShareVacancy(
+                      'Graduate Trainee — Banking',
+                      'Himalayan Bank Ltd',
+                    )
+                  "
+                >
+                  Share Vacancy
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Cloud Support Engineer</div>
+                <div class="secondary-text">
+                  CloudPeak Systems — Posted: Sep 20, 2026 | Deadline: Oct 25,
+                  2026
+                </div>
+                <div class="tag-container">
+                  <span class="tag">Not Shared Yet</span>
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge dashed">Draft</span>
+                <button class="link-btn" onclick="dispatchVacancy(this)">
+                  Verify &amp; Dispatch
+                </button>
+                <button
+                  class="link-btn"
+                  onclick="
+                    openShareVacancy(
+                      'Cloud Support Engineer',
+                      'CloudPeak Systems',
+                    )
+                  "
+                >
+                  Share
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Supply Chain Analyst</div>
+                <div class="secondary-text">
+                  Sagarmatha Logistics — Posted: Sep 22, 2026 | Deadline: Nov
+                  01, 2026
+                </div>
+                <div class="tag-container">
+                  <span class="tag">Not Shared Yet</span>
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge dashed">Draft</span>
+                <button class="link-btn" onclick="dispatchVacancy(this)">
+                  Verify &amp; Dispatch
+                </button>
+                <button
+                  class="link-btn"
+                  onclick="
+                    openShareVacancy(
+                      'Supply Chain Analyst',
+                      'Sagarmatha Logistics',
+                    )
+                  "
+                >
+                  Share
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- PAGE: INTERVIEWS -->
+        <section class="page" id="page-interviews">
+          <div class="page-header">
+            <div>
+              <h1>Interview Scheduling Matrix</h1>
+              <p class="subtitle">
+                Coordinating corporate hiring teams and student cohorts
+              </p>
+            </div>
+            <button class="primary" onclick="openScheduleInterview()">
+              + Schedule interview
+            </button>
+          </div>
+          <div class="table-wrap">
+            <table id="interviews-table">
+              <thead>
+                <tr>
+                  <th>Student</th>
+                  <th>Company</th>
+                  <th>Position</th>
+                  <th>Date &amp; time</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Sunita Gurung</td>
+                  <td>Everest Analytics</td>
+                  <td>Data Analyst</td>
+                  <td>Sep 12, 10:00</td>
+                  <td>
+                    <span class="badge dashed">Scheduled</span>
+                    <button class="link-btn" onclick="markOutcome(this)">
+                      Mark outcome
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Nisha Adhikari</td>
+                  <td>TechNova Solutions</td>
+                  <td>Software Engineer Intern</td>
+                  <td>Sep 12, 14:00</td>
+                  <td>
+                    <span class="badge dashed">Scheduled</span>
+                    <button class="link-btn" onclick="markOutcome(this)">
+                      Mark outcome
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Aisha Karki</td>
+                  <td>Himalayan Bank Ltd</td>
+                  <td>Graduate Trainee</td>
+                  <td>Sep 13, 11:00</td>
+                  <td>
+                    <span class="badge dashed">Scheduled</span>
+                    <button class="link-btn" onclick="markOutcome(this)">
+                      Mark outcome
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Rajesh Karki</td>
+                  <td>TechNova Solutions</td>
+                  <td>Software Engineer Intern</td>
+                  <td>Sep 10, 9:00</td>
+                  <td><span class="badge filled">Selected</span></td>
+                </tr>
+                <tr>
+                  <td>Anita Poudel</td>
+                  <td>Everest Analytics</td>
+                  <td>Data Analyst</td>
+                  <td>Sep 9, 15:00</td>
+                  <td><span class="badge outline">Not selected</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- PAGE: RESUMES -->
+        <section class="page" id="page-resumes">
+          <div class="page-header">
+            <div>
+              <h1>Student Resume Archive</h1>
+              <p class="subtitle">
+                Profiles, portfolios, and certification links
+              </p>
+            </div>
+          </div>
+          <div class="toolbar">
+            <input
+              type="text"
+              placeholder="Search students"
+              oninput="filterRows(this, '#resumes-list', '.list-row')"
+            />
+          </div>
+          <div class="list" id="resumes-list">
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Sunita Gurung</div>
+                <div class="secondary-text">
+                  3 certifications — updated 2 days ago
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge filled">Verified</span
+                ><button class="link-btn" onclick="viewResume(this)">
+                  View
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Nisha Adhikari</div>
+                <div class="secondary-text">
+                  2 certifications — updated 5 days ago
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge filled">Verified</span
+                ><button class="link-btn" onclick="viewResume(this)">
+                  View
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Aisha Karki</div>
+                <div class="secondary-text">
+                  1 certification — updated 1 week ago
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge filled">Verified</span
+                ><button class="link-btn" onclick="viewResume(this)">
+                  View
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Rajesh Karki</div>
+                <div class="secondary-text">
+                  2 certifications — updated 3 days ago
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge filled">Verified</span
+                ><button class="link-btn" onclick="viewResume(this)">
+                  View
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Anita Poudel</div>
+                <div class="secondary-text">
+                  1 certification — updated 1 week ago
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge filled">Verified</span
+                ><button class="link-btn" onclick="viewResume(this)">
+                  View
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Bibek Rai</div>
+                <div class="secondary-text">
+                  0 certifications — updated 2 months ago
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge dashed">Needs update</span
+                ><button class="link-btn" onclick="requestUpdate(this)">
+                  Request update
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Prakash Thapa</div>
+                <div class="secondary-text">
+                  1 certification — updated 2 weeks ago
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge filled">Verified</span
+                ><button class="link-btn" onclick="viewResume(this)">
+                  View
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Manisha Shrestha</div>
+                <div class="secondary-text">
+                  0 certifications — never uploaded
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge outline">Missing</span
+                ><button class="link-btn" onclick="requestUpdate(this)">
+                  Request update
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Suman Basnet</div>
+                <div class="secondary-text">
+                  0 certifications — updated 3 months ago
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge dashed">Needs update</span
+                ><button class="link-btn" onclick="requestUpdate(this)">
+                  Request update
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Kiran Magar</div>
+                <div class="secondary-text">
+                  0 certifications — never uploaded
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge outline">Missing</span
+                ><button class="link-btn" onclick="requestUpdate(this)">
+                  Request update
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- PAGE: PLACEMENT SUCCESS DASHBOARD -->
+        <section class="page" id="page-success">
+          <div class="page-header">
+            <div>
+              <h1>Placement Success Dashboard</h1>
+              <p class="subtitle">
+                BSc Computer Science, graduating cohort 2027
+              </p>
+            </div>
+            <div class="header-actions">
+              <button class="secondary" onclick="exportReport()">
+                Export report
+              </button>
+              <button class="primary" onclick="openAddPlacementRecord()">
+                + Add Placement Record
+              </button>
+            </div>
+          </div>
+          <div class="stat-grid">
+            <div class="stat-card">
+              <div class="stat-value" id="ps-placed-count">36</div>
+              <div class="stat-label">Students placed</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="ps-rate">87%</div>
+              <div class="stat-label">Placement rate</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="ps-avg-salary">NPR 55,000</div>
+              <div class="stat-label">Avg entry salary / month</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="ps-companies-count">18</div>
+              <div class="stat-label">Companies hiring</div>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div>
+              <p
+                style="
+                  font-size: 12px;
+                  font-weight: 600;
+                  color: var(--text-muted);
+                  margin: 0 0 8px;
+                "
+              >
+                Entry salary distribution
+              </p>
+              <div class="list">
+                <div class="list-row">
+                  <div class="primary-text">Below NPR 30,000</div>
+                  <div class="right">
+                    <div class="bar-track">
+                      <div
+                        class="bar-fill"
+                        id="bar-sal-1"
+                        style="width: 20%"
+                      ></div>
+                    </div>
+                    <span class="secondary-text" id="count-sal-1"
+                      >4 students</span
+                    >
+                  </div>
+                </div>
+                <div class="list-row">
+                  <div class="primary-text">NPR 30,000–50,000</div>
+                  <div class="right">
+                    <div class="bar-track">
+                      <div
+                        class="bar-fill"
+                        id="bar-sal-2"
+                        style="width: 55%"
+                      ></div>
+                    </div>
+                    <span class="secondary-text" id="count-sal-2"
+                      >11 students</span
+                    >
+                  </div>
+                </div>
+                <div class="list-row">
+                  <div class="primary-text">NPR 50,000–70,000</div>
+                  <div class="right">
+                    <div class="bar-track">
+                      <div
+                        class="bar-fill"
+                        id="bar-sal-3"
+                        style="width: 100%"
+                      ></div>
+                    </div>
+                    <span class="secondary-text" id="count-sal-3"
+                      >15 students</span
+                    >
+                  </div>
+                </div>
+                <div class="list-row">
+                  <div class="primary-text">Above NPR 70,000</div>
+                  <div class="right">
+                    <div class="bar-track">
+                      <div
+                        class="bar-fill"
+                        id="bar-sal-4"
+                        style="width: 30%"
+                      ></div>
+                    </div>
+                    <span class="secondary-text" id="count-sal-4"
+                      >6 students</span
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <p
+                style="
+                  font-size: 12px;
+                  font-weight: 600;
+                  color: var(--text-muted);
+                  margin: 0 0 8px;
+                "
+              >
+                Top hiring companies
+              </p>
+              <div class="list" id="top-hiring-list">
+                <div class="list-row">
+                  <div class="primary-text">TechNova Solutions</div>
+                  <div class="right">
+                    <span class="secondary-text">14 hires</span>
+                  </div>
+                </div>
+                <div class="list-row">
+                  <div class="primary-text">Himalayan Bank Ltd</div>
+                  <div class="right">
+                    <span class="secondary-text">8 hires</span>
+                  </div>
+                </div>
+                <div class="list-row">
+                  <div class="primary-text">CloudPeak Systems</div>
+                  <div class="right">
+                    <span class="secondary-text">6 hires</span>
+                  </div>
+                </div>
+                <div class="list-row">
+                  <div class="primary-text">Everest Analytics</div>
+                  <div class="right">
+                    <span class="secondary-text">5 hires</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top: 10px">
+            <div class="card-title">
+              <span>Recent Student Placements Ledger</span>
+              <button
+                class="primary"
+                style="padding: 6px 12px; font-size: 12px"
+                onclick="openAddPlacementRecord()"
+              >
+                + Add New
+              </button>
+            </div>
+            <div class="table-wrap">
+              <table id="placement-records-table">
+                <thead>
+                  <tr>
+                    <th>Student</th>
+                    <th>Company</th>
+                    <th>Role</th>
+                    <th>Monthly Package</th>
+                    <th>Placement Date</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Rajesh Karki</td>
+                    <td>TechNova Solutions</td>
+                    <td>Software Engineer Intern</td>
+                    <td>NPR 55,000</td>
+                    <td>Sep 10, 2026</td>
+                    <td><span class="badge filled">Confirmed</span></td>
+                  </tr>
+                  <tr>
+                    <td>Sunita Gurung</td>
+                    <td>Everest Analytics</td>
+                    <td>Data Analyst</td>
+                    <td>NPR 60,000</td>
+                    <td>Sep 15, 2026</td>
+                    <td><span class="badge filled">Confirmed</span></td>
+                  </tr>
+                  <tr>
+                    <td>Nisha Adhikari</td>
+                    <td>TechNova Solutions</td>
+                    <td>Frontend Developer</td>
+                    <td>NPR 50,000</td>
+                    <td>Sep 18, 2026</td>
+                    <td><span class="badge filled">Confirmed</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- PAGE: MARKET ANALYSIS DASHBOARD -->
+        <section class="page" id="page-market">
+          <div class="page-header">
+            <div>
+              <h1>Placement Market Analysis Dashboard</h1>
+              <p class="subtitle">
+                Industry trends, skill demand, and market salary benchmarks
+              </p>
+            </div>
+            <button class="secondary" onclick="exportReport()">
+              Export Analytics
+            </button>
+          </div>
+
+          <div class="stat-grid">
+            <div class="stat-card">
+              <div class="stat-value">Software / AI</div>
+              <div class="stat-label">Highest Demand Sector</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">+18% YoY</div>
+              <div class="stat-label">Tech Hiring Growth</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">NPR 58,500</div>
+              <div class="stat-label">Market Avg Offer</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">React, Python, AWS</div>
+              <div class="stat-label">Top Skills Demanded</div>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-title">Industry Hiring Share</div>
+              <div class="list" style="border: none">
+                <div class="list-row" style="padding: 8px 0">
+                  <div class="primary-text">Software &amp; IT Services</div>
+                  <div class="right">
+                    <div class="bar-track">
+                      <div class="bar-fill" style="width: 85%"></div>
+                    </div>
+                    <span class="secondary-text">45%</span>
+                  </div>
+                </div>
+                <div class="list-row" style="padding: 8px 0">
+                  <div class="primary-text">Fintech &amp; Banking</div>
+                  <div class="right">
+                    <div class="bar-track">
+                      <div class="bar-fill" style="width: 50%"></div>
+                    </div>
+                    <span class="secondary-text">25%</span>
+                  </div>
+                </div>
+                <div class="list-row" style="padding: 8px 0">
+                  <div class="primary-text">Data Science &amp; AI</div>
+                  <div class="right">
+                    <div class="bar-track">
+                      <div class="bar-fill" style="width: 35%"></div>
+                    </div>
+                    <span class="secondary-text">18%</span>
+                  </div>
+                </div>
+                <div class="list-row" style="padding: 8px 0">
+                  <div class="primary-text">E-Commerce &amp; Logistics</div>
+                  <div class="right">
+                    <div class="bar-track">
+                      <div class="bar-fill" style="width: 20%"></div>
+                    </div>
+                    <span class="secondary-text">12%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-title">Average Salary Benchmarks by Role</div>
+              <div class="list" style="border: none">
+                <div class="list-row" style="padding: 8px 0">
+                  <div class="primary-text">Full Stack / Cloud Dev</div>
+                  <div class="right">
+                    <span class="primary-text">NPR 65,000 / mo</span>
+                  </div>
+                </div>
+                <div class="list-row" style="padding: 8px 0">
+                  <div class="primary-text">Data &amp; AI Engineer</div>
+                  <div class="right">
+                    <span class="primary-text">NPR 62,000 / mo</span>
+                  </div>
+                </div>
+                <div class="list-row" style="padding: 8px 0">
+                  <div class="primary-text">Cybersecurity Associate</div>
+                  <div class="right">
+                    <span class="primary-text">NPR 58,000 / mo</span>
+                  </div>
+                </div>
+                <div class="list-row" style="padding: 8px 0">
+                  <div class="primary-text">QA &amp; System Analyst</div>
+                  <div class="right">
+                    <span class="primary-text">NPR 45,000 / mo</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">
+              Market Insight &amp; Skill Gap Recommendations
+            </div>
+            <p
+              style="
+                font-size: 13px;
+                color: var(--text-secondary);
+                line-height: 1.5;
+                margin: 0 0 10px;
+              "
+            >
+              Based on company recruiter feedback, local tech partners show high
+              demand for <strong>Cloud Infrastructure (AWS/Azure)</strong> and
+              <strong>Modern Frontend Frameworks (React/Angular)</strong>.
+            </p>
+            <div class="tag-container">
+              <span class="tag">High Priority: AWS Fundamentals</span>
+              <span class="tag">High Priority: React.js</span>
+              <span class="tag">Emerging: Agentic AI Tools</span>
+              <span class="tag">Moderate: PostgreSQL Optimization</span>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- MODAL OVERLAY SHELL -->
+    <div
+      class="modal-overlay"
+      id="modal-overlay"
+      onclick="if (event.target === this) closeModal();"
+    >
+      <div class="modal">
+        <div class="modal-header">
+          <h3 id="modal-title"></h3>
+          <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body" id="modal-body"></div>
+        <div class="modal-footer" id="modal-footer"></div>
+      </div>
+    </div>
+
+    <script>
+      var modalContext = null;
+
+      // Global Data Collections
+      var STUDENTS = [
+        "Sunita Gurung",
+        "Nisha Adhikari",
+        "Aisha Karki",
+        "Rajesh Karki",
+        "Anita Poudel",
+        "Bibek Rai",
+        "Prakash Thapa",
+        "Manisha Shrestha",
+        "Suman Basnet",
+        "Kiran Magar",
+      ];
+      var COMPANIES = [
+        "TechNova Solutions",
+        "Himalayan Bank Ltd",
+        "Everest Analytics",
+        "CloudPeak Systems",
+        "Sagarmatha Logistics",
+        "NextGen Retail Group",
+      ];
+
+      var placementStats = {
+        placedCount: 36,
+        totalStudents: 41,
+        avgSalary: 55000,
+        companiesHiring: 18,
+        salaryBuckets: { b1: 4, b2: 11, b3: 15, b4: 6 },
+        companyHires: {
+          "TechNova Solutions": 14,
+          "Himalayan Bank Ltd": 8,
+          "CloudPeak Systems": 6,
+          "Everest Analytics": 5,
+        },
+      };
+
+      /* ---------- Page Navigation ---------- */
+      function showPage(id, el) {
+        document.querySelectorAll(".page").forEach(function (p) {
+          p.classList.remove("active");
+        });
+        var targetPage = document.getElementById("page-" + id);
+        if (targetPage) targetPage.classList.add("active");
+
+        document.querySelectorAll(".nav-item").forEach(function (n) {
+          n.classList.remove("active");
+        });
+        if (el) {
+          el.classList.add("active");
+        } else {
+          var matchNav = document.querySelector(
+            '.nav-item[data-page="' + id + '"]',
+          );
+          if (matchNav) matchNav.classList.add("active");
+        }
+      }
+
+      function goTo(id) {
+        showPage(id);
+      }
+
+      function filterRows(inputEl, containerSelector, rowSelector) {
+        var q = inputEl.value.toLowerCase();
+        document
+          .querySelectorAll(containerSelector + " " + rowSelector)
+          .forEach(function (row) {
+            row.style.display =
+              row.textContent.toLowerCase().indexOf(q) > -1 ? "" : "none";
+          });
+      }
+
+      function filterMOU(status) {
+        var rows = document.querySelectorAll("#corporate-list .list-row");
+        rows.forEach(function (row) {
+          var rowStatus = row.getAttribute("data-mou");
+          if (status === "ALL" || rowStatus === status) {
+            row.style.display = "flex";
+          } else {
+            row.style.display = "none";
+          }
+        });
+      }
+
+      /* ---------- Modal Utilities ---------- */
+      function openModal(title, bodyHtml, footerHtml) {
+        document.getElementById("modal-title").textContent = title;
+        document.getElementById("modal-body").innerHTML = bodyHtml;
+        document.getElementById("modal-footer").innerHTML =
+          footerHtml ||
+          '<button class="secondary" onclick="closeModal()">Close</button>';
+        document.getElementById("modal-overlay").classList.add("open");
+      }
+
+      function closeModal() {
+        document.getElementById("modal-overlay").classList.remove("open");
+        modalContext = null;
+      }
+
+      function formInput(label, id, val, type) {
+        type = type || "text";
+        return (
+          '<div class="form-group"><label>' +
+          label +
+          '</label><input type="' +
+          type +
+          '" id="' +
+          id +
+          '" value="' +
+          (val === undefined ? "" : val) +
+          '"></div>'
+        );
+      }
+
+      function formTextarea(label, id, val) {
+        return (
+          '<div class="form-group"><label>' +
+          label +
+          '</label><textarea id="' +
+          id +
+          '">' +
+          (val || "") +
+          "</textarea></div>"
+        );
+      }
+
+      function formSelect(label, id, opts, selectedVal) {
+        var o = opts
+          .map(function (x) {
+            var sel = x === selectedVal ? " selected" : "";
+            return "<option" + sel + ">" + x + "</option>";
+          })
+          .join("");
+        return (
+          '<div class="form-group"><label>' +
+          label +
+          '</label><select id="' +
+          id +
+          '">' +
+          o +
+          "</select></div>"
+        );
+      }
+
+      /* ---------- Corporate Directory & MOU Details ---------- */
+      function openAddCompany() {
+        openModal(
+          "Add company",
+          formInput("Company name", "ac-name", "") +
+            formInput("Industry", "ac-industry", "") +
+            '<div class="form-row-2">' +
+            formInput("Point of contact", "ac-poc", "") +
+            formInput("Contact email", "ac-email", "", "text") +
+            "</div>" +
+            formSelect("Initial MOU Status", "ac-mou-status", [
+              "Active",
+              "In Process",
+              "Expiring Soon",
+              "Expired",
+            ]) +
+            formTextarea("Notes", "ac-notes"),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveCompany()">Save</button>',
+        );
+      }
+
+      function saveCompany() {
+        var name =
+          document.getElementById("ac-name").value || "Untitled company";
+        var industry =
+          document.getElementById("ac-industry").value ||
+          "Unspecified industry";
+        var poc =
+          document.getElementById("ac-poc").value || "Unassigned contact";
+        var mouStatus = document.getElementById("ac-mou-status").value;
+        var list = document.getElementById("corporate-list");
+        var row = document.createElement("div");
+        row.className = "list-row";
+        row.setAttribute("data-mou", mouStatus);
+
+        var badgeClass = "mou-active";
+        var badgeText = "🚩 MOU Active";
+        if (mouStatus === "In Process") {
+          badgeClass = "mou-process";
+          badgeText = "⏳ MOU In Process";
+        } else if (mouStatus === "Expiring Soon") {
+          badgeClass = "mou-expiring";
+          badgeText = "⚠️ MOU Expiring Soon";
+        } else if (mouStatus === "Expired") {
+          badgeClass = "mou-expired";
+          badgeText = "❌ MOU Expired";
+        }
+
+        row.innerHTML =
+          '<div><div class="primary-text">' +
+          name +
+          '</div><div class="secondary-text">' +
+          industry +
+          " — POC: " +
+          poc +
+          "</div></div>" +
+          '<div class="right"><span class="secondary-text">0 hires</span><span class="badge ' +
+          badgeClass +
+          '">' +
+          badgeText +
+          "</span>" +
+          '<button class="link-btn" onclick="viewHistory(this)">History</button>' +
+          '<button class="link-btn" onclick="openEditMOU(this, \'' +
+          name +
+          "', '" +
+          mouStatus +
+          "', '', '')\">MOU Details</button></div>";
+
+        list.appendChild(row);
+        COMPANIES.push(name);
+
+        // Update dashboard stat
+        var compCountEl = document.getElementById("dash-active-comp");
+        compCountEl.textContent = parseInt(compCountEl.textContent) + 1;
+
+        closeModal();
+      }
+
+      function viewHistory(btn) {
+        var row = btn.closest(".list-row");
+        var name = row.querySelector(".primary-text").textContent;
+        openModal(
+          "Hiring history — " + name,
+          '<div class="list-row" style="border:none;padding:6px 0;"><span>Rajesh Karki — Software Engineer Intern</span><span class="secondary-text">2026</span></div>' +
+            '<div class="list-row" style="border:none;padding:6px 0;"><span>Prior cohort candidate — Backend Developer</span><span class="secondary-text">2025</span></div>',
+          '<button class="primary" onclick="closeModal()">Close</button>',
+        );
+      }
+
+      function openEditMOU(
+        btn,
+        companyName,
+        currentStatus,
+        startDate,
+        endDate,
+      ) {
+        var row = btn.closest(".list-row");
+        modalContext = { row: row };
+        openModal(
+          "MOU & Legal Details — " + companyName,
+          formSelect(
+            "MOU Status Flag",
+            "mou-status",
+            ["Active", "In Process", "Expiring Soon", "Expired"],
+            currentStatus,
+          ) +
+            '<div class="form-row-2">' +
+            formInput(
+              "MOU Effective Date",
+              "mou-start",
+              startDate || "2024-01-01",
+              "date",
+            ) +
+            formInput(
+              "MOU Renewal/Expiration Date",
+              "mou-end",
+              endDate || "2026-12-31",
+              "date",
+            ) +
+            "</div>" +
+            formTextarea(
+              "MOU Notes / Legal Terms",
+              "mou-notes",
+              "MOU drafted for student internships, placements, and joint workshops.",
+            ),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveMOUDetails()">Update MOU</button>',
+        );
+      }
+
+      function saveMOUDetails() {
+        var status = document.getElementById("mou-status").value;
+        var endDate = document.getElementById("mou-end").value;
+        var row = modalContext.row;
+        row.setAttribute("data-mou", status);
+
+        var badge = row.querySelector(".badge");
+        if (status === "Active") {
+          badge.className = "badge mou-active";
+          badge.textContent = "🚩 MOU Active";
+        } else if (status === "In Process") {
+          badge.className = "badge mou-process";
+          badge.textContent = "⏳ MOU In Process";
+        } else if (status === "Expiring Soon") {
+          badge.className = "badge mou-expiring";
+          badge.textContent = "⚠️ MOU Expiring Soon";
+        } else {
+          badge.className = "badge mou-expired";
+          badge.textContent = "❌ MOU Expired";
+        }
+
+        closeModal();
+      }
+
+      /* ---------- Vacancy Posting & Sharing ---------- */
+      function openPostVacancy() {
+        openModal(
+          "Post vacancy",
+          formInput("Job title", "pv-title", "") +
+            '<div class="form-row-2">' +
+            formSelect("Company", "pv-company", COMPANIES) +
+            formInput("Positions open", "pv-positions", "1", "number") +
+            "</div>" +
+            '<div class="form-row-2">' +
+            formInput("Posting Date", "pv-posted", "2026-09-28", "date") +
+            formInput(
+              "Application deadline",
+              "pv-deadline",
+              "2026-10-30",
+              "date",
+            ) +
+            "</div>",
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveVacancy()">Save as draft</button>',
+        );
+      }
+
+      function saveVacancy() {
+        var title =
+          document.getElementById("pv-title").value || "Untitled vacancy";
+        var company = document.getElementById("pv-company").value;
+        var posted =
+          document.getElementById("pv-posted").value || "Sep 28, 2026";
+        var deadline = document.getElementById("pv-deadline").value || "TBC";
+        var list = document.getElementById("vacancies-list");
+        var row = document.createElement("div");
+        row.className = "list-row";
+        row.innerHTML =
+          '<div><div class="primary-text">' +
+          title +
+          '</div><div class="secondary-text">' +
+          company +
+          " — Posted: " +
+          posted +
+          " | Deadline: " +
+          deadline +
+          "</div>" +
+          '<div class="tag-container"><span class="tag">Not Shared Yet</span></div></div>' +
+          '<div class="right"><span class="badge dashed">Draft</span><button class="link-btn" onclick="dispatchVacancy(this)">Verify &amp; Dispatch</button>' +
+          '<button class="link-btn" onclick="openShareVacancy(\'' +
+          title +
+          "', '" +
+          company +
+          "')\">Share</button></div>";
+        list.appendChild(row);
+
+        var vacCountEl = document.getElementById("dash-open-vacancies");
+        vacCountEl.textContent = parseInt(vacCountEl.textContent) + 1;
+
+        closeModal();
+      }
+
+      function dispatchVacancy(btn) {
+        var row = btn.closest(".list-row");
+        var badge = row.querySelector(".badge");
+        badge.textContent = "Dispatched";
+        badge.className = "badge filled";
+        btn.remove();
+      }
+
+      function openShareVacancy(roleTitle, companyName) {
+        openModal(
+          "Share Vacancy: " + roleTitle + " (" + companyName + ")",
+          '<p style="font-size:13px;color:var(--text-secondary);">Select the channels to dispatch and announce this vacancy:</p>' +
+            '<div class="checkbox-group">' +
+            '<label class="checkbox-item"><input type="checkbox" id="chk-portal" checked> Student Portal</label>' +
+            '<label class="checkbox-item"><input type="checkbox" id="chk-email" checked> Email Broadcast</label>' +
+            '<label class="checkbox-item"><input type="checkbox" id="chk-wa" checked> WhatsApp Cohort Group</label>' +
+            '<label class="checkbox-item"><input type="checkbox" id="chk-li"> LinkedIn Page</label>' +
+            "</div>" +
+            formTextarea(
+              "Custom Announcement Message",
+              "share-msg",
+              "New opportunity alert! " +
+                roleTitle +
+                " position open at " +
+                companyName +
+                ". Apply before the deadline.",
+            ),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="confirmShareVacancy()">Broadcast Vacancy</button>',
+        );
+      }
+
+      function confirmShareVacancy() {
+        alert("Vacancy successfully shared across selected channels!");
+        closeModal();
+      }
+
+      /* ---------- Interview Management ---------- */
+      function openScheduleInterview() {
+        openModal(
+          "Schedule interview",
+          formSelect("Student", "si-student", STUDENTS) +
+            formSelect("Company", "si-company", COMPANIES) +
+            '<div class="form-row-2">' +
+            formInput("Position", "si-position", "") +
+            formInput("Date &amp; time", "si-datetime", "e.g. Sep 15, 10:00") +
+            "</div>",
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveInterview()">Schedule</button>',
+        );
+      }
+
+      function saveInterview() {
+        var student = document.getElementById("si-student").value;
+        var company = document.getElementById("si-company").value;
+        var position =
+          document.getElementById("si-position").value || "Unspecified role";
+        var when = document.getElementById("si-datetime").value || "TBC";
+        var tbody = document.querySelector("#interviews-table tbody");
+        var tr = document.createElement("tr");
+        tr.innerHTML =
+          "<td>" +
+          student +
+          "</td><td>" +
+          company +
+          "</td><td>" +
+          position +
+          "</td><td>" +
+          when +
+          '</td><td><span class="badge dashed">Scheduled</span> <button class="link-btn" onclick="markOutcome(this)">Mark outcome</button></td>';
+        tbody.appendChild(tr);
+        closeModal();
+      }
+
+      function markOutcome(btn) {
+        var tr = btn.closest("tr");
+        modalContext = { tr: tr };
+        openModal(
+          "Mark interview outcome",
+          formSelect("Outcome", "mo-outcome", [
+            "Selected",
+            "Not selected",
+            "Reschedule",
+          ]),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveOutcome()">Save</button>',
+        );
+      }
+
+      function saveOutcome() {
+        var outcome = document.getElementById("mo-outcome").value;
+        var tr = modalContext.tr;
+        var cell = tr.children[4];
+        if (outcome === "Reschedule") {
+          cell.innerHTML =
+            '<span class="badge dashed">Scheduled</span> <button class="link-btn" onclick="markOutcome(this)">Mark outcome</button>';
+        } else {
+          cell.innerHTML =
+            '<span class="badge ' +
+            (outcome === "Selected" ? "filled" : "outline") +
+            '">' +
+            outcome +
+            "</span>";
+        }
+        closeModal();
+      }
+
+      /* ---------- Resumes ---------- */
+      function viewResume(btn) {
+        var row = btn.closest(".list-row");
+        var name = row.querySelector(".primary-text").textContent;
+        openModal(
+          "Resume — " + name,
+          '<p style="font-size:13px;color:var(--text-secondary);margin:0 0 12px;">Portfolio link, CV, and certification files preview:</p>' +
+            '<div class="list-row" style="border:none;padding:6px 0;"><span>Portfolio</span><span class="badge filled">Linked</span></div>' +
+            '<div class="list-row" style="border:none;padding:6px 0;"><span>CV (PDF)</span><span class="badge filled">Uploaded</span></div>',
+          '<button class="primary" onclick="closeModal()">Close</button>',
+        );
+      }
+
+      function requestUpdate(btn) {
+        var row = btn.closest(".list-row");
+        var name = row.querySelector(".primary-text").textContent;
+        openModal(
+          "Reminder sent",
+          '<p style="font-size:13px;">A resume update reminder has been sent to ' +
+            name +
+            ".</p>",
+          '<button class="primary" onclick="closeModal()">Done</button>',
+        );
+      }
+
+      /* ---------- PLACEMENT SUCCESS ADD RECORD & COMPUTATIONS ---------- */
+      function openAddPlacementRecord() {
+        openModal(
+          "Add Placement Success Record",
+          formSelect("Student Name", "pr-student", STUDENTS) +
+            formSelect("Company", "pr-company", COMPANIES) +
+            '<div class="form-row-2">' +
+            formInput("Job Role / Position", "pr-role", "Software Engineer") +
+            formInput("Monthly Package (NPR)", "pr-salary", "55000", "number") +
+            "</div>" +
+            '<div class="form-row-2">' +
+            formInput("Placement Date", "pr-date", "2026-09-28", "date") +
+            formSelect("Status", "pr-status", [
+              "Confirmed",
+              "Pending Verification",
+            ]) +
+            "</div>",
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="savePlacementRecord()">Save Placement Record</button>',
+        );
+      }
+
+      function savePlacementRecord() {
+        var student = document.getElementById("pr-student").value;
+        var company = document.getElementById("pr-company").value;
+        var role =
+          document.getElementById("pr-role").value || "Graduate Trainee";
+        var salary =
+          parseInt(document.getElementById("pr-salary").value) || 50000;
+        var pdate = document.getElementById("pr-date").value || "2026-09-28";
+        var status = document.getElementById("pr-status").value;
+
+        // 1. Append to Placement Table
+        var tbody = document.querySelector("#placement-records-table tbody");
+        var tr = document.createElement("tr");
+        tr.innerHTML =
+          "<td>" +
+          student +
+          "</td><td>" +
+          company +
+          "</td><td>" +
+          role +
+          "</td><td>NPR " +
+          salary.toLocaleString() +
+          "</td><td>" +
+          pdate +
+          '</td><td><span class="badge filled">' +
+          status +
+          "</span></td>";
+        tbody.insertBefore(tr, tbody.firstChild);
+
+        // 2. Recalculate Stats
+        placementStats.placedCount++;
+        if (salary < 30000) placementStats.salaryBuckets.b1++;
+        else if (salary <= 50000) placementStats.salaryBuckets.b2++;
+        else if (salary <= 70000) placementStats.salaryBuckets.b3++;
+        else placementStats.salaryBuckets.b4++;
+
+        if (placementStats.companyHires[company]) {
+          placementStats.companyHires[company]++;
+        } else {
+          placementStats.companyHires[company] = 1;
+        }
+
+        updatePlacementUI();
+        closeModal();
+      }
+
+      function updatePlacementUI() {
+        // Update placed count & rate
+        document.getElementById("ps-placed-count").textContent =
+          placementStats.placedCount;
+        var rate = Math.round(
+          (placementStats.placedCount / placementStats.totalStudents) * 100,
+        );
+        document.getElementById("ps-rate").textContent = rate + "%";
+        document.getElementById("dash-placement-rate").textContent = rate + "%";
+
+        // Update salary buckets
+        var b1 = placementStats.salaryBuckets.b1;
+        var b2 = placementStats.salaryBuckets.b2;
+        var b3 = placementStats.salaryBuckets.b3;
+        var b4 = placementStats.salaryBuckets.b4;
+        var maxB = Math.max(b1, b2, b3, b4, 1);
+
+        document.getElementById("count-sal-1").textContent = b1 + " students";
+        document.getElementById("count-sal-2").textContent = b2 + " students";
+        document.getElementById("count-sal-3").textContent = b3 + " students";
+        document.getElementById("count-sal-4").textContent = b4 + " students";
+
+        document.getElementById("bar-sal-1").style.width =
+          (b1 / maxB) * 100 + "%";
+        document.getElementById("bar-sal-2").style.width =
+          (b2 / maxB) * 100 + "%";
+        document.getElementById("bar-sal-3").style.width =
+          (b3 / maxB) * 100 + "%";
+        document.getElementById("bar-sal-4").style.width =
+          (b4 / maxB) * 100 + "%";
+
+        // Update Top Hiring Companies UI
+        var topList = document.getElementById("top-hiring-list");
+        topList.innerHTML = "";
+        for (var comp in placementStats.companyHires) {
+          var row = document.createElement("div");
+          row.className = "list-row";
+          row.innerHTML =
+            '<div class="primary-text">' +
+            comp +
+            '</div><div class="right"><span class="secondary-text">' +
+            placementStats.companyHires[comp] +
+            " hires</span></div>";
+          topList.appendChild(row);
+        }
+      }
+
+      function exportReport() {
+        openModal(
+          "Export Report",
+          '<p style="font-size:13px;">Preparing the placement success and market analysis report as a PDF file...</p>',
+          '<button class="primary" onclick="closeModal()">Close</button>',
+        );
+      }
+    </script>
+  </body>
+</html>

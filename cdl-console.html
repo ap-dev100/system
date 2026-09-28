@@ -1,0 +1,1343 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ING ERP — Career Development &amp; Learning</title>
+    <style>
+      :root {
+        --surface-1: #fafafa;
+        --surface-2: #f2f2f2;
+        --border: #e6e6e6;
+        --border-strong: #cfcfcf;
+        --text-primary: #111111;
+        --text-secondary: #5a5a5e;
+        --text-muted: #9a9a9e;
+        --fill-primary: #000000;
+        --on-primary: #ffffff;
+        --radius: 10px;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+          Arial, sans-serif;
+        background: var(--surface-2);
+        color: var(--text-primary);
+      }
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 24px;
+        background: #fff;
+        border-bottom: 1px solid var(--border);
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .topbar .who {
+        font-size: 12px;
+        color: var(--text-secondary);
+      }
+      .topbar .who strong {
+        color: var(--text-primary);
+        font-weight: 600;
+      }
+      .app {
+        display: flex;
+        min-height: 100vh;
+      }
+      .sidebar {
+        width: 220px;
+        flex-shrink: 0;
+        background: var(--surface-1);
+        border-right: 1px solid var(--border);
+        padding: 20px 12px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0 8px 16px;
+      }
+      .brand .mark {
+        width: 24px;
+        height: 24px;
+        border-radius: 6px;
+        background: var(--fill-primary);
+        flex-shrink: 0;
+      }
+      .brand .name {
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 1.3;
+      }
+      .brand .role {
+        font-size: 11px;
+        color: var(--text-muted);
+        line-height: 1.3;
+      }
+      .nav-item {
+        display: block;
+        padding: 8px 10px;
+        border-radius: 7px;
+        font-size: 13px;
+        color: var(--text-secondary);
+        cursor: pointer;
+        margin-bottom: 2px;
+      }
+      .nav-item:hover {
+        background: var(--surface-2);
+      }
+      .nav-item.active {
+        background: var(--fill-primary);
+        color: var(--on-primary);
+      }
+      .nav-divider {
+        border-top: 1px solid var(--border);
+        margin: 12px 4px;
+      }
+      .group {
+        margin-bottom: 16px;
+      }
+      .group-label {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-muted);
+        margin: 0 0 6px 10px;
+      }
+      .main {
+        flex: 1;
+        padding: 32px 36px;
+        min-width: 0;
+      }
+      .page {
+        display: none;
+      }
+      .page.active {
+        display: block;
+      }
+      .page-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: 22px;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      h1 {
+        font-size: 22px;
+        margin: 0;
+        font-weight: 600;
+      }
+      .subtitle {
+        font-size: 13px;
+        color: var(--text-secondary);
+        margin: 5px 0 0;
+      }
+      .section-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-muted);
+        margin: 0 0 8px;
+      }
+      button.primary {
+        background: var(--fill-primary);
+        color: var(--on-primary);
+        border: none;
+        border-radius: 8px;
+        padding: 10px 16px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      button.secondary {
+        background: #fff;
+        color: var(--text-primary);
+        border: 1px solid var(--border-strong);
+        border-radius: 8px;
+        padding: 10px 16px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      .link-btn {
+        background: none;
+        border: none;
+        color: var(--text-primary);
+        font-size: 12px;
+        font-weight: 600;
+        text-decoration: underline;
+        cursor: pointer;
+        padding: 0;
+        white-space: nowrap;
+      }
+      .toolbar {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 18px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      input[type="text"],
+      input[type="number"],
+      input[type="date"],
+      select,
+      textarea {
+        border: 1px solid var(--border-strong);
+        border-radius: 8px;
+        padding: 10px 12px;
+        font-size: 13px;
+        background: #fff;
+        color: var(--text-primary);
+        font-family: inherit;
+      }
+      input[type="text"] {
+        flex: 1;
+        min-width: 160px;
+      }
+      select {
+        width: 170px;
+      }
+      .badge {
+        font-size: 11px;
+        padding: 2px 9px;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+      .badge.filled {
+        background: var(--fill-primary);
+        color: var(--on-primary);
+      }
+      .badge.outline {
+        border: 1px solid var(--border-strong);
+        color: var(--text-secondary);
+      }
+      .badge.dashed {
+        border: 1px dashed var(--border-strong);
+        color: var(--text-secondary);
+      }
+      .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+      .stat-grid.cols-3 {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .stat-card {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: #fff;
+        padding: 16px 18px;
+      }
+      .stat-value {
+        font-size: 22px;
+        font-weight: 700;
+      }
+      .stat-label {
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-top: 4px;
+      }
+      .list {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+        background: #fff;
+      }
+      .list-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 13px 18px;
+        gap: 14px;
+        border-bottom: 1px solid var(--border);
+      }
+      .list-row:last-child {
+        border-bottom: none;
+      }
+      .list-row .primary-text {
+        font-size: 14px;
+        font-weight: 600;
+      }
+      .list-row .secondary-text {
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-top: 3px;
+      }
+      .list-row .right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-shrink: 0;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+      .table-wrap {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+        background: #fff;
+        overflow-x: auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        padding: 11px 13px;
+        font-size: 13px;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+        white-space: nowrap;
+      }
+      th {
+        font-weight: 600;
+        color: var(--text-secondary);
+        background: var(--surface-1);
+        font-size: 12px;
+      }
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+      td.num {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+      .sig-chain {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        font-size: 11px;
+        margin-top: 4px;
+      }
+      .sig {
+        padding: 2px 8px;
+        border-radius: 999px;
+        border: 1px solid var(--border-strong);
+        color: var(--text-secondary);
+      }
+      .sig.done {
+        background: var(--fill-primary);
+        color: var(--on-primary);
+        border-color: var(--fill-primary);
+      }
+      .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        z-index: 50;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      .modal-overlay.open {
+        display: flex;
+      }
+      .modal {
+        background: #fff;
+        border-radius: 12px;
+        max-width: 460px;
+        width: 100%;
+        max-height: 86vh;
+        overflow-y: auto;
+        border: 1px solid var(--border-strong);
+      }
+      .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border);
+      }
+      .modal-header h3 {
+        margin: 0;
+        font-size: 16px;
+      }
+      .modal-close {
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        color: var(--text-secondary);
+        line-height: 1;
+        padding: 4px;
+      }
+      .modal-body {
+        padding: 18px 20px;
+      }
+      .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        padding: 14px 20px;
+        border-top: 1px solid var(--border);
+      }
+      .form-group {
+        margin-bottom: 14px;
+      }
+      .form-group label {
+        display: block;
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-bottom: 5px;
+        font-weight: 600;
+      }
+      .form-group input,
+      .form-group select,
+      .form-group textarea {
+        width: 100%;
+      }
+      .form-group textarea {
+        resize: vertical;
+        min-height: 70px;
+      }
+      .form-row-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 10px;
+      }
+      .form-row-2 input,
+      .form-row-2 select {
+        width: 100%;
+      }
+      @media (max-width: 640px) {
+        .sidebar {
+          display: none;
+        }
+        .main {
+          padding: 22px;
+        }
+        .stat-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="topbar">
+      <div class="who">
+        Signed in as <strong>Ms. Ritu Basnet</strong> — CDL Head / Manager
+      </div>
+      <div class="who">
+        Career Development &amp; Learning — internships and career readiness
+      </div>
+    </div>
+
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="mark"></div>
+          <div>
+            <div class="name">ING ERP</div>
+            <div class="role">CDL Department</div>
+          </div>
+        </div>
+        <div
+          class="nav-item active"
+          data-page="dashboard"
+          onclick="showPage('dashboard', this)"
+        >
+          Dashboard
+        </div>
+        <div class="nav-divider"></div>
+        <nav>
+          <div class="group">
+            <p class="group-label">Overview</p>
+            <div
+              class="nav-item"
+              data-page="statusmatrix"
+              onclick="showPage('statusmatrix', this)"
+            >
+              Student status matrix
+            </div>
+          </div>
+          <div class="group">
+            <p class="group-label">Authorization</p>
+            <div
+              class="nav-item"
+              data-page="authorization"
+              onclick="showPage('authorization', this)"
+            >
+              Agreement verification
+            </div>
+          </div>
+          <div class="group">
+            <p class="group-label">Monitoring</p>
+            <div
+              class="nav-item"
+              data-page="weeklylogs"
+              onclick="showPage('weeklylogs', this)"
+            >
+              Weekly log book
+            </div>
+            <div
+              class="nav-item"
+              data-page="followup"
+              onclick="showPage('followup', this)"
+            >
+              Employer follow-ups
+            </div>
+          </div>
+          <div class="group">
+            <p class="group-label">Completion</p>
+            <div
+              class="nav-item"
+              data-page="portfoliovault"
+              onclick="showPage('portfoliovault', this)"
+            >
+              Report &amp; portfolio vault
+            </div>
+          </div>
+          <div class="group">
+            <p class="group-label">Management</p>
+            <div
+              class="nav-item"
+              data-page="staffallocation"
+              onclick="showPage('staffallocation', this)"
+            >
+              Staff allocation
+            </div>
+            <div
+              class="nav-item"
+              data-page="compliancealerts"
+              onclick="showPage('compliancealerts', this)"
+            >
+              Compliance alerts
+            </div>
+          </div>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <section class="page active" id="page-dashboard">
+          <div class="page-header">
+            <div>
+              <h1>CDL overview</h1>
+              <p class="subtitle">
+                Internship pipeline, BSc Computer Science cohort
+              </p>
+            </div>
+          </div>
+          <div class="stat-grid">
+            <div class="stat-card">
+              <div class="stat-value">10</div>
+              <div class="stat-label">Students tracked</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">1</div>
+              <div class="stat-label">Active internships</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">3</div>
+              <div class="stat-label">Compliance alerts</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">1</div>
+              <div class="stat-label">Authorization pending signature</div>
+            </div>
+          </div>
+          <div class="list" style="margin-bottom: 20px">
+            <div class="list-row">
+              <div>
+                <div class="primary-text">
+                  Rajesh Karki's Week 3 log is overdue
+                </div>
+                <div class="secondary-text">
+                  TechNova Solutions internship — not yet submitted
+                </div>
+              </div>
+              <div class="right">
+                <button class="link-btn" onclick="goTo('weeklylogs')">
+                  Review
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">
+                  Rajesh Karki's authorization awaits your signature
+                </div>
+                <div class="secondary-text">
+                  Student, employer, and coordinator have all signed
+                </div>
+              </div>
+              <div class="right">
+                <button class="link-btn" onclick="goTo('authorization')">
+                  Sign
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">
+                  Manisha Shrestha has been On Hold for 6 weeks
+                </div>
+                <div class="secondary-text">
+                  No internship search progress — nearing threshold
+                </div>
+              </div>
+              <div class="right">
+                <button class="link-btn" onclick="goTo('compliancealerts')">
+                  Review
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="toolbar">
+            <button class="secondary" onclick="openLogStatus()">
+              + Log student status
+            </button>
+            <button class="secondary" onclick="openNewAuthorization()">
+              + New authorization
+            </button>
+            <button class="secondary" onclick="openNewFollowup()">
+              + Schedule follow-up
+            </button>
+          </div>
+        </section>
+
+        <section class="page" id="page-statusmatrix">
+          <div class="page-header">
+            <div>
+              <h1>CDL Student Status Master Matrix</h1>
+              <p class="subtitle">Placement state across the full pipeline</p>
+            </div>
+            <button class="primary" onclick="openLogStatus()">
+              + Log status
+            </button>
+          </div>
+          <div class="toolbar">
+            <input
+              type="text"
+              placeholder="Search students"
+              oninput="filterRows(this, '#statusmatrix-list', '.list-row')"
+            />
+          </div>
+          <div class="list" id="statusmatrix-list">
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Aisha Karki</div>
+                <div class="secondary-text">Coordinator: Ms. Bina Thapa</div>
+              </div>
+              <div class="right">
+                <span class="badge outline">Searching</span>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Bibek Rai</div>
+                <div class="secondary-text">
+                  Applied to Himalayan Bank Ltd — coordinator: Mr. Sandip Rana
+                </div>
+              </div>
+              <div class="right"><span class="badge dashed">Applied</span></div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Sunita Gurung</div>
+                <div class="secondary-text">
+                  Interviewing at Everest Analytics — coordinator: Ms. Bina
+                  Thapa
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge dashed">Interviewing</span>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Prakash Thapa</div>
+                <div class="secondary-text">Coordinator: Mr. Sandip Rana</div>
+              </div>
+              <div class="right">
+                <span class="badge outline">Not started</span>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Manisha Shrestha</div>
+                <div class="secondary-text">
+                  On hold — also on Academic Probation and fee hold —
+                  coordinator: Ms. Bina Thapa
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge outline">On hold</span>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Rajesh Karki</div>
+                <div class="secondary-text">
+                  TechNova Solutions, Software Engineer Intern — coordinator:
+                  Mr. Sandip Rana
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge filled">Internship active</span>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Nisha Adhikari</div>
+                <div class="secondary-text">Coordinator: Ms. Bina Thapa</div>
+              </div>
+              <div class="right">
+                <span class="badge outline">Searching</span>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Suman Basnet</div>
+                <div class="secondary-text">Coordinator: Mr. Sandip Rana</div>
+              </div>
+              <div class="right">
+                <span class="badge outline">Not started</span>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Anita Poudel</div>
+                <div class="secondary-text">
+                  Not selected at Everest Analytics — back to searching —
+                  coordinator: Ms. Bina Thapa
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge outline">Searching</span>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Kiran Magar</div>
+                <div class="secondary-text">
+                  On hold — also on Academic Probation and fee hold —
+                  coordinator: Mr. Sandip Rana
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge outline">On hold</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="page" id="page-authorization">
+          <div class="page-header">
+            <div>
+              <h1>CDL Authorization &amp; Agreement Verification</h1>
+              <p class="subtitle">
+                Student &rarr; Employer &rarr; Coordinator &rarr; CDL Head
+              </p>
+            </div>
+            <button class="primary" onclick="openNewAuthorization()">
+              + New authorization
+            </button>
+          </div>
+          <div class="list" id="authorization-list">
+            <div class="list-row">
+              <div>
+                <div class="primary-text">
+                  Rajesh Karki — TechNova Solutions
+                </div>
+                <div class="secondary-text">
+                  Signature chain
+                  <div class="sig-chain">
+                    <span class="sig done">Student</span
+                    ><span class="sig done">Employer</span
+                    ><span class="sig done">Coordinator</span
+                    ><span class="sig">CDL Head</span>
+                  </div>
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge dashed">Awaiting your signature</span
+                ><button class="link-btn" onclick="signAsHead(this)">
+                  Sign as CDL Head
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">
+                  Sunita Gurung — Everest Analytics
+                </div>
+                <div class="secondary-text">
+                  Signature chain
+                  <div class="sig-chain">
+                    <span class="sig done">Student</span
+                    ><span class="sig">Employer</span
+                    ><span class="sig">Coordinator</span
+                    ><span class="sig">CDL Head</span>
+                  </div>
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge outline">In progress</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="page" id="page-weeklylogs">
+          <div class="page-header">
+            <div>
+              <h1>Weekly Internship Log Book Engine</h1>
+              <p class="subtitle">
+                Hours, reflections, and coordinator sign-off
+              </p>
+            </div>
+            <button class="primary" onclick="openLogEntry()">
+              + Log entry
+            </button>
+          </div>
+          <div class="list" id="weeklylogs-list">
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Rajesh Karki — Week 1</div>
+                <div class="secondary-text">
+                  TechNova Solutions — 40 hours logged
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge filled">Signed off</span>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Rajesh Karki — Week 2</div>
+                <div class="secondary-text">
+                  TechNova Solutions — 40 hours logged
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge filled">Signed off</span>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Rajesh Karki — Week 3</div>
+                <div class="secondary-text">
+                  TechNova Solutions — not yet submitted
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge outline">Overdue</span
+                ><button class="link-btn" onclick="sendLogReminder(this)">
+                  Send reminder
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="page" id="page-followup">
+          <div class="page-header">
+            <div>
+              <h1>Follow-Up &amp; Employer Interaction Scheduler</h1>
+              <p class="subtitle">Check-ins, site visits, and email outreach</p>
+            </div>
+            <button class="primary" onclick="openNewFollowup()">
+              + New follow-up
+            </button>
+          </div>
+          <div class="list" id="followup-list">
+            <div class="list-row">
+              <div>
+                <div class="primary-text">
+                  Rajesh Karki — TechNova Solutions
+                </div>
+                <div class="secondary-text">
+                  Check-in call — Sep 10 — positive feedback from supervisor
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge filled">Completed</span>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">
+                  Sunita Gurung — Everest Analytics
+                </div>
+                <div class="secondary-text">
+                  Email follow-up — scheduled Sep 12
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge dashed">Scheduled</span
+                ><button class="link-btn" onclick="logFollowupOutcome(this)">
+                  Log outcome
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="page" id="page-portfoliovault">
+          <div class="page-header">
+            <div>
+              <h1>Final CDL Report &amp; Portfolio Vault</h1>
+              <p class="subtitle">
+                Timestamped submissions for formal evaluation
+              </p>
+            </div>
+            <button class="primary" onclick="openRequestSubmission()">
+              + Request submission
+            </button>
+          </div>
+          <div class="list" id="portfoliovault-list">
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Aditi Rana (previous cohort)</div>
+                <div class="secondary-text">
+                  CloudPeak Systems — final report and employer feedback on file
+                </div>
+              </div>
+              <div class="right">
+                <span class="secondary-text">Grade: Excellent</span
+                ><span class="badge filled">Evaluated</span>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Rajesh Karki</div>
+                <div class="secondary-text">
+                  TechNova Solutions — internship ongoing, report due Dec 2026
+                </div>
+              </div>
+              <div class="right">
+                <span class="badge outline">Not yet due</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="page" id="page-staffallocation">
+          <div class="page-header">
+            <div>
+              <h1>CDL Staff Allocation &amp; Team Workspace</h1>
+              <p class="subtitle">
+                Balancing cohort workload across coordinators
+              </p>
+            </div>
+            <button class="primary" onclick="openReassignCohort()">
+              + Reassign cohort
+            </button>
+          </div>
+          <div class="list" id="staffallocation-list">
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Ms. Bina Thapa</div>
+                <div class="secondary-text">
+                  BSc Computer Science, Group A — Aisha Karki, Sunita Gurung,
+                  Manisha Shrestha, Nisha Adhikari, Anita Poudel
+                </div>
+              </div>
+              <div class="right">
+                <span class="secondary-text">5 students</span
+                ><span class="badge filled">Balanced</span>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Mr. Sandip Rana</div>
+                <div class="secondary-text">
+                  BSc Computer Science, Group B — Bibek Rai, Prakash Thapa,
+                  Rajesh Karki, Suman Basnet, Kiran Magar
+                </div>
+              </div>
+              <div class="right">
+                <span class="secondary-text">5 students</span
+                ><span class="badge filled">Balanced</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="page" id="page-compliancealerts">
+          <div class="page-header">
+            <div>
+              <h1>Placement Verification &amp; Compliance Alerts</h1>
+              <p class="subtitle">
+                Unplaced thresholds and missing documentation
+              </p>
+            </div>
+          </div>
+          <div class="list" id="compliancealerts-list">
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Missing weekly log</div>
+                <div class="secondary-text">Rajesh Karki — Week 3 overdue</div>
+              </div>
+              <div class="right">
+                <button class="link-btn" onclick="notifyCoordinator(this)">
+                  Notify coordinator
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Unplaced nearing threshold</div>
+                <div class="secondary-text">
+                  Manisha Shrestha — On Hold, no search progress in 6 weeks
+                </div>
+              </div>
+              <div class="right">
+                <button class="link-btn" onclick="escalateToHead(this)">
+                  Escalate to CDL Head
+                </button>
+              </div>
+            </div>
+            <div class="list-row">
+              <div>
+                <div class="primary-text">Unsigned compliance document</div>
+                <div class="secondary-text">
+                  Kiran Magar — authorization not yet started
+                </div>
+              </div>
+              <div class="right">
+                <button class="link-btn" onclick="followUpCompliance(this)">
+                  Follow up
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div
+      class="modal-overlay"
+      id="modal-overlay"
+      onclick="if (event.target === this) closeModal();"
+    >
+      <div class="modal">
+        <div class="modal-header">
+          <h3 id="modal-title"></h3>
+          <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body" id="modal-body"></div>
+        <div class="modal-footer" id="modal-footer"></div>
+      </div>
+    </div>
+
+    <script>
+      var modalContext = null;
+      var STUDENTS = [
+        "Aisha Karki",
+        "Bibek Rai",
+        "Sunita Gurung",
+        "Prakash Thapa",
+        "Manisha Shrestha",
+        "Rajesh Karki",
+        "Nisha Adhikari",
+        "Suman Basnet",
+        "Anita Poudel",
+        "Kiran Magar",
+      ];
+      var COORDINATORS = ["Ms. Bina Thapa", "Mr. Sandip Rana"];
+
+      function showPage(id, el) {
+        document.querySelectorAll(".page").forEach(function (p) {
+          p.classList.remove("active");
+        });
+        document.getElementById("page-" + id).classList.add("active");
+        document.querySelectorAll(".nav-item").forEach(function (n) {
+          n.classList.remove("active");
+        });
+        if (el) el.classList.add("active");
+      }
+      function goTo(id) {
+        showPage(
+          id,
+          document.querySelector('.nav-item[data-page="' + id + '"]'),
+        );
+      }
+      function filterRows(inputEl, containerSelector, rowSelector) {
+        var q = inputEl.value.toLowerCase();
+        document
+          .querySelectorAll(containerSelector + " " + rowSelector)
+          .forEach(function (row) {
+            row.style.display =
+              row.textContent.toLowerCase().indexOf(q) > -1 ? "" : "none";
+          });
+      }
+
+      /* ---------- modal shell ---------- */
+      function openModal(title, bodyHtml, footerHtml) {
+        document.getElementById("modal-title").textContent = title;
+        document.getElementById("modal-body").innerHTML = bodyHtml;
+        document.getElementById("modal-footer").innerHTML =
+          footerHtml ||
+          '<button class="secondary" onclick="closeModal()">Close</button>';
+        document.getElementById("modal-overlay").classList.add("open");
+      }
+      function closeModal() {
+        document.getElementById("modal-overlay").classList.remove("open");
+        modalContext = null;
+      }
+      function formInput(label, id, val, type) {
+        type = type || "text";
+        return (
+          '<div class="form-group"><label>' +
+          label +
+          '</label><input type="' +
+          type +
+          '" id="' +
+          id +
+          '" value="' +
+          (val === undefined ? "" : val) +
+          '"></div>'
+        );
+      }
+      function formTextarea(label, id) {
+        return (
+          '<div class="form-group"><label>' +
+          label +
+          '</label><textarea id="' +
+          id +
+          '"></textarea></div>'
+        );
+      }
+      function formSelect(label, id, opts) {
+        var o = opts
+          .map(function (x) {
+            return "<option>" + x + "</option>";
+          })
+          .join("");
+        return (
+          '<div class="form-group"><label>' +
+          label +
+          '</label><select id="' +
+          id +
+          '">' +
+          o +
+          "</select></div>"
+        );
+      }
+
+      /* ---------- status matrix ---------- */
+      function openLogStatus() {
+        openModal(
+          "Log student status",
+          formSelect("Student", "ls-student", STUDENTS) +
+            formSelect("Status", "ls-status", [
+              "Not Started",
+              "Searching",
+              "Applied",
+              "Interviewing",
+              "Internship Active",
+              "On Hold",
+              "Completed",
+            ]) +
+            formInput("Employer (if applicable)", "ls-employer", ""),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveStatus()">Save</button>',
+        );
+      }
+      function saveStatus() {
+        var student = document.getElementById("ls-student").value;
+        var status = document.getElementById("ls-status").value;
+        var employer = document.getElementById("ls-employer").value;
+        var rows = document.querySelectorAll("#statusmatrix-list .list-row");
+        var badgeClass =
+          status === "Internship Active" || status === "Completed"
+            ? "filled"
+            : status === "Applied" || status === "Interviewing"
+              ? "dashed"
+              : "outline";
+        rows.forEach(function (row) {
+          if (row.querySelector(".primary-text").textContent === student) {
+            row.querySelector(".secondary-text").textContent =
+              (employer ? employer + " — " : "") + "updated just now";
+            row.querySelector(".right").innerHTML =
+              '<span class="badge ' + badgeClass + '">' + status + "</span>";
+          }
+        });
+        closeModal();
+      }
+
+      /* ---------- authorization ---------- */
+      function openNewAuthorization() {
+        openModal(
+          "New authorization",
+          formSelect("Student", "na-student", STUDENTS) +
+            formInput("Employer", "na-employer", ""),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveAuthorization()">Start authorization</button>',
+        );
+      }
+      function saveAuthorization() {
+        var student = document.getElementById("na-student").value;
+        var employer =
+          document.getElementById("na-employer").value || "Employer TBC";
+        var list = document.getElementById("authorization-list");
+        var row = document.createElement("div");
+        row.className = "list-row";
+        row.innerHTML =
+          '<div><div class="primary-text">' +
+          student +
+          " — " +
+          employer +
+          '</div><div class="secondary-text">Signature chain<div class="sig-chain"><span class="sig done">Student</span><span class="sig">Employer</span><span class="sig">Coordinator</span><span class="sig">CDL Head</span></div></div></div><div class="right"><span class="badge outline">In progress</span></div>';
+        list.appendChild(row);
+        closeModal();
+      }
+      function signAsHead(btn) {
+        var row = btn.closest(".list-row");
+        var chain = row.querySelectorAll(".sig");
+        chain[chain.length - 1].classList.add("done");
+        row.querySelector(".right").innerHTML =
+          '<span class="badge filled">Fully authorized</span>';
+      }
+
+      /* ---------- weekly logs ---------- */
+      function openLogEntry() {
+        openModal(
+          "Log entry",
+          formSelect("Student", "le-student", STUDENTS) +
+            '<div class="form-row-2">' +
+            formInput("Week", "le-week", "") +
+            formInput("Hours", "le-hours", "") +
+            "</div>",
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveLogEntry()">Log</button>',
+        );
+      }
+      function saveLogEntry() {
+        var student = document.getElementById("le-student").value;
+        var week = document.getElementById("le-week").value || "Untitled week";
+        var hours = document.getElementById("le-hours").value || "0";
+        var list = document.getElementById("weeklylogs-list");
+        var row = document.createElement("div");
+        row.className = "list-row";
+        row.innerHTML =
+          '<div><div class="primary-text">' +
+          student +
+          " — " +
+          week +
+          '</div><div class="secondary-text">' +
+          hours +
+          ' hours logged</div></div><div class="right"><span class="badge dashed">Pending review</span></div>';
+        list.appendChild(row);
+        closeModal();
+      }
+      function sendLogReminder(btn) {
+        var row = btn.closest(".list-row");
+        row.querySelector(".right").innerHTML =
+          '<span class="badge dashed">Reminder sent</span>';
+        btn.remove();
+      }
+
+      /* ---------- follow-up scheduler ---------- */
+      function openNewFollowup() {
+        openModal(
+          "New follow-up",
+          formSelect("Student", "nf-student", STUDENTS) +
+            '<div class="form-row-2">' +
+            formSelect("Type", "nf-type", [
+              "Check-in call",
+              "Site visit",
+              "Email",
+            ]) +
+            formInput("Date", "nf-date", "", "date") +
+            "</div>",
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveFollowup()">Schedule</button>',
+        );
+      }
+      function saveFollowup() {
+        var student = document.getElementById("nf-student").value;
+        var type = document.getElementById("nf-type").value;
+        var date = document.getElementById("nf-date").value || "TBC";
+        var list = document.getElementById("followup-list");
+        var row = document.createElement("div");
+        row.className = "list-row";
+        row.innerHTML =
+          '<div><div class="primary-text">' +
+          student +
+          '</div><div class="secondary-text">' +
+          type +
+          " — scheduled " +
+          date +
+          '</div></div><div class="right"><span class="badge dashed">Scheduled</span><button class="link-btn" onclick="logFollowupOutcome(this)">Log outcome</button></div>';
+        list.appendChild(row);
+        closeModal();
+      }
+      function logFollowupOutcome(btn) {
+        var row = btn.closest(".list-row");
+        modalContext = { row: row };
+        openModal(
+          "Log outcome",
+          formTextarea("Outcome notes", "fo-notes"),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveFollowupOutcome()">Save</button>',
+        );
+      }
+      function saveFollowupOutcome() {
+        var row = modalContext.row;
+        row.querySelector(".right").innerHTML =
+          '<span class="badge filled">Completed</span>';
+        closeModal();
+      }
+
+      /* ---------- portfolio vault ---------- */
+      function openRequestSubmission() {
+        openModal(
+          "Request submission",
+          formSelect("Student", "rs-student", STUDENTS),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveSubmissionRequest()">Send request</button>',
+        );
+      }
+      function saveSubmissionRequest() {
+        var student = document.getElementById("rs-student").value;
+        var list = document.getElementById("portfoliovault-list");
+        var row = document.createElement("div");
+        row.className = "list-row";
+        row.innerHTML =
+          '<div><div class="primary-text">' +
+          student +
+          '</div><div class="secondary-text">Submission requested just now</div></div><div class="right"><span class="badge dashed">Awaiting submission</span></div>';
+        list.appendChild(row);
+        closeModal();
+      }
+
+      /* ---------- staff allocation ---------- */
+      function openReassignCohort() {
+        openModal(
+          "Reassign cohort",
+          formSelect("Student", "rc-student", STUDENTS) +
+            formSelect("New coordinator", "rc-coordinator", COORDINATORS),
+          '<button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="closeModal()">Reassign</button>',
+        );
+      }
+
+      /* ---------- compliance alerts ---------- */
+      function notifyCoordinator(btn) {
+        var row = btn.closest(".list-row");
+        row.querySelector(".right").innerHTML =
+          '<span class="badge filled">Coordinator notified</span>';
+        btn.remove();
+      }
+      function escalateToHead(btn) {
+        var row = btn.closest(".list-row");
+        row.querySelector(".right").innerHTML =
+          '<span class="badge filled">Escalated</span>';
+        btn.remove();
+      }
+      function followUpCompliance(btn) {
+        var row = btn.closest(".list-row");
+        row.querySelector(".right").innerHTML =
+          '<span class="badge filled">Follow-up sent</span>';
+        btn.remove();
+      }
+    </script>
+  </body>
+</html>

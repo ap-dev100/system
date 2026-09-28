@@ -1,0 +1,2867 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>College CEO Console — Northgate College</title>
+    <style>
+      :root {
+        --bg: #ffffff;
+        --ink: #111111;
+        --ink-soft: #5b5b5b;
+        --ink-faint: #9a9a9a;
+        --line: #dcdcdc;
+        --line-strong: #b7b7b7;
+        --fill: #f4f4f4;
+        --sidebar: #070707;
+        --sidebar-line: #242424;
+        --sidebar-ink: #cfcfcf;
+        --sidebar-ink-dim: #7a7a7a;
+        --serif:
+          "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+        --sans:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial,
+          sans-serif;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: var(--sans);
+        color: var(--ink);
+        background: var(--bg);
+        font-size: 14.5px;
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+      }
+      button,
+      input,
+      select,
+      textarea {
+        font-family: inherit;
+      }
+      .app {
+        display: flex;
+        min-height: 100vh;
+      }
+
+      /* SIDEBAR */
+      .sidebar {
+        width: 264px;
+        flex-shrink: 0;
+        background: var(--sidebar);
+        color: var(--sidebar-ink);
+        display: flex;
+        flex-direction: column;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        overflow-y: auto;
+      }
+      .brand {
+        padding: 26px 24px 18px;
+        border-bottom: 1px solid var(--sidebar-line);
+      }
+      .brand-mark {
+        font-family: var(--serif);
+        font-size: 19px;
+        color: #fff;
+        letter-spacing: 0.01em;
+      }
+      .brand-sub {
+        font-size: 11px;
+        color: var(--sidebar-ink-dim);
+        margin-top: 5px;
+      }
+      .nav {
+        flex: 1;
+        padding: 12px 10px;
+        overflow-y: auto;
+      }
+      .nav-group-label {
+        font-size: 10.5px;
+        color: var(--sidebar-ink-dim);
+        padding: 14px 14px 6px;
+      }
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        width: 100%;
+        padding: 9px 12px;
+        background: none;
+        border: none;
+        color: var(--sidebar-ink);
+        font-size: 13px;
+        text-align: left;
+        cursor: pointer;
+        border-left: 2px solid transparent;
+        font-family: var(--sans);
+      }
+      .nav-item:hover {
+        color: #fff;
+      }
+      .nav-item.active {
+        color: #fff;
+        border-left-color: #fff;
+        background: rgba(255, 255, 255, 0.06);
+      }
+      .nav-mono {
+        width: 30px;
+        height: 20px;
+        border: 1px solid var(--sidebar-line);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 9.5px;
+        letter-spacing: 0.02em;
+        color: var(--sidebar-ink-dim);
+        flex-shrink: 0;
+      }
+      .nav-item.active .nav-mono {
+        border-color: #fff;
+        color: #fff;
+      }
+      .sidebar-foot {
+        padding: 16px 24px;
+        border-top: 1px solid var(--sidebar-line);
+        font-size: 11.5px;
+        color: var(--sidebar-ink-dim);
+      }
+      .sidebar-foot .who {
+        color: #e6e6e6;
+        font-size: 12.5px;
+        margin-bottom: 2px;
+      }
+
+      /* MAIN */
+      .main {
+        flex: 1;
+        min-width: 0;
+      }
+      .topbar {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 24px;
+        padding: 28px 40px 20px;
+        border-bottom: 1px solid var(--line);
+        flex-wrap: wrap;
+      }
+      .topbar h1 {
+        font-family: var(--serif);
+        font-weight: 400;
+        font-size: 26px;
+        margin: 0;
+      }
+      .topbar .desc {
+        font-size: 13px;
+        color: var(--ink-soft);
+        margin-top: 6px;
+        max-width: 640px;
+      }
+      .topbar .actions {
+        display: flex;
+        gap: 10px;
+        flex-shrink: 0;
+        padding-top: 2px;
+      }
+      .content {
+        padding: 32px 40px 90px;
+        max-width: 1180px;
+      }
+
+      /* BUTTONS */
+      .btn {
+        font-family: var(--sans);
+        font-size: 13px;
+        padding: 9px 16px;
+        border: 1px solid var(--ink);
+        background: var(--ink);
+        color: #fff;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      .btn:hover {
+        background: #000;
+      }
+      .btn-outline {
+        background: transparent;
+        color: var(--ink);
+        border: 1px solid var(--line-strong);
+      }
+      .btn-outline:hover {
+        border-color: var(--ink);
+      }
+      .btn-ghost {
+        background: none;
+        border: none;
+        color: var(--ink-soft);
+        text-decoration: underline;
+        cursor: pointer;
+        font-size: 12.5px;
+        padding: 0;
+      }
+      .btn-small {
+        padding: 5px 11px;
+        font-size: 12px;
+      }
+
+      /* KPI ROW */
+      .kpi-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        border-top: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+        margin-bottom: 38px;
+      }
+      .kpi {
+        padding: 20px 22px;
+        border-left: 1px solid var(--line);
+      }
+      .kpi:first-child {
+        border-left: none;
+      }
+      .kpi .num {
+        font-family: var(--serif);
+        font-size: 29px;
+        font-variant-numeric: tabular-nums;
+      }
+      .kpi .label {
+        font-size: 11.8px;
+        color: var(--ink-soft);
+        margin-top: 5px;
+      }
+      .kpi .delta {
+        font-size: 11.3px;
+        margin-top: 7px;
+        color: var(--ink-faint);
+      }
+
+      /* SECTIONS */
+      .section-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin: 44px 0 14px;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .section-head h2 {
+        font-family: var(--serif);
+        font-weight: 400;
+        font-size: 18px;
+        margin: 0;
+      }
+      .section-head .hint {
+        font-size: 11.8px;
+        color: var(--ink-faint);
+      }
+      .lede {
+        font-size: 13px;
+        color: var(--ink-soft);
+        margin: -8px 0 30px;
+        max-width: 680px;
+      }
+
+      /* CHART */
+      .chart-wrap {
+        border: 1px solid var(--line);
+        padding: 22px 24px 16px;
+      }
+      .legend {
+        display: flex;
+        gap: 20px;
+        font-size: 12px;
+        color: var(--ink-soft);
+        margin-top: 12px;
+        flex-wrap: wrap;
+      }
+      .legend span {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .swatch {
+        width: 10px;
+        height: 10px;
+        display: inline-block;
+        border: 1px solid var(--ink);
+      }
+
+      /* TABLE */
+      .table-wrap {
+        overflow-x: auto;
+        border-bottom: 1px solid var(--line);
+      }
+      table.ledger {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+        min-width: 560px;
+      }
+      table.ledger th {
+        text-align: left;
+        font-weight: 500;
+        color: var(--ink-soft);
+        font-size: 11.3px;
+        padding: 0 14px 10px;
+        border-bottom: 1px solid var(--ink);
+        white-space: nowrap;
+      }
+      table.ledger td {
+        padding: 12px 14px;
+        border-bottom: 1px solid var(--line);
+        vertical-align: top;
+      }
+      table.ledger tbody tr {
+        cursor: pointer;
+      }
+      table.ledger tbody tr:hover {
+        background: var(--fill);
+      }
+      table.ledger td.num,
+      table.ledger th.num {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+      .tag {
+        display: inline-block;
+        font-size: 10.8px;
+        padding: 2.5px 8px;
+        border: 1px solid var(--ink);
+        white-space: nowrap;
+      }
+      .tag.dim {
+        border-color: var(--line-strong);
+        color: var(--ink-soft);
+      }
+      .row-actions {
+        display: flex;
+        gap: 6px;
+      }
+      .row-actions button {
+        position: relative;
+        z-index: 2;
+      }
+
+      /* DASHBOARD GRID */
+      .dash-strip {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        border-top: 1px solid var(--ink);
+        border-bottom: 1px solid var(--line);
+        margin: 8px 0 40px;
+      }
+      .dash-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(268px, 1fr));
+        gap: 1px;
+        background: var(--line);
+        border: 1px solid var(--line);
+      }
+      .dash-card {
+        background: #fff;
+        padding: 22px;
+        cursor: pointer;
+        transition: background 0.1s;
+      }
+      .dash-card:hover {
+        background: var(--fill);
+      }
+      .dash-card .mono {
+        width: 34px;
+        height: 24px;
+        border: 1px solid var(--ink);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        margin-bottom: 16px;
+      }
+      .dash-card h4 {
+        font-family: var(--serif);
+        font-weight: 400;
+        font-size: 16px;
+        margin: 0 0 8px;
+      }
+      .dash-card p {
+        font-size: 12.3px;
+        color: var(--ink-soft);
+        margin: 0 0 14px;
+        min-height: 34px;
+      }
+      .dash-card .metric {
+        font-family: var(--serif);
+        font-size: 21px;
+      }
+      .dash-card .metric-label {
+        font-size: 11px;
+        color: var(--ink-faint);
+      }
+
+      /* OVERLAYS: MODAL + DRAWER */
+      .overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.32);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 80;
+        padding: 20px;
+      }
+      .modal {
+        background: #fff;
+        width: 480px;
+        max-width: 100%;
+        max-height: 92vh;
+        overflow-y: auto;
+        padding: 30px 32px;
+        border: 1px solid var(--ink);
+      }
+      .modal h3 {
+        font-family: var(--serif);
+        font-weight: 400;
+        font-size: 21px;
+        margin: 0 0 4px;
+      }
+      .modal .sub {
+        font-size: 12.5px;
+        color: var(--ink-soft);
+        margin-bottom: 22px;
+      }
+      .field {
+        margin-bottom: 16px;
+      }
+      .field label {
+        display: block;
+        font-size: 11.8px;
+        color: var(--ink-soft);
+        margin-bottom: 6px;
+      }
+      .field input,
+      .field select,
+      .field textarea {
+        width: 100%;
+        padding: 9px 10px;
+        border: 1px solid var(--line-strong);
+        font-family: var(--sans);
+        font-size: 13.5px;
+        background: #fff;
+        color: var(--ink);
+      }
+      .field input:focus,
+      .field select:focus,
+      .field textarea:focus {
+        outline: 2px solid var(--ink);
+        outline-offset: 1px;
+      }
+      .field textarea {
+        min-height: 78px;
+        resize: vertical;
+      }
+      .check-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px 14px;
+      }
+      .check-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+      }
+      .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 24px;
+      }
+
+      .drawer-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.25);
+        z-index: 70;
+        display: flex;
+        justify-content: flex-end;
+      }
+      .drawer {
+        width: 440px;
+        max-width: 94vw;
+        background: #fff;
+        height: 100%;
+        overflow-y: auto;
+        padding: 32px 34px;
+        border-left: 1px solid var(--ink);
+      }
+      .drawer .eyebrow {
+        font-size: 11.5px;
+        color: var(--ink-faint);
+        margin-bottom: 6px;
+      }
+      .drawer h3 {
+        font-family: var(--serif);
+        font-size: 22px;
+        font-weight: 400;
+        margin: 0 0 18px;
+      }
+      .kv {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 11px 0;
+        border-bottom: 1px solid var(--line);
+        font-size: 13px;
+      }
+      .kv .k {
+        color: var(--ink-soft);
+        flex-shrink: 0;
+      }
+      .kv .v {
+        text-align: right;
+      }
+      .drawer-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 26px;
+        flex-wrap: wrap;
+      }
+      .drawer-note {
+        margin-top: 20px;
+      }
+      .close-x {
+        background: none;
+        border: none;
+        font-size: 20px;
+        color: var(--ink-soft);
+        cursor: pointer;
+        line-height: 1;
+        padding: 0;
+      }
+      .drawer-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+      }
+
+      /* TOAST */
+      .toast {
+        position: fixed;
+        bottom: 26px;
+        right: 26px;
+        background: #111;
+        color: #fff;
+        padding: 13px 20px;
+        font-size: 13px;
+        z-index: 100;
+        border: 1px solid #000;
+      }
+
+      /* MISC */
+      .footnote {
+        font-size: 11.5px;
+        color: var(--ink-faint);
+        margin-top: 10px;
+      }
+      .pill-count {
+        display: inline-block;
+        font-size: 11px;
+        border: 1px solid var(--ink);
+        padding: 2px 9px;
+        margin-left: 10px;
+      }
+      .empty {
+        padding: 40px 0;
+        text-align: center;
+        color: var(--ink-faint);
+        font-size: 13px;
+        border: 1px dashed var(--line-strong);
+      }
+      .slide-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      .slide-list li {
+        padding: 12px 0;
+        border-bottom: 1px solid var(--line);
+        font-size: 13px;
+      }
+      .slide-list li .num {
+        color: var(--ink-faint);
+        font-size: 11.5px;
+        margin-right: 8px;
+      }
+
+      @media (max-width: 820px) {
+        .sidebar {
+          position: fixed;
+          z-index: 60;
+          transform: translateX(-100%);
+          transition: transform 0.2s;
+        }
+        .sidebar.open {
+          transform: translateX(0);
+        }
+        .topbar,
+        .content {
+          padding-left: 20px;
+          padding-right: 20px;
+        }
+        .menu-btn {
+          display: inline-flex !important;
+        }
+      }
+      .menu-btn {
+        display: none;
+        border: 1px solid var(--line-strong);
+        background: #fff;
+        padding: 8px 10px;
+        cursor: pointer;
+        margin-right: 12px;
+      }
+      .title-row {
+        display: flex;
+        align-items: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <aside class="sidebar" id="sidebar"></aside>
+      <main class="main">
+        <div class="topbar" id="topbar"></div>
+        <div class="content" id="content"></div>
+      </main>
+    </div>
+    <div id="modal-root"></div>
+    <div id="drawer-root"></div>
+    <div id="toast-root"></div>
+
+    <script>
+      /* ============================= UTILITIES ============================= */
+      const $ = (sel) => document.querySelector(sel);
+      const money = (n) => "$" + Math.round(n).toLocaleString("en-US");
+      const moneyK = (n) =>
+        n >= 1000000 ? "$" + (n / 1000000).toFixed(2) + "M" : money(n);
+      const pct = (n) => Math.round(n * 10) / 10 + "%";
+      const num = (n) => Math.round(n).toLocaleString("en-US");
+      function toast(msg) {
+        const root = $("#toast-root");
+        root.innerHTML = `<div class="toast">${msg}</div>`;
+        clearTimeout(window.__toastTimer);
+        window.__toastTimer = setTimeout(() => {
+          root.innerHTML = "";
+        }, 2600);
+      }
+      function closeModal() {
+        $("#modal-root").innerHTML = "";
+      }
+      function closeDrawer() {
+        $("#drawer-root").innerHTML = "";
+      }
+
+      /* ============================= CHART (SVG bar) ============================= */
+      function barChart(id, labels, series) {
+        const w = Math.max(
+          600,
+          labels.length * Math.max(90, series.length * 46),
+        );
+        const h = 210,
+          padL = 8,
+          padB = 28,
+          padT = 16,
+          padR = 8;
+        const max = Math.max(1, ...series.flatMap((s) => s.values)) * 1.18;
+        const groupW = (w - padL - padR) / labels.length;
+        const barW = Math.min(30, (groupW - 18) / series.length);
+        let bars = "";
+        labels.forEach((lab, li) => {
+          const gx =
+            padL +
+            li * groupW +
+            (groupW - (barW * series.length + (series.length - 1) * 6)) / 2;
+          series.forEach((s, si) => {
+            const val = s.values[li];
+            const bh = (val / max) * (h - padT - padB);
+            const bx = gx + si * (barW + 6);
+            const by = h - padB - bh;
+            const fillId =
+              si === 0
+                ? `url(#${id}-f0)`
+                : si === 1
+                  ? `url(#${id}-f1)`
+                  : `url(#${id}-f2)`;
+            bars += `<rect x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(bh, 0).toFixed(1)}" fill="${fillId}" stroke="#111" stroke-width="0.6"/>`;
+            bars += `<text x="${(bx + barW / 2).toFixed(1)}" y="${(by - 5).toFixed(1)}" font-size="9.5" text-anchor="middle" fill="#5b5b5b" font-family="sans-serif">${s.fmt ? s.fmt(val) : val}</text>`;
+          });
+          bars += `<text x="${(gx + (barW * series.length + (series.length - 1) * 6) / 2).toFixed(1)}" y="${h - 9}" font-size="10.3" text-anchor="middle" fill="#5b5b5b" font-family="sans-serif">${lab}</text>`;
+        });
+        bars += `<line x1="${padL}" y1="${h - padB}" x2="${w - padR}" y2="${h - padB}" stroke="#111" stroke-width="1"/>`;
+        return `<svg viewBox="0 0 ${w} ${h}" style="width:100%;height:${h}px;display:block;">
+    <defs>
+      <pattern id="${id}-f1" width="6" height="6" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"><rect width="6" height="6" fill="#fff"/><line x1="0" y1="0" x2="0" y2="6" stroke="#111" stroke-width="2.6"/></pattern>
+      <pattern id="${id}-f0" width="2" height="2" patternUnits="userSpaceOnUse"><rect width="2" height="2" fill="#111"/></pattern>
+      <pattern id="${id}-f2" width="2" height="2" patternUnits="userSpaceOnUse"><rect width="2" height="2" fill="#c7c7c7"/></pattern>
+    </defs>
+    ${bars}
+  </svg>`;
+      }
+      function chartLegend(series) {
+        return `<div class="legend">${series.map((s, i) => `<span><span class="swatch" style="background:${i === 0 ? "#111" : i === 1 ? "repeating-linear-gradient(45deg,#111,#111 2px,#fff 2px,#fff 4px)" : "#c7c7c7"}"></span>${s.name}</span>`).join("")}</div>`;
+      }
+
+      /* ============================= STATE / MOCK DATA ============================= */
+      const state = {
+        active: "dashboard",
+        pl: [
+          {
+            center: "Academic Affairs",
+            revenue: 1820000,
+            spend: 1510000,
+            note: "",
+          },
+          {
+            center: "Admissions & Marketing",
+            revenue: 410000,
+            spend: 512000,
+            note: "",
+          },
+          {
+            center: "Facilities & Estates",
+            revenue: 0,
+            spend: 684000,
+            note: "",
+          },
+          {
+            center: "Student Services",
+            revenue: 96000,
+            spend: 318000,
+            note: "",
+          },
+          {
+            center: "Residence Halls",
+            revenue: 1240000,
+            spend: 812000,
+            note: "",
+          },
+          { center: "Athletics", revenue: 210000, spend: 266000, note: "" },
+        ],
+        enf: [
+          { program: "Nursing", leads: 610, applications: 349, forecast: 176 },
+          {
+            program: "Business Administration",
+            leads: 520,
+            applications: 280,
+            forecast: 134,
+          },
+          {
+            program: "IT & Computing",
+            leads: 388,
+            applications: 190,
+            forecast: 74,
+          },
+          {
+            program: "Skilled Trades",
+            leads: 256,
+            applications: 150,
+            forecast: 63,
+          },
+          {
+            program: "Early Childhood Education",
+            leads: 301,
+            applications: 140,
+            forecast: 62,
+          },
+          {
+            program: "Culinary Arts",
+            leads: 265,
+            applications: 118,
+            forecast: 45,
+          },
+        ],
+        sib: [
+          { metric: "Student retention", local: 87, network: 83, best: 91 },
+          { metric: "Module pass ratio", local: 88, network: 85, best: 93 },
+          {
+            metric: "Graduate employment (12mo)",
+            local: 79,
+            network: 76,
+            best: 88,
+          },
+          {
+            metric: "Student satisfaction (x20, of 5.0)",
+            local: 84,
+            network: 80,
+            best: 92,
+          },
+          {
+            metric: "Avg class size (inverse index)",
+            local: 76,
+            network: 73,
+            best: 81,
+          },
+          {
+            metric: "Staff-to-student ratio (index)",
+            local: 79,
+            network: 75,
+            best: 86,
+          },
+        ],
+        aca: [
+          {
+            dept: "Nursing & Health Sciences",
+            enrolled: 512,
+            pass: 91,
+            dropout: 4.4,
+            satisfaction: 4.4,
+          },
+          {
+            dept: "Business",
+            enrolled: 640,
+            pass: 89,
+            dropout: 6.1,
+            satisfaction: 4.1,
+          },
+          {
+            dept: "Trades & Engineering",
+            enrolled: 356,
+            pass: 88,
+            dropout: 6.6,
+            satisfaction: 4.0,
+          },
+          {
+            dept: "Culinary Arts",
+            enrolled: 210,
+            pass: 86,
+            dropout: 7.2,
+            satisfaction: 4.3,
+          },
+          {
+            dept: "IT & Computing",
+            enrolled: 388,
+            pass: 84,
+            dropout: 8.9,
+            satisfaction: 3.9,
+          },
+        ],
+        comp: [
+          {
+            domain: "Health & Safety",
+            readiness: 96,
+            reviewed: "Aug 2026",
+            owner: "Facilities Dir.",
+            status: "On track",
+          },
+          {
+            domain: "Accreditation Standards",
+            readiness: 94,
+            reviewed: "Sep 2026",
+            owner: "Academic Registrar",
+            status: "On track",
+          },
+          {
+            domain: "Staff Credentialing",
+            readiness: 90,
+            reviewed: "Aug 2026",
+            owner: "HR",
+            status: "On track",
+          },
+          {
+            domain: "Data Protection",
+            readiness: 88,
+            reviewed: "Jul 2026",
+            owner: "IT & Compliance",
+            status: "On track",
+          },
+          {
+            domain: "Financial Aid Administration",
+            readiness: 82,
+            reviewed: "Jun 2026",
+            owner: "Finance Office",
+            status: "Action needed",
+          },
+        ],
+        briefs: [
+          {
+            period: "Q2 FY26 Board Update",
+            sections: [
+              "P&L Aggregators",
+              "Strategic Enrollment Forecasts",
+              "Strategic Risk Registers",
+            ],
+            format: "PDF",
+            status: "Ready",
+            generated: "12 Jul 2026",
+          },
+          {
+            period: "August 2026 Monthly Summary",
+            sections: ["P&L Aggregators", "Regulatory Compliance Scorecards"],
+            format: "DOCX",
+            status: "Ready",
+            generated: "02 Sep 2026",
+          },
+        ],
+        risks: [
+          {
+            title: "Faculty attrition in Nursing dept.",
+            category: "Staffing",
+            severity: "High",
+            trend: "Rising",
+            owner: "HR Director",
+            status: "Open",
+          },
+          {
+            title: "Declining trades program enrollment",
+            category: "Enrollment",
+            severity: "High",
+            trend: "Rising",
+            owner: "Admissions Dir.",
+            status: "Open",
+          },
+          {
+            title: "Budget variance — Facilities",
+            category: "Financial",
+            severity: "Medium",
+            trend: "Stable",
+            owner: "CFO",
+            status: "Open",
+          },
+          {
+            title: "Ageing residence hall infrastructure",
+            category: "Facilities",
+            severity: "Medium",
+            trend: "Stable",
+            owner: "Facilities Dir.",
+            status: "Mitigating",
+          },
+          {
+            title: "Accreditation documentation gaps",
+            category: "Compliance",
+            severity: "Low",
+            trend: "Falling",
+            owner: "Registrar",
+            status: "Mitigated",
+          },
+        ],
+        schol: [
+          {
+            fund: "Founders Merit Scholarship",
+            recipients: 86,
+            gradRate: 82,
+            ttd: 2.1,
+          },
+          {
+            fund: "Trades Pathway Award",
+            recipients: 40,
+            gradRate: 79,
+            ttd: 2.0,
+          },
+          {
+            fund: "First-Generation Access Fund",
+            recipients: 64,
+            gradRate: 74,
+            ttd: 2.4,
+          },
+          {
+            fund: "Community Equity Scholarship",
+            recipients: 58,
+            gradRate: 71,
+            ttd: 2.5,
+          },
+        ],
+        mkt: [
+          {
+            inst: "Northgate College (this college)",
+            enrollment: 4120,
+            share: 23,
+          },
+          { inst: "Riverside Technical College", enrollment: 3860, share: 21 },
+          { inst: "Ashfield Community College", enrollment: 2940, share: 16 },
+          { inst: "Northgate Career Institute", enrollment: 2510, share: 14 },
+          {
+            inst: "Private Regional University Ext.",
+            enrollment: 2260,
+            share: 12,
+          },
+        ],
+        sent: [
+          { source: "Social media", mentions: 148, positive: 58, negative: 22 },
+          {
+            source: "Local news coverage",
+            mentions: 64,
+            positive: 71,
+            negative: 12,
+          },
+          { source: "Parent surveys", mentions: 52, positive: 82, negative: 6 },
+          {
+            source: "Community forums",
+            mentions: 22,
+            positive: 63,
+            negative: 19,
+          },
+          {
+            source: "Employer surveys",
+            mentions: 26,
+            positive: 88,
+            negative: 4,
+          },
+        ],
+        cap: [
+          {
+            project: "New STEM Building",
+            budget: 6200000,
+            spent: 3850000,
+            pct: 62,
+            roi: 12.4,
+            status: "On schedule",
+          },
+          {
+            project: "Residence Hall Renovation",
+            budget: 2400000,
+            spent: 2180000,
+            pct: 91,
+            roi: 9.1,
+            status: "On schedule",
+          },
+          {
+            project: "Library Modernization",
+            budget: 2200000,
+            spent: 1920000,
+            pct: 87,
+            roi: 10.6,
+            status: "On schedule",
+          },
+          {
+            project: "Athletics Complex Upgrade",
+            budget: 1800000,
+            spent: 640000,
+            pct: 35,
+            roi: 7.8,
+            status: "Behind schedule",
+          },
+        ],
+        partners: [
+          {
+            partner: "Meridian Health Systems",
+            industry: "Healthcare",
+            internships: 38,
+            hires: 22,
+            contractEnd: "Jun 2027",
+            status: "Active",
+          },
+          {
+            partner: "Harborview Hospitality Group",
+            industry: "Culinary Arts",
+            internships: 31,
+            hires: 18,
+            contractEnd: "Aug 2027",
+            status: "Active",
+          },
+          {
+            partner: "Northbridge Construction Group",
+            industry: "Skilled Trades",
+            internships: 26,
+            hires: 14,
+            contractEnd: "Dec 2026",
+            status: "Renewal due",
+          },
+          {
+            partner: "CoreLogic Technology",
+            industry: "IT & Computing",
+            internships: 22,
+            hires: 9,
+            contractEnd: "Nov 2026",
+            status: "Renewal due",
+          },
+          {
+            partner: "Vantage Financial Services",
+            industry: "Business",
+            internships: 19,
+            hires: 11,
+            contractEnd: "Mar 2027",
+            status: "Active",
+          },
+        ],
+        alum: [
+          {
+            campaign: "STEM Building Naming Campaign",
+            goal: 1200000,
+            raised: 940000,
+            donors: 180,
+            deadline: "Jun 2027",
+          },
+          {
+            campaign: "Founders Legacy Fund",
+            goal: 800000,
+            raised: 612000,
+            donors: 410,
+            deadline: "Dec 2026",
+          },
+          {
+            campaign: "First-Gen Scholarship Drive",
+            goal: 300000,
+            raised: 268000,
+            donors: 520,
+            deadline: "Nov 2026",
+          },
+          {
+            campaign: "Athletics Alumni Fund",
+            goal: 150000,
+            raised: 96000,
+            donors: 130,
+            deadline: "Jan 2027",
+          },
+        ],
+        decks: [
+          {
+            title: "Q2 FY26 Board Meeting",
+            date: "18 Jul 2026",
+            modules: ["pl", "enf", "risks"],
+            status: "Final",
+          },
+        ],
+        overrides: [
+          {
+            type: "Expense request",
+            requestor: "CFO Office",
+            amount: "$84,000",
+            reason: "Emergency HVAC repair — Residence Hall B",
+            status: "Pending",
+            note: "",
+          },
+          {
+            type: "Structural change",
+            requestor: "Academic Dean",
+            amount: "—",
+            reason:
+              "Merge Culinary Arts and Hospitality departments into one school",
+            status: "Pending",
+            note: "",
+          },
+          {
+            type: "Policy exception",
+            requestor: "Registrar",
+            amount: "—",
+            reason: "Late-enrollment exception for 14 veteran students",
+            status: "Pending",
+            note: "",
+          },
+          {
+            type: "Expense request",
+            requestor: "Athletics Director",
+            amount: "$26,500",
+            reason: "Additional recruiting travel budget",
+            status: "Approved",
+            note: "Approved against Q3 contingency line.",
+          },
+        ],
+      };
+
+      /* ============================= NAV CONFIG ============================= */
+      const NAV = [
+        { id: "dashboard", label: "Overview", mono: "OV" },
+        { id: "pl", label: "P&L Aggregators", mono: "PL" },
+        { id: "enf", label: "Enrollment Forecasts", mono: "EF" },
+        { id: "sib", label: "Sibling Benchmarks", mono: "SB" },
+        { id: "aca", label: "Academic Success", mono: "AS" },
+        { id: "comp", label: "Compliance Scorecards", mono: "CS" },
+        { id: "brief", label: "Briefing Generator", mono: "BG" },
+        { id: "risks", label: "Strategic Risk Register", mono: "RR" },
+        { id: "schol", label: "Scholarship ROI", mono: "SR" },
+        { id: "mkt", label: "Market Share", mono: "MS" },
+        { id: "sent", label: "Community Sentiment", mono: "CT" },
+        { id: "cap", label: "Capital Investment", mono: "CI" },
+        { id: "partners", label: "Corporate Partner Hub", mono: "CP" },
+        { id: "alum", label: "Alumni Donations", mono: "AD" },
+        { id: "decks", label: "Board Panel Builder", mono: "BB" },
+        { id: "overrides", label: "Command Overrides", mono: "CO" },
+      ];
+
+      const TITLES = {
+        dashboard: {
+          title: "Executive overview",
+          desc: "Northgate College — live position across finance, enrollment, risk and compliance, benchmarked against the wider ING network.",
+        },
+        pl: {
+          title: "College P&L Aggregators",
+          desc: "Live revenue balances mapped directly against operational spend, by cost centre.",
+        },
+        enf: {
+          title: "Strategic Enrollment Forecasts",
+          desc: "Marketing lead metrics tracked against historical enrollment conversion, by program.",
+        },
+        sib: {
+          title: "Sibling College Performance Benchmarks",
+          desc: "Northgate’s metrics compared against anonymized data from other ING colleges.",
+        },
+        aca: {
+          title: "Academic Success Dashboards",
+          desc: "Drop-out frequency, module pass ratios and student satisfaction, aggregated by department.",
+        },
+        comp: {
+          title: "Regulatory Compliance Scorecards",
+          desc: "Readiness for external educational audits, tracked by compliance domain.",
+        },
+        brief: {
+          title: "Executive Briefing Generator",
+          desc: "Convert campus performance data into summarized PDF or DOCX briefs for the board.",
+        },
+        risks: {
+          title: "Strategic Risk Register",
+          desc: "Flags on staff departures, budget variance and enrollment declines, with owners and status.",
+        },
+        schol: {
+          title: "Scholarship ROI Analytics",
+          desc: "Long-term graduation success of students on institutional scholarships, by fund.",
+        },
+        mkt: {
+          title: "Market Share Comparators",
+          desc: "Regional student enrollment compared against known competitor footprints.",
+        },
+        sent: {
+          title: "Community Sentiment Trackers",
+          desc: "Public perception and regional community trust, tracked by source.",
+        },
+        cap: {
+          title: "Capital Investment Trackers",
+          desc: "Returns on major building and facility investments, by project.",
+        },
+        partners: {
+          title: "Corporate Partner Hub",
+          desc: "Relationships, internship contracts and employment placements with corporate partners.",
+        },
+        alum: {
+          title: "Alumni Donation Manager",
+          desc: "Fundraising drives and corporate alumni donations, tracked by campaign.",
+        },
+        decks: {
+          title: "Board Meeting Panel Builder",
+          desc: "Import real-time chart data from any module into a board presentation.",
+        },
+        overrides: {
+          title: "Executive Command Overrides",
+          desc: "Final approval authority on exceptional expense requests and structural changes.",
+        },
+      };
+
+      /* ============================= GENERIC FEATURE CONFIGS ============================= */
+      const FEATURES = {
+        pl: {
+          dataKey: "pl",
+          tableTitle: "Cost centres",
+          kpis: (rows) => {
+            const rev = rows.reduce((a, r) => a + r.revenue, 0),
+              sp = rows.reduce((a, r) => a + r.spend, 0);
+            return [
+              { value: moneyK(rev), label: "Live revenue balance" },
+              { value: moneyK(sp), label: "Operational spend" },
+              {
+                value: pct(((rev - sp) / rev) * 100),
+                label: "Net margin",
+                delta: rev - sp >= 0 ? "Surplus position" : "Deficit position",
+              },
+              {
+                value: "14 mo",
+                label: "Cash runway",
+                delta: "Modelled estimate",
+              },
+            ];
+          },
+          chart: (rows) => ({
+            labels: rows.map((r) => r.center.split(" ")[0]),
+            series: [
+              {
+                name: "Revenue",
+                values: rows.map((r) => Math.round(r.revenue / 1000)),
+                fmt: (v) => "$" + v + "k",
+              },
+              {
+                name: "Spend",
+                values: rows.map((r) => Math.round(r.spend / 1000)),
+                fmt: (v) => "$" + v + "k",
+              },
+            ],
+          }),
+          columns: [
+            { key: "center", label: "Cost centre" },
+            {
+              key: "revenue",
+              label: "Revenue",
+              align: "num",
+              fmt: (v) => money(v),
+            },
+            {
+              key: "spend",
+              label: "Spend",
+              align: "num",
+              fmt: (v) => money(v),
+            },
+            {
+              key: "variance",
+              label: "Variance",
+              align: "num",
+              fmt: (v, r) => {
+                const d = r.revenue - r.spend;
+                return (d >= 0 ? "+" : "") + money(d);
+              },
+            },
+            {
+              key: "status",
+              label: "Status",
+              fmt: (v, r) =>
+                r.revenue - r.spend >= 0
+                  ? '<span class="tag">Surplus</span>'
+                  : '<span class="tag dim">Deficit</span>',
+            },
+          ],
+          form: {
+            actionLabel: "+ Log budget entry",
+            title: "Log budget entry",
+            sub: "Record a new or adjusted cost-centre line. Figures roll into totals immediately.",
+            fields: [
+              {
+                key: "center",
+                label: "Cost centre",
+                type: "text",
+                placeholder: "e.g. Continuing Education",
+              },
+              {
+                key: "revenue",
+                label: "Revenue ($)",
+                type: "number",
+                placeholder: "0",
+              },
+              {
+                key: "spend",
+                label: "Spend ($)",
+                type: "number",
+                placeholder: "0",
+              },
+              {
+                key: "note",
+                label: "Note (optional)",
+                type: "textarea",
+                placeholder: "Context for this entry",
+              },
+            ],
+            build: (v) => ({
+              center: v.center || "Untitled centre",
+              revenue: +v.revenue || 0,
+              spend: +v.spend || 0,
+              note: v.note || "",
+            }),
+          },
+          rowAction: {
+            label: "Export line item",
+            apply: () => toast("Line item exported to finance system."),
+          },
+        },
+        enf: {
+          dataKey: "enf",
+          tableTitle: "Program pipeline",
+          kpis: (rows) => {
+            const leads = rows.reduce((a, r) => a + r.leads, 0),
+              apps = rows.reduce((a, r) => a + r.applications, 0),
+              fc = rows.reduce((a, r) => a + r.forecast, 0);
+            return [
+              { value: num(leads), label: "Qualified leads" },
+              {
+                value: pct((apps / leads) * 100),
+                label: "Lead → applicant conversion",
+              },
+              { value: num(fc), label: "Projected fall intake" },
+              {
+                value: "84%",
+                label: "Forecast confidence",
+                delta: "Model estimate",
+              },
+            ];
+          },
+          chart: (rows) => ({
+            labels: rows.map((r) => r.program.split(" ")[0]),
+            series: [
+              { name: "Leads", values: rows.map((r) => r.leads) },
+              { name: "Applications", values: rows.map((r) => r.applications) },
+              { name: "Forecast intake", values: rows.map((r) => r.forecast) },
+            ],
+          }),
+          columns: [
+            { key: "program", label: "Program" },
+            { key: "leads", label: "Leads", align: "num" },
+            { key: "applications", label: "Applications", align: "num" },
+            {
+              key: "conversion",
+              label: "Conversion",
+              align: "num",
+              fmt: (v, r) => pct((r.applications / r.leads) * 100),
+            },
+            { key: "forecast", label: "Forecast intake", align: "num" },
+          ],
+          form: {
+            actionLabel: "+ Log pipeline update",
+            title: "Log pipeline update",
+            sub: "Add or refresh a program’s lead and application counts.",
+            fields: [
+              {
+                key: "program",
+                label: "Program",
+                type: "text",
+                placeholder: "e.g. Paralegal Studies",
+              },
+              {
+                key: "leads",
+                label: "Qualified leads",
+                type: "number",
+                placeholder: "0",
+              },
+              {
+                key: "applications",
+                label: "Applications received",
+                type: "number",
+                placeholder: "0",
+              },
+            ],
+            build: (v) => {
+              const leads = +v.leads || 1,
+                apps = +v.applications || 0;
+              return {
+                program: v.program || "Untitled program",
+                leads,
+                applications: apps,
+                forecast: Math.round(apps * 0.55),
+              };
+            },
+          },
+          rowAction: {
+            label: "Flag for admissions follow-up",
+            apply: () => toast("Admissions team notified."),
+          },
+        },
+        sib: {
+          dataKey: "sib",
+          tableTitle: "Metric comparison vs. ING network",
+          kpis: (rows) => {
+            const above = rows.filter((r) => r.local > r.network).length;
+            return [
+              { value: "#2 of 6", label: "Network-wide rank" },
+              {
+                value: above + " / " + rows.length,
+                label: "Metrics above network average",
+              },
+              {
+                value: rows.length - above + " / " + rows.length,
+                label: "Metrics below network average",
+              },
+              {
+                value: pct(rows.reduce((a, r) => a + r.local, 0) / rows.length),
+                label: "Composite index",
+              },
+            ];
+          },
+          chart: (rows) => ({
+            labels: rows.map((r) => r.metric.split(" ")[0]),
+            series: [
+              { name: "Northgate", values: rows.map((r) => r.local) },
+              { name: "Network average", values: rows.map((r) => r.network) },
+              { name: "Best in network", values: rows.map((r) => r.best) },
+            ],
+          }),
+          columns: [
+            { key: "metric", label: "Metric" },
+            { key: "local", label: "Northgate", align: "num", fmt: (v) => v },
+            { key: "network", label: "Network avg.", align: "num" },
+            { key: "best", label: "Best in network", align: "num" },
+            {
+              key: "gap",
+              label: "Gap",
+              align: "num",
+              fmt: (v, r) => {
+                const d = r.local - r.network;
+                return (d >= 0 ? "+" : "") + d;
+              },
+            },
+          ],
+          form: {
+            actionLabel: "+ Request deep-dive",
+            title: "Request deep-dive comparison",
+            sub: "Ask network operations for a full breakdown against an anonymized peer college.",
+            fields: [
+              {
+                key: "metric",
+                label: "Metric",
+                type: "text",
+                placeholder: "e.g. Time-to-degree",
+              },
+              {
+                key: "local",
+                label: "Northgate value",
+                type: "number",
+                placeholder: "0",
+              },
+              {
+                key: "network",
+                label: "Network average",
+                type: "number",
+                placeholder: "0",
+              },
+              {
+                key: "best",
+                label: "Best in network",
+                type: "number",
+                placeholder: "0",
+              },
+            ],
+            build: (v) => ({
+              metric: v.metric || "Untitled metric",
+              local: +v.local || 0,
+              network: +v.network || 0,
+              best: +v.best || 0,
+            }),
+          },
+          rowAction: {
+            label: "Request deep-dive analysis",
+            apply: () => toast("Deep-dive request sent to network operations."),
+          },
+        },
+        aca: {
+          dataKey: "aca",
+          tableTitle: "Department outcomes",
+          kpis: (rows) => {
+            const w = rows.reduce((a, r) => a + r.enrolled, 0);
+            const dropout =
+              rows.reduce((a, r) => a + r.dropout * r.enrolled, 0) / w;
+            const pass = rows.reduce((a, r) => a + r.pass * r.enrolled, 0) / w;
+            const sat =
+              rows.reduce((a, r) => a + r.satisfaction * r.enrolled, 0) / w;
+            return [
+              { value: pct(dropout), label: "Drop-out rate" },
+              { value: pct(pass), label: "Module pass ratio" },
+              { value: sat.toFixed(1) + " / 5", label: "Student satisfaction" },
+              { value: "137", label: "Students flagged at-risk" },
+            ];
+          },
+          chart: (rows) => ({
+            labels: rows.map((r) => r.dept.split(" ")[0]),
+            series: [
+              { name: "Pass ratio %", values: rows.map((r) => r.pass) },
+              { name: "Drop-out %", values: rows.map((r) => r.dropout) },
+            ],
+          }),
+          columns: [
+            { key: "dept", label: "Department" },
+            { key: "enrolled", label: "Enrolled", align: "num" },
+            { key: "pass", label: "Pass ratio", align: "num", fmt: pct },
+            { key: "dropout", label: "Drop-out rate", align: "num", fmt: pct },
+            {
+              key: "satisfaction",
+              label: "Satisfaction",
+              align: "num",
+              fmt: (v) => v.toFixed(1) + " / 5",
+            },
+          ],
+          form: {
+            actionLabel: "+ Log department outcome",
+            title: "Log department outcome",
+            sub: "Update or add a department’s latest academic outcome figures.",
+            fields: [
+              {
+                key: "dept",
+                label: "Department",
+                type: "text",
+                placeholder: "e.g. Applied Sciences",
+              },
+              {
+                key: "enrolled",
+                label: "Students enrolled",
+                type: "number",
+                placeholder: "0",
+              },
+              {
+                key: "pass",
+                label: "Pass ratio (%)",
+                type: "number",
+                placeholder: "0",
+              },
+              {
+                key: "dropout",
+                label: "Drop-out rate (%)",
+                type: "number",
+                placeholder: "0",
+              },
+              {
+                key: "satisfaction",
+                label: "Satisfaction (1–5)",
+                type: "number",
+                placeholder: "0",
+              },
+            ],
+            build: (v) => ({
+              dept: v.dept || "Untitled department",
+              enrolled: +v.enrolled || 0,
+              pass: +v.pass || 0,
+              dropout: +v.dropout || 0,
+              satisfaction: +v.satisfaction || 0,
+            }),
+          },
+          rowAction: {
+            label: "Flag intervention cohort",
+            apply: () =>
+              toast("Intervention cohort flagged to Student Services."),
+          },
+        },
+        comp: {
+          dataKey: "comp",
+          tableTitle: "Compliance domains",
+          kpis: (rows) => {
+            const avg = rows.reduce((a, r) => a + r.readiness, 0) / rows.length;
+            return [
+              { value: pct(avg), label: "Overall audit readiness" },
+              { value: "4", label: "Open findings" },
+              { value: "3", label: "Audits this year" },
+              { value: "46 days", label: "Next scheduled audit" },
+            ];
+          },
+          chart: (rows) => ({
+            labels: rows.map((r) => r.domain.split(" ")[0]),
+            series: [
+              { name: "Readiness %", values: rows.map((r) => r.readiness) },
+            ],
+          }),
+          columns: [
+            { key: "domain", label: "Compliance domain" },
+            { key: "readiness", label: "Readiness", align: "num", fmt: pct },
+            { key: "reviewed", label: "Last reviewed" },
+            { key: "owner", label: "Owner" },
+            {
+              key: "status",
+              label: "Status",
+              fmt: (v) =>
+                v === "On track"
+                  ? '<span class="tag">On track</span>'
+                  : '<span class="tag dim">Action needed</span>',
+            },
+          ],
+          form: {
+            actionLabel: "+ Log corrective action",
+            title: "Log corrective action",
+            sub: "Record a readiness update or a new corrective action against a compliance domain.",
+            fields: [
+              {
+                key: "domain",
+                label: "Compliance domain",
+                type: "text",
+                placeholder: "e.g. Title IX Reporting",
+              },
+              {
+                key: "readiness",
+                label: "Readiness (%)",
+                type: "number",
+                placeholder: "0",
+              },
+              {
+                key: "owner",
+                label: "Owner",
+                type: "text",
+                placeholder: "e.g. Compliance Office",
+              },
+              {
+                key: "status",
+                label: "Status",
+                type: "select",
+                options: ["On track", "Action needed"],
+              },
+            ],
+            build: (v) => ({
+              domain: v.domain || "Untitled domain",
+              readiness: +v.readiness || 0,
+              reviewed: "Sep 2026",
+              owner: v.owner || "Unassigned",
+              status: v.status || "On track",
+            }),
+          },
+          rowAction: {
+            label: "Log corrective action",
+            apply: () => toast("Corrective action logged and assigned."),
+          },
+        },
+        schol: {
+          dataKey: "schol",
+          tableTitle: "Scholarship funds",
+          kpis: (rows) => {
+            const rec = rows.reduce((a, r) => a + r.recipients, 0);
+            const grad =
+              rows.reduce((a, r) => a + r.gradRate * r.recipients, 0) / rec;
+            return [
+              { value: num(rec), label: "Scholars tracked" },
+              { value: pct(grad), label: "5-year graduation rate" },
+              {
+                value: "64%",
+                label: "Non-scholar comparison",
+                delta: "Institutional average",
+              },
+              { value: "1.4x", label: "Scholarship ROI index" },
+            ];
+          },
+          chart: (rows) => ({
+            labels: rows.map((r) => r.fund.split(" ")[0]),
+            series: [
+              { name: "Grad rate %", values: rows.map((r) => r.gradRate) },
+              { name: "Recipients", values: rows.map((r) => r.recipients) },
+            ],
+          }),
+          columns: [
+            { key: "fund", label: "Scholarship fund" },
+            { key: "recipients", label: "Recipients", align: "num" },
+            { key: "gradRate", label: "Grad rate", align: "num", fmt: pct },
+            {
+              key: "ttd",
+              label: "Avg. time-to-degree",
+              align: "num",
+              fmt: (v) => v + " yrs",
+            },
+          ],
+          form: {
+            actionLabel: "+ Add scholarship fund",
+            title: "Add scholarship fund",
+            sub: "Track a new institutional scholarship fund and its recipients.",
+            fields: [
+              {
+                key: "fund",
+                label: "Fund name",
+                type: "text",
+                placeholder: "e.g. Veterans Access Fund",
+              },
+              {
+                key: "recipients",
+                label: "Recipients",
+                type: "number",
+                placeholder: "0",
+              },
+              {
+                key: "gradRate",
+                label: "Graduation rate (%)",
+                type: "number",
+                placeholder: "0",
+              },
+              {
+                key: "ttd",
+                label: "Avg. time-to-degree (yrs)",
+                type: "number",
+                placeholder: "0",
+                step: "0.1",
+              },
+            ],
+            build: (v) => ({
+              fund: v.fund || "Untitled fund",
+              recipients: +v.recipients || 0,
+              gradRate: +v.gradRate || 0,
+              ttd: +v.ttd || 0,
+            }),
+          },
+        },
+        mkt: {
+          dataKey: "mkt",
+          tableTitle: "Regional institutions",
+          kpis: () => [
+            { value: "23%", label: "Regional market share" },
+            { value: "+1.8 pt", label: "Year-over-year change" },
+            { value: "5", label: "Competitors tracked" },
+            { value: "#2 of 6", label: "Regional rank" },
+          ],
+          chart: (rows) => ({
+            labels: rows.map((r) => r.inst.split(" ")[0]),
+            series: [
+              {
+                name: "Est. enrollment",
+                values: rows.map((r) => r.enrollment),
+              },
+            ],
+          }),
+          columns: [
+            { key: "inst", label: "Institution" },
+            {
+              key: "enrollment",
+              label: "Est. enrollment",
+              align: "num",
+              fmt: num,
+            },
+            { key: "share", label: "Regional share", align: "num", fmt: pct },
+          ],
+          form: {
+            actionLabel: "+ Update competitor estimate",
+            title: "Update competitor estimate",
+            sub: "Refresh an institution’s estimated enrollment and market share.",
+            fields: [
+              {
+                key: "inst",
+                label: "Institution",
+                type: "text",
+                placeholder: "e.g. Summit Vocational College",
+              },
+              {
+                key: "enrollment",
+                label: "Estimated enrollment",
+                type: "number",
+                placeholder: "0",
+              },
+              {
+                key: "share",
+                label: "Regional share (%)",
+                type: "number",
+                placeholder: "0",
+              },
+            ],
+            build: (v) => ({
+              inst: v.inst || "Untitled institution",
+              enrollment: +v.enrollment || 0,
+              share: +v.share || 0,
+            }),
+          },
+        },
+        sent: {
+          dataKey: "sent",
+          tableTitle: "Sentiment by source",
+          kpis: (rows) => {
+            const m = rows.reduce((a, r) => a + r.mentions, 0);
+            const pos =
+              rows.reduce((a, r) => a + r.positive * r.mentions, 0) / m;
+            return [
+              { value: "7.4 / 10", label: "Community trust index" },
+              { value: num(m), label: "Mentions this month" },
+              { value: pct(pos), label: "Positive share" },
+              { value: "92%", label: "Response rate" },
+            ];
+          },
+          chart: (rows) => ({
+            labels: rows.map((r) => r.source.split(" ")[0]),
+            series: [
+              { name: "Positive %", values: rows.map((r) => r.positive) },
+              { name: "Negative %", values: rows.map((r) => r.negative) },
+            ],
+          }),
+          columns: [
+            { key: "source", label: "Source" },
+            { key: "mentions", label: "Mentions", align: "num" },
+            { key: "positive", label: "Positive", align: "num", fmt: pct },
+            { key: "negative", label: "Negative", align: "num", fmt: pct },
+          ],
+          form: {
+            actionLabel: "+ Log community event",
+            title: "Log community event or response",
+            sub: "Record a new sentiment source reading or community response.",
+            fields: [
+              {
+                key: "source",
+                label: "Source",
+                type: "text",
+                placeholder: "e.g. Town hall meeting",
+              },
+              {
+                key: "mentions",
+                label: "Mentions",
+                type: "number",
+                placeholder: "0",
+              },
+              {
+                key: "positive",
+                label: "Positive (%)",
+                type: "number",
+                placeholder: "0",
+              },
+              {
+                key: "negative",
+                label: "Negative (%)",
+                type: "number",
+                placeholder: "0",
+              },
+            ],
+            build: (v) => ({
+              source: v.source || "Untitled source",
+              mentions: +v.mentions || 0,
+              positive: +v.positive || 0,
+              negative: +v.negative || 0,
+            }),
+          },
+        },
+        cap: {
+          dataKey: "cap",
+          tableTitle: "Capital projects",
+          kpis: (rows) => {
+            const spent = rows.reduce((a, r) => a + r.spent, 0);
+            const roi = rows.reduce((a, r) => a + r.roi, 0) / rows.length;
+            const behind = rows.filter(
+              (r) => r.status === "Behind schedule",
+            ).length;
+            return [
+              { value: rows.length, label: "Active capital projects" },
+              { value: moneyK(spent), label: "Capital deployed to date" },
+              { value: pct(roi), label: "Avg. projected ROI" },
+              { value: behind, label: "Projects behind schedule" },
+            ];
+          },
+          chart: (rows) => ({
+            labels: rows.map((r) => r.project.split(" ")[0]),
+            series: [
+              {
+                name: "Budget ($k)",
+                values: rows.map((r) => Math.round(r.budget / 1000)),
+                fmt: (v) => "$" + v + "k",
+              },
+              {
+                name: "Spent ($k)",
+                values: rows.map((r) => Math.round(r.spent / 1000)),
+                fmt: (v) => "$" + v + "k",
+              },
+            ],
+          }),
+          columns: [
+            { key: "project", label: "Project" },
+            { key: "budget", label: "Budget", align: "num", fmt: money },
+            {
+              key: "pct",
+              label: "% Complete",
+              align: "num",
+              fmt: (v) => v + "%",
+            },
+            { key: "roi", label: "Projected ROI", align: "num", fmt: pct },
+            {
+              key: "status",
+              label: "Status",
+              fmt: (v) =>
+                v === "On schedule"
+                  ? '<span class="tag">On schedule</span>'
+                  : '<span class="tag dim">Behind schedule</span>',
+            },
+          ],
+          form: {
+            actionLabel: "+ Log project update",
+            title: "Log capital project update",
+            sub: "Add a new capital project or refresh an existing one’s progress.",
+            fields: [
+              {
+                key: "project",
+                label: "Project name",
+                type: "text",
+                placeholder: "e.g. Solar Retrofit Program",
+              },
+              {
+                key: "budget",
+                label: "Budget ($)",
+                type: "number",
+                placeholder: "0",
+              },
+              {
+                key: "spent",
+                label: "Spent to date ($)",
+                type: "number",
+                placeholder: "0",
+              },
+              {
+                key: "pct",
+                label: "% Complete",
+                type: "number",
+                placeholder: "0",
+              },
+              {
+                key: "roi",
+                label: "Projected ROI (%)",
+                type: "number",
+                placeholder: "0",
+              },
+              {
+                key: "status",
+                label: "Status",
+                type: "select",
+                options: ["On schedule", "Behind schedule"],
+              },
+            ],
+            build: (v) => ({
+              project: v.project || "Untitled project",
+              budget: +v.budget || 0,
+              spent: +v.spent || 0,
+              pct: +v.pct || 0,
+              roi: +v.roi || 0,
+              status: v.status || "On schedule",
+            }),
+          },
+          rowAction: {
+            label: "Flag for board review",
+            apply: () => toast("Project flagged for the next board panel."),
+          },
+        },
+        partners: {
+          dataKey: "partners",
+          tableTitle: "Corporate partners",
+          kpis: (rows) => {
+            const intern = rows.reduce((a, r) => a + r.internships, 0),
+              hires = rows.reduce((a, r) => a + r.hires, 0);
+            const renew = rows.filter((r) => r.status === "Renewal due").length;
+            return [
+              { value: rows.length, label: "Active partners" },
+              { value: intern, label: "Internship placements" },
+              { value: hires, label: "Employment placements (12mo)" },
+              { value: renew, label: "Contracts due for renewal" },
+            ];
+          },
+          chart: (rows) => ({
+            labels: rows.map((r) => r.partner.split(" ")[0]),
+            series: [
+              { name: "Internships", values: rows.map((r) => r.internships) },
+              { name: "Hires", values: rows.map((r) => r.hires) },
+            ],
+          }),
+          columns: [
+            { key: "partner", label: "Partner" },
+            { key: "industry", label: "Industry" },
+            { key: "internships", label: "Internships", align: "num" },
+            { key: "hires", label: "Hires (12mo)", align: "num" },
+            { key: "contractEnd", label: "Contract end" },
+            {
+              key: "status",
+              label: "Status",
+              fmt: (v) =>
+                v === "Active"
+                  ? '<span class="tag">Active</span>'
+                  : '<span class="tag dim">Renewal due</span>',
+            },
+          ],
+          form: {
+            actionLabel: "+ Add corporate partner",
+            title: "Add corporate partner",
+            sub: "Track a new employer relationship, internship pipeline or placement contract.",
+            fields: [
+              {
+                key: "partner",
+                label: "Partner name",
+                type: "text",
+                placeholder: "e.g. Cascade Manufacturing Co.",
+              },
+              {
+                key: "industry",
+                label: "Industry",
+                type: "text",
+                placeholder: "e.g. Manufacturing",
+              },
+              {
+                key: "internships",
+                label: "Internships",
+                type: "number",
+                placeholder: "0",
+              },
+              {
+                key: "hires",
+                label: "Hires (12mo)",
+                type: "number",
+                placeholder: "0",
+              },
+              {
+                key: "contractEnd",
+                label: "Contract end",
+                type: "text",
+                placeholder: "e.g. Dec 2027",
+              },
+            ],
+            build: (v) => ({
+              partner: v.partner || "Untitled partner",
+              industry: v.industry || "—",
+              internships: +v.internships || 0,
+              hires: +v.hires || 0,
+              contractEnd: v.contractEnd || "—",
+              status: "Active",
+            }),
+          },
+          rowAction: {
+            label: "Send renewal reminder",
+            apply: () => toast("Renewal reminder sent to partner liaison."),
+          },
+        },
+        alum: {
+          dataKey: "alum",
+          tableTitle: "Fundraising campaigns",
+          kpis: (rows) => {
+            const raised = rows.reduce((a, r) => a + r.raised, 0),
+              goal = rows.reduce((a, r) => a + r.goal, 0),
+              donors = rows.reduce((a, r) => a + r.donors, 0);
+            return [
+              { value: moneyK(raised), label: "Raised year-to-date" },
+              { value: num(donors), label: "Active donors" },
+              { value: money(raised / donors), label: "Average gift" },
+              {
+                value: pct((raised / goal) * 100),
+                label: "Combined goal progress",
+              },
+            ];
+          },
+          chart: (rows) => ({
+            labels: rows.map((r) => r.campaign.split(" ")[0]),
+            series: [
+              {
+                name: "Goal ($k)",
+                values: rows.map((r) => Math.round(r.goal / 1000)),
+                fmt: (v) => "$" + v + "k",
+              },
+              {
+                name: "Raised ($k)",
+                values: rows.map((r) => Math.round(r.raised / 1000)),
+                fmt: (v) => "$" + v + "k",
+              },
+            ],
+          }),
+          columns: [
+            { key: "campaign", label: "Campaign" },
+            { key: "goal", label: "Goal", align: "num", fmt: money },
+            { key: "raised", label: "Raised", align: "num", fmt: money },
+            { key: "donors", label: "Donors", align: "num" },
+            { key: "deadline", label: "Deadline" },
+          ],
+          form: {
+            actionLabel: "+ Log donation / pledge",
+            title: "Log donation or pledge",
+            sub: "Record a new gift or start tracking a new fundraising campaign.",
+            fields: [
+              {
+                key: "campaign",
+                label: "Campaign",
+                type: "text",
+                placeholder: "e.g. Nursing Simulation Lab Fund",
+              },
+              {
+                key: "goal",
+                label: "Goal ($)",
+                type: "number",
+                placeholder: "0",
+              },
+              {
+                key: "raised",
+                label: "Raised so far ($)",
+                type: "number",
+                placeholder: "0",
+              },
+              {
+                key: "donors",
+                label: "Donor count",
+                type: "number",
+                placeholder: "0",
+              },
+              {
+                key: "deadline",
+                label: "Deadline",
+                type: "text",
+                placeholder: "e.g. May 2027",
+              },
+            ],
+            build: (v) => ({
+              campaign: v.campaign || "Untitled campaign",
+              goal: +v.goal || 0,
+              raised: +v.raised || 0,
+              donors: +v.donors || 0,
+              deadline: v.deadline || "—",
+            }),
+          },
+          rowAction: {
+            label: "Send donor thank-you",
+            apply: () => toast("Thank-you correspondence queued for donors."),
+          },
+        },
+      };
+
+      /* ============================= SPECIAL VIEW: DASHBOARD ============================= */
+      function renderDashboard() {
+        const rev = state.pl.reduce((a, r) => a + r.revenue, 0),
+          sp = state.pl.reduce((a, r) => a + r.spend, 0);
+        const fc = state.enf.reduce((a, r) => a + r.forecast, 0);
+        const openRisks = state.risks.filter(
+          (r) => r.status !== "Mitigated",
+        ).length;
+        const compAvg =
+          state.comp.reduce((a, r) => a + r.readiness, 0) / state.comp.length;
+        const pendingOverrides = state.overrides.filter(
+          (o) => o.status === "Pending",
+        ).length;
+
+        const cards = [
+          { id: "pl", metric: moneyK(rev - sp), label: "Net position" },
+          { id: "enf", metric: num(fc), label: "Projected fall intake" },
+          { id: "sib", metric: "#2 of 6", label: "Network rank" },
+          {
+            id: "aca",
+            metric: pct(
+              state.aca.reduce((a, r) => a + r.pass, 0) / state.aca.length,
+            ),
+            label: "Avg. pass ratio",
+          },
+          { id: "comp", metric: pct(compAvg), label: "Audit readiness" },
+          { id: "brief", metric: state.briefs.length, label: "Briefs on file" },
+          { id: "risks", metric: openRisks, label: "Open risks" },
+          { id: "schol", metric: "1.4x", label: "Scholarship ROI" },
+          { id: "mkt", metric: "23%", label: "Regional share" },
+          { id: "sent", metric: "7.4/10", label: "Trust index" },
+          {
+            id: "cap",
+            metric: moneyK(state.cap.reduce((a, r) => a + r.spent, 0)),
+            label: "Capital deployed",
+          },
+          {
+            id: "partners",
+            metric: state.partners.length,
+            label: "Active partners",
+          },
+          {
+            id: "alum",
+            metric: moneyK(state.alum.reduce((a, r) => a + r.raised, 0)),
+            label: "Raised YTD",
+          },
+          {
+            id: "decks",
+            metric: state.decks.length,
+            label: "Board panels built",
+          },
+          {
+            id: "overrides",
+            metric: pendingOverrides,
+            label: "Pending approvals",
+          },
+        ];
+
+        return `
+    <div class="dash-strip kpi-row">
+      <div class="kpi"><div class="num">${moneyK(rev - sp)}</div><div class="label">Net financial position</div></div>
+      <div class="kpi"><div class="num">${openRisks}</div><div class="label">Open strategic risks</div></div>
+      <div class="kpi"><div class="num">${pct(compAvg)}</div><div class="label">Regulatory readiness</div></div>
+      <div class="kpi"><div class="num">${pendingOverrides}</div><div class="label">Awaiting your approval</div></div>
+    </div>
+    <div class="section-head"><h2>All modules</h2><span class="hint">15 areas of oversight · click any card to open</span></div>
+    <div class="dash-grid">
+      ${cards
+        .map((c) => {
+          const t = TITLES[c.id];
+          const nav = NAV.find((n) => n.id === c.id);
+          return `<div class="dash-card" onclick="navigate('${c.id}')">
+          <div class="mono">${nav.mono}</div>
+          <h4>${t.title}</h4>
+          <p>${t.desc}</p>
+          <div class="metric">${c.metric}</div>
+          <div class="metric-label">${c.label}</div>
+        </div>`;
+        })
+        .join("")}
+    </div>
+  `;
+      }
+
+      /* ============================= SPECIAL VIEW: BRIEFING GENERATOR ============================= */
+      const BRIEF_SECTIONS = [
+        "P&L Aggregators",
+        "Strategic Enrollment Forecasts",
+        "Sibling College Benchmarks",
+        "Academic Success Dashboards",
+        "Regulatory Compliance Scorecards",
+        "Strategic Risk Registers",
+        "Scholarship ROI Analytics",
+        "Market Share Comparators",
+        "Capital Investment Trackers",
+      ];
+
+      function renderBrief() {
+        return `
+    <div class="section-head"><h2>Briefs on file</h2><span class="hint">${state.briefs.length} generated</span></div>
+    ${renderBriefTable()}
+  `;
+      }
+      function renderBriefTable() {
+        if (!state.briefs.length)
+          return `<div class="empty">No briefs generated yet. Use “Generate briefing” above to create one.</div>`;
+        return `<div class="table-wrap"><table class="ledger"><thead><tr>
+    <th>Period</th><th>Sections</th><th>Format</th><th>Generated</th><th>Status</th>
+  </tr></thead><tbody>
+    ${state.briefs
+      .map(
+        (b, i) => `<tr onclick="openBriefDetail(${i})">
+      <td>${b.period}</td>
+      <td>${b.sections.length} sections</td>
+      <td>${b.format}</td>
+      <td>${b.generated}</td>
+      <td>${b.status === "Ready" ? '<span class="tag">Ready</span>' : '<span class="tag dim">Generating…</span>'}</td>
+    </tr>`,
+      )
+      .join("")}
+  </tbody></table></div>`;
+      }
+      function openBriefModal() {
+        $("#modal-root").innerHTML =
+          `<div class="overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <h3>Generate briefing</h3>
+      <div class="sub">Compile a summarized update from live campus performance data.</div>
+      <form onsubmit="submitBrief(event)">
+        <div class="field"><label>Period label</label><input name="period" required placeholder="e.g. September 2026 Monthly"></div>
+        <div class="field"><label>Sections to include</label>
+          <div class="check-grid">
+            ${BRIEF_SECTIONS.map((s, i) => `<label class="check-row"><input type="checkbox" name="sec" value="${s}" ${i < 3 ? "checked" : ""}> ${s}</label>`).join("")}
+          </div>
+        </div>
+        <div class="field"><label>Format</label>
+          <select name="format"><option>PDF</option><option>DOCX</option></select>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
+          <button type="submit" class="btn">Generate briefing</button>
+        </div>
+      </form>
+    </div>
+  </div>`;
+      }
+      function submitBrief(e) {
+        e.preventDefault();
+        const f = e.target;
+        const period = f.period.value;
+        const sections = Array.from(
+          f.querySelectorAll('input[name="sec"]:checked'),
+        ).map((c) => c.value);
+        const format = f.format.value;
+        if (!sections.length) {
+          toast("Select at least one section.");
+          return;
+        }
+        const brief = {
+          period,
+          sections,
+          format,
+          status: "Generating…",
+          generated: "—",
+        };
+        state.briefs.unshift(brief);
+        closeModal();
+        if (state.active === "brief") renderContent();
+        toast("Compiling briefing…");
+        setTimeout(() => {
+          brief.status = "Ready";
+          brief.generated = "Sep 2026";
+          if (state.active === "brief") renderContent();
+          toast("Briefing ready to download.");
+        }, 1500);
+      }
+      function openBriefDetail(i) {
+        const b = state.briefs[i];
+        $("#drawer-root").innerHTML =
+          `<div class="drawer-overlay" onclick="if(event.target===this)closeDrawer()">
+    <div class="drawer">
+      <div class="drawer-top"><div><div class="eyebrow">Executive briefing</div><h3>${b.period}</h3></div><button class="close-x" onclick="closeDrawer()">&times;</button></div>
+      <div class="kv"><span class="k">Format</span><span class="v">${b.format}</span></div>
+      <div class="kv"><span class="k">Generated</span><span class="v">${b.generated}</span></div>
+      <div class="kv"><span class="k">Status</span><span class="v">${b.status}</span></div>
+      <div class="section-head" style="margin-top:26px;"><h2 style="font-size:15px;">Outline</h2></div>
+      <ul class="slide-list">
+        ${b.sections.map((s, idx) => `<li><span class="num">${String(idx + 1).padStart(2, "0")}</span>${s}</li>`).join("")}
+      </ul>
+      <div class="drawer-actions">
+        ${b.status === "Ready" ? `<button class="btn" onclick="toast('Download started: ${b.period.replace(/\\s+/g, "_")}.${b.format.toLowerCase()}')">Download ${b.format}</button>` : `<button class="btn" disabled style="opacity:.5;cursor:default;">Compiling…</button>`}
+        <button class="btn btn-outline" onclick="closeDrawer()">Close</button>
+      </div>
+    </div>
+  </div>`;
+      }
+
+      /* ============================= SPECIAL VIEW: BOARD PANEL BUILDER ============================= */
+      const DECK_MODULES = [
+        "pl",
+        "enf",
+        "sib",
+        "aca",
+        "comp",
+        "risks",
+        "schol",
+        "mkt",
+        "sent",
+        "cap",
+        "partners",
+        "alum",
+      ];
+
+      function renderDecks() {
+        return `
+    <div class="section-head"><h2>Board panels</h2><span class="hint">${state.decks.length} built</span></div>
+    ${
+      state.decks.length
+        ? `<div class="table-wrap"><table class="ledger"><thead><tr>
+      <th>Title</th><th>Meeting date</th><th>Modules</th><th>Status</th>
+    </tr></thead><tbody>
+      ${state.decks
+        .map(
+          (d, i) => `<tr onclick="openDeckDetail(${i})">
+        <td>${d.title}</td><td>${d.date}</td><td>${d.modules.length} modules</td>
+        <td>${d.status === "Final" ? '<span class="tag">Final</span>' : '<span class="tag dim">Draft</span>'}</td>
+      </tr>`,
+        )
+        .join("")}
+    </tbody></table></div>`
+        : `<div class="empty">No panels built yet. Use “Build new panel” above.</div>`
+    }
+  `;
+      }
+      function openDeckModal() {
+        $("#modal-root").innerHTML =
+          `<div class="overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <h3>Build new panel</h3>
+      <div class="sub">Pull real-time chart data from any module into a board presentation.</div>
+      <form onsubmit="submitDeck(event)">
+        <div class="field"><label>Panel title</label><input name="title" required placeholder="e.g. Q3 FY26 Board Meeting"></div>
+        <div class="field"><label>Meeting date</label><input name="date" required placeholder="e.g. 14 Oct 2026"></div>
+        <div class="field"><label>Modules to include</label>
+          <div class="check-grid">
+            ${DECK_MODULES.map((m, i) => `<label class="check-row"><input type="checkbox" name="mod" value="${m}" ${i < 3 ? "checked" : ""}> ${TITLES[m].title}</label>`).join("")}
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
+          <button type="submit" class="btn">Draft panel</button>
+        </div>
+      </form>
+    </div>
+  </div>`;
+      }
+      function submitDeck(e) {
+        e.preventDefault();
+        const f = e.target;
+        const modules = Array.from(
+          f.querySelectorAll('input[name="mod"]:checked'),
+        ).map((c) => c.value);
+        if (!modules.length) {
+          toast("Select at least one module.");
+          return;
+        }
+        state.decks.unshift({
+          title: f.title.value,
+          date: f.date.value,
+          modules,
+          status: "Draft",
+        });
+        closeModal();
+        if (state.active === "decks") renderContent();
+        toast("Panel drafted.");
+      }
+      function deckSlideSnapshot(mod) {
+        const cfg = FEATURES[mod];
+        if (!cfg) return TITLES[mod].title;
+        const kpi = cfg.kpis(state[cfg.dataKey])[0];
+        return `${TITLES[mod].title} — ${kpi.value} ${kpi.label.toLowerCase()}`;
+      }
+      function openDeckDetail(i) {
+        const d = state.decks[i];
+        $("#drawer-root").innerHTML =
+          `<div class="drawer-overlay" onclick="if(event.target===this)closeDrawer()">
+    <div class="drawer">
+      <div class="drawer-top"><div><div class="eyebrow">Board panel</div><h3>${d.title}</h3></div><button class="close-x" onclick="closeDrawer()">&times;</button></div>
+      <div class="kv"><span class="k">Meeting date</span><span class="v">${d.date}</span></div>
+      <div class="kv"><span class="k">Status</span><span class="v">${d.status}</span></div>
+      <div class="section-head" style="margin-top:26px;"><h2 style="font-size:15px;">Generated slides</h2></div>
+      <ul class="slide-list">
+        ${d.modules.map((m, idx) => `<li><span class="num">${String(idx + 1).padStart(2, "0")}</span>${deckSlideSnapshot(m)}</li>`).join("")}
+      </ul>
+      <div class="drawer-actions">
+        <button class="btn" onclick="toast('Panel exported to PDF.')">Export to PDF</button>
+        ${d.status !== "Final" ? `<button class="btn btn-outline" onclick="markDeckFinal(${i})">Mark final</button>` : ""}
+        <button class="btn btn-outline" onclick="closeDrawer()">Close</button>
+      </div>
+    </div>
+  </div>`;
+      }
+      function markDeckFinal(i) {
+        state.decks[i].status = "Final";
+        closeDrawer();
+        if (state.active === "decks") renderContent();
+        toast("Panel marked final.");
+      }
+
+      /* ============================= SPECIAL VIEW: RISK REGISTER (extends generic) ============================= */
+      FEATURES.risks = {
+        dataKey: "risks",
+        tableTitle: "Risk register",
+        kpis: (rows) => [
+          {
+            value: rows.filter((r) => r.status !== "Mitigated").length,
+            label: "Active risks",
+          },
+          {
+            value: rows.filter((r) => r.severity === "High").length,
+            label: "High severity",
+          },
+          { value: "2", label: "New this month" },
+          {
+            value: rows.filter((r) => r.status === "Mitigated").length,
+            label: "Mitigated",
+          },
+        ],
+        chart: (rows) => ({
+          labels: ["High", "Medium", "Low"],
+          series: [
+            {
+              name: "Risk count",
+              values: ["High", "Medium", "Low"].map(
+                (sv) => rows.filter((r) => r.severity === sv).length,
+              ),
+            },
+          ],
+        }),
+        columns: [
+          { key: "title", label: "Risk" },
+          { key: "category", label: "Category" },
+          {
+            key: "severity",
+            label: "Severity",
+            fmt: (v) =>
+              `<span class="tag ${v === "High" ? "" : "dim"}">${v}</span>`,
+          },
+          { key: "trend", label: "Trend" },
+          { key: "owner", label: "Owner" },
+          {
+            key: "status",
+            label: "Status",
+            fmt: (v) =>
+              `<span class="tag ${v === "Mitigated" ? "dim" : ""}">${v}</span>`,
+          },
+        ],
+        form: {
+          actionLabel: "+ Log new risk",
+          title: "Log new risk",
+          sub: "Add a new item to the strategic risk register.",
+          fields: [
+            {
+              key: "title",
+              label: "Risk title",
+              type: "text",
+              placeholder: "e.g. Vendor contract lapse — IT services",
+            },
+            {
+              key: "category",
+              label: "Category",
+              type: "select",
+              options: [
+                "Staffing",
+                "Financial",
+                "Enrollment",
+                "Facilities",
+                "Compliance",
+              ],
+            },
+            {
+              key: "severity",
+              label: "Severity",
+              type: "select",
+              options: ["High", "Medium", "Low"],
+            },
+            {
+              key: "owner",
+              label: "Owner",
+              type: "text",
+              placeholder: "e.g. Finance Office",
+            },
+          ],
+          build: (v) => ({
+            title: v.title || "Untitled risk",
+            category: v.category || "Staffing",
+            severity: v.severity || "Medium",
+            trend: "Stable",
+            owner: v.owner || "Unassigned",
+            status: "Open",
+          }),
+        },
+        rowAction: {
+          label: "Mark mitigated",
+          apply: (row) => {
+            row.status = "Mitigated";
+            row.trend = "Falling";
+            toast("Risk marked mitigated.");
+          },
+        },
+      };
+
+      /* ============================= SPECIAL VIEW: COMMAND OVERRIDES ============================= */
+      function renderOverrides() {
+        const pending = state.overrides.filter(
+          (o) => o.status === "Pending",
+        ).length;
+        return `
+    <div class="kpi-row">
+      <div class="kpi"><div class="num">${pending}</div><div class="label">Pending your approval</div></div>
+      <div class="kpi"><div class="num">${state.overrides.filter((o) => o.status === "Approved").length}</div><div class="label">Approved this cycle</div></div>
+      <div class="kpi"><div class="num">${state.overrides.filter((o) => o.status === "Rejected").length}</div><div class="label">Rejected this cycle</div></div>
+      <div class="kpi"><div class="num">${state.overrides.length}</div><div class="label">Total requests on file</div></div>
+    </div>
+    <div class="section-head"><h2>Approval queue</h2><span class="hint">Click a row for full detail</span></div>
+    <div class="table-wrap"><table class="ledger"><thead><tr>
+      <th>Type</th><th>Requested by</th><th>Amount</th><th>Reason</th><th>Status</th><th></th>
+    </tr></thead><tbody>
+      ${state.overrides
+        .map(
+          (o, i) => `<tr onclick="openOverrideDetail(${i})">
+        <td>${o.type}</td>
+        <td>${o.requestor}</td>
+        <td class="num">${o.amount}</td>
+        <td>${o.reason}</td>
+        <td>${overrideTag(o.status)}</td>
+        <td class="row-actions">
+          ${
+            o.status === "Pending"
+              ? `
+            <button class="btn btn-small" onclick="event.stopPropagation();quickDecision(${i},'Approved')">Approve</button>
+            <button class="btn btn-outline btn-small" onclick="event.stopPropagation();openOverrideDetail(${i},true)">Reject</button>
+          `
+              : ""
+          }
+        </td>
+      </tr>`,
+        )
+        .join("")}
+    </tbody></table></div>
+  `;
+      }
+      function overrideTag(s) {
+        if (s === "Pending") return '<span class="tag dim">Pending</span>';
+        if (s === "Approved") return '<span class="tag">Approved</span>';
+        return '<span class="tag dim">Rejected</span>';
+      }
+      function quickDecision(i, decision) {
+        state.overrides[i].status = decision;
+        renderContent();
+        toast(`Request ${decision.toLowerCase()}.`);
+      }
+      function openOverrideDetail(i, focusReject) {
+        const o = state.overrides[i];
+        $("#drawer-root").innerHTML =
+          `<div class="drawer-overlay" onclick="if(event.target===this)closeDrawer()">
+    <div class="drawer">
+      <div class="drawer-top"><div><div class="eyebrow">${o.type}</div><h3>${o.reason}</h3></div><button class="close-x" onclick="closeDrawer()">&times;</button></div>
+      <div class="kv"><span class="k">Requested by</span><span class="v">${o.requestor}</span></div>
+      <div class="kv"><span class="k">Amount</span><span class="v">${o.amount}</span></div>
+      <div class="kv"><span class="k">Status</span><span class="v">${o.status}</span></div>
+      ${o.status !== "Pending" && o.note ? `<div class="kv"><span class="k">Decision note</span><span class="v">${o.note}</span></div>` : ""}
+      ${
+        o.status === "Pending"
+          ? `
+        <div class="drawer-note">
+          <div class="field"><label>Decision note ${focusReject ? "(required to reject)" : "(optional for approval)"}</label>
+            <textarea id="override-note" placeholder="Add context for this decision"></textarea>
+          </div>
+        </div>
+        <div class="drawer-actions">
+          <button class="btn" onclick="decideOverride(${i},'Approved')">Approve request</button>
+          <button class="btn btn-outline" onclick="decideOverride(${i},'Rejected')">Reject request</button>
+        </div>
+      `
+          : `<div class="drawer-actions"><button class="btn btn-outline" onclick="closeDrawer()">Close</button></div>`
+      }
+    </div>
+  </div>`;
+        if (focusReject) {
+          setTimeout(() => {
+            const t = $("#override-note");
+            if (t) t.focus();
+          }, 50);
+        }
+      }
+      function decideOverride(i, decision) {
+        const note = ($("#override-note") || {}).value || "";
+        if (decision === "Rejected" && !note.trim()) {
+          toast("Add a reason before rejecting.");
+          return;
+        }
+        state.overrides[i].status = decision;
+        state.overrides[i].note = note;
+        closeDrawer();
+        renderContent();
+        toast(`Request ${decision.toLowerCase()}.`);
+      }
+
+      /* ============================= GENERIC RENDER ENGINE ============================= */
+      function renderGenericFeature(id) {
+        const cfg = FEATURES[id];
+        const rows = state[cfg.dataKey];
+        const kpis = cfg.kpis(rows);
+        const chart = cfg.chart ? cfg.chart(rows) : null;
+        return `
+    <div class="kpi-row">${kpis.map((k) => `<div class="kpi"><div class="num">${k.value}</div><div class="label">${k.label}</div>${k.delta ? `<div class="delta">${k.delta}</div>` : ""}</div>`).join("")}</div>
+    ${
+      chart
+        ? `
+      <div class="section-head"><h2>Trend</h2><span class="hint">Illustrative view across current entries</span></div>
+      <div class="chart-wrap">${barChart(id + "-chart", chart.labels, chart.series)}</div>
+      ${chart.series.length > 1 ? chartLegend(chart.series) : ""}
+    `
+        : ""
+    }
+    <div class="section-head"><h2>${cfg.tableTitle}</h2><span class="hint">${rows.length} ${rows.length === 1 ? "record" : "records"} · click a row for detail</span></div>
+    ${renderTable(cfg, rows)}
+  `;
+      }
+      function renderTable(cfg, rows) {
+        if (!rows.length)
+          return `<div class="empty">No records yet. Use the action button above to add one.</div>`;
+        const featureKey = Object.keys(FEATURES).find(
+          (k) => FEATURES[k] === cfg,
+        );
+        return `<div class="table-wrap"><table class="ledger"><thead><tr>
+    ${cfg.columns.map((c) => `<th class="${c.align === "num" ? "num" : ""}">${c.label}</th>`).join("")}
+  </tr></thead><tbody>
+    ${rows
+      .map(
+        (r, i) => `<tr onclick="openDetail('${featureKey}',${i})">
+      ${cfg.columns.map((c) => `<td class="${c.align === "num" ? "num" : ""}">${c.fmt ? c.fmt(r[c.key], r) : r[c.key]}</td>`).join("")}
+    </tr>`,
+      )
+      .join("")}
+  </tbody></table></div>`;
+      }
+      function openDetail(featureId, idx) {
+        const cfg = FEATURES[featureId];
+        const row = state[cfg.dataKey][idx];
+        const titleKey = cfg.columns[0].key;
+        $("#drawer-root").innerHTML =
+          `<div class="drawer-overlay" onclick="if(event.target===this)closeDrawer()">
+    <div class="drawer">
+      <div class="drawer-top"><div><div class="eyebrow">${TITLES[featureId].title}</div><h3>${row[titleKey]}</h3></div><button class="close-x" onclick="closeDrawer()">&times;</button></div>
+      ${cfg.columns
+        .slice(1)
+        .map(
+          (c) =>
+            `<div class="kv"><span class="k">${c.label}</span><span class="v">${c.fmt ? c.fmt(row[c.key], row) : row[c.key]}</span></div>`,
+        )
+        .join("")}
+      ${row.note ? `<div class="kv"><span class="k">Note</span><span class="v">${row.note}</span></div>` : ""}
+      <div class="drawer-actions">
+        ${cfg.rowAction ? `<button class="btn" onclick="applyRowAction('${featureId}',${idx})">${cfg.rowAction.label}</button>` : ""}
+        <button class="btn btn-outline" onclick="closeDrawer()">Close</button>
+      </div>
+    </div>
+  </div>`;
+      }
+      function applyRowAction(featureId, idx) {
+        const cfg = FEATURES[featureId];
+        const row = state[cfg.dataKey][idx];
+        cfg.rowAction.apply(row, idx);
+        closeDrawer();
+        if (state.active === featureId) renderContent();
+      }
+      function openAddModal(featureId) {
+        const cfg = FEATURES[featureId];
+        const form = cfg.form;
+        $("#modal-root").innerHTML =
+          `<div class="overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <h3>${form.title}</h3>
+      <div class="sub">${form.sub}</div>
+      <form onsubmit="submitAdd(event,'${featureId}')">
+        ${form.fields
+          .map((f) => {
+            if (f.type === "select") {
+              return `<div class="field"><label>${f.label}</label><select name="${f.key}">${f.options.map((o) => `<option>${o}</option>`).join("")}</select></div>`;
+            }
+            if (f.type === "textarea") {
+              return `<div class="field"><label>${f.label}</label><textarea name="${f.key}" placeholder="${f.placeholder || ""}"></textarea></div>`;
+            }
+            return `<div class="field"><label>${f.label}</label><input name="${f.key}" type="${f.type}" ${f.step ? `step="${f.step}"` : ""} placeholder="${f.placeholder || ""}"></div>`;
+          })
+          .join("")}
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
+          <button type="submit" class="btn">${form.actionLabel.replace("+ ", "").replace(/^./, (c) => c.toUpperCase())}</button>
+        </div>
+      </form>
+    </div>
+  </div>`;
+      }
+      function submitAdd(e, featureId) {
+        e.preventDefault();
+        const cfg = FEATURES[featureId];
+        const f = e.target;
+        const values = {};
+        cfg.form.fields.forEach((fl) => {
+          values[fl.key] = f[fl.key] ? f[fl.key].value : "";
+        });
+        const row = cfg.form.build(values);
+        state[cfg.dataKey].unshift(row);
+        closeModal();
+        if (state.active === featureId) renderContent();
+        toast("Added successfully.");
+      }
+
+      /* ============================= TOP-LEVEL RENDER ============================= */
+      function renderSidebar() {
+        $("#sidebar").innerHTML = `
+    <div class="brand">
+      <div class="brand-mark">ING College OS</div>
+      <div class="brand-sub">College CEO Console — Northgate College</div>
+    </div>
+    <nav class="nav">
+      ${NAV.map((n) => `<button class="nav-item" data-id="${n.id}" onclick="navigate('${n.id}')"><span class="nav-mono">${n.mono}</span>${n.label}</button>`).join("")}
+    </nav>
+    <div class="sidebar-foot">
+      <div class="who">Signed in as College CEO</div>
+      Northgate College · ING Network
+    </div>
+  `;
+      }
+      function renderTopbar() {
+        const t = TITLES[state.active];
+        let actionsHtml = "";
+        if (FEATURES[state.active] && FEATURES[state.active].form) {
+          actionsHtml = `<button class="btn" onclick="openAddModal('${state.active}')">${FEATURES[state.active].form.actionLabel}</button>`;
+        } else if (state.active === "brief") {
+          actionsHtml = `<button class="btn" onclick="openBriefModal()">+ Generate briefing</button>`;
+        } else if (state.active === "decks") {
+          actionsHtml = `<button class="btn" onclick="openDeckModal()">+ Build new panel</button>`;
+        } else if (state.active === "overrides") {
+          const pending = state.overrides.filter(
+            (o) => o.status === "Pending",
+          ).length;
+          actionsHtml = `<span class="pill-count">${pending} pending</span>`;
+        }
+        $("#topbar").innerHTML = `
+    <div>
+      <div class="title-row"><button class="menu-btn" onclick="toggleSidebar()">&#9776;</button><h1>${t.title}</h1></div>
+      <div class="desc">${t.desc}</div>
+    </div>
+    <div class="actions">${actionsHtml}</div>
+  `;
+      }
+      function renderContent() {
+        let html = "";
+        if (state.active === "dashboard") html = renderDashboard();
+        else if (state.active === "brief") html = renderBrief();
+        else if (state.active === "decks") html = renderDecks();
+        else if (state.active === "overrides") html = renderOverrides();
+        else if (FEATURES[state.active])
+          html = renderGenericFeature(state.active);
+        $("#content").innerHTML = html;
+      }
+      function navigate(id) {
+        state.active = id;
+        document.querySelectorAll(".nav-item").forEach((el) => {
+          el.classList.toggle("active", el.getAttribute("data-id") === id);
+        });
+        renderTopbar();
+        renderContent();
+        closeModal();
+        closeDrawer();
+        document.getElementById("sidebar").classList.remove("open");
+        window.scrollTo(0, 0);
+      }
+      function toggleSidebar() {
+        document.getElementById("sidebar").classList.toggle("open");
+      }
+
+      /* ============================= INIT ============================= */
+      renderSidebar();
+      navigate("dashboard");
+    </script>
+  </body>
+</html>
